@@ -1,4 +1,7 @@
 <?php
+
+require "nocache.php";
+
 // Initialize the session
 session_start();
 // Check if the user is already logged in, if yes then redirect him to welcome page
@@ -118,17 +121,20 @@ $dbHandler->close();
             <div id="login-column" class="col-md-6">
                 <div class="col-md-12 box">
                     <h2>Login Akun</h2>
-                    <form class="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                        <input type="hidden" name="token" value="<?php echo $token ?>">
-                        <div class="form-group <?php echo (!empty($username_err)) ? 'has-error' : ''; ?>">
+                    <form class="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"], ENT_QUOTES, 'UTF-8'); ?>" method="post">
+                        <input type="hidden" name="token" value="<?php echo htmlspecialchars($token, ENT_QUOTES, 'UTF-8'); ?>">
+                        <div class="form-group <?php echo htmlspecialchars((!empty($username_err)) ? 'has-error' : '', ENT_QUOTES, 'UTF-8'); ?>">
                             <label id="p">Username :</label>
-                            <input type="text" name="username" class="form-control" value="<?php echo $username; ?>">
-                            <span class="help-block"><?php echo $username_err; ?></span>
+                            <input type="text" name="username" class="form-control" value="<?php echo htmlspecialchars($username, ENT_QUOTES, 'UTF-8'); ?>">
+                            <span class="help-block"><?php echo htmlspecialchars($username_err, ENT_QUOTES, 'UTF-8'); ?></span>
                         </div>
-                        <div class="form-group <?php echo (!empty($password_err)) ? 'has-error' : ''; ?>">
+                        <div class="form-group <?php echo
+                                                    htmlspecialchars((!empty($password_err)) ? 'has-error' : '', ENT_QUOTES, 'UTF-8');
+                                                ?>">
                             <label>Password :</label>
                             <input type="password" name="password" class="form-control">
-                            <span class="help-block"><?php echo $password_err; ?></span>
+                            <span class="help-block"><?php echo
+                                                            htmlspecialchars($password_err, ENT_QUOTES, 'UTF-8'); ?></span>
                         </div>
                         <div class="form-group">
                             <button type="submit" name="submit" class="btn">Masuk</button>

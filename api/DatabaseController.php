@@ -85,7 +85,7 @@ class DatabaseController
 
     function errorHandler()
     {
-        echo "Oops, something is going wrong. Please try again later";
+        echo htmlspecialchars("Oops, something is going wrong. Please try again later", ENT_QUOTES, 'UTF-8');
         $this->close();
     }
 }

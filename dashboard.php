@@ -1,4 +1,6 @@
 <?php
+// https://phpsecurity.readthedocs.io/en/latest/Cross-Site-Scripting-(XSS).html
+require "nocache.php";
 // Initialize the session
 session_start();
 
@@ -31,7 +33,7 @@ if ($fetchResult) {
 
 <head>
 
-  <meta name="token" content="<?php echo $token ?>" />
+  <meta name="token" content="<?php echo htmlspecialchars($token, ENT_QUOTES, 'UTF-8'); ?>" />
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -49,7 +51,7 @@ if ($fetchResult) {
   <!-- Bootstrap CSS CDN -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous" />
   <!-- Our Custom CSS -->
-  <link href="style/style.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" type="text/css" href="style/style.css?<?php echo date('l jS \of F Y h:i:s A'); ?>" />
   <!-- Scrollbar Custom CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css" />
 
@@ -124,11 +126,11 @@ if ($fetchResult) {
     </nav>
     <!-- Page Content  -->
     <div id="content">
-      <input type="text" id="mydatepicker" />
+      <!-- <input type="text" id="mydatepicker" /> -->
       <?php
       if ($deviceBelonging) {
         if ($deviceBelongingType == "main") {
-          //require "pagecon/main-device.php";
+          require "pagecon/main-device.php";
         }
       } else {
         require "pagecon/no-device-found.php";

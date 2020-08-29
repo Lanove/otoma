@@ -1,7 +1,7 @@
 <div class="container-fluid" id="bigdevicebox">
     <!-- Box gedi perangkat -->
     <div class="row" id="deviceheader">
-        <dummy></dummy>
+        <dummy class=""></dummy>
         <div class="col-12 d-inline-flex align-items-center">
             <div class="dropdown">
                 <a href="#" data-toggle="dropdown">
@@ -39,24 +39,36 @@
                 <div class="row content">
                     <div class="col-12">
                         <!-- Row 1 Content -->
+                        <div class="row timerInput">
+                            <div class="col-12 d-inline-flex align-items-center">
+                                <div class="p">
+                                    Atur timer :
+                                </div>
+                                <div class="ml-auto">
+                                    <input type="text" id="t1" readonly="readonly">
+                                </div>
+                                <button id="timerButton" class="btn">Pause</button>
+                                <button id="timerButton" class="btn">Reset</button>
+                            </div>
+                        </div>
+                        <!-- Row 2 Content -->
+                        <div class="row">
+                            <div class="col-12 d-inline-flex align-items-center">
+                                <div class="progBar">
+                                    <div id="progBar1">
+                                        Tidak ada timer
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Row 3 Content -->
                         <div class="row">
                             <div class="col-12 d-inline-flex align-items-center">
                                 <div class="p">
                                     Pemakaian Daya :
                                 </div>
                                 <div class="p ml-auto">
-                                    0.0W
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Row 2 Content -->
-                        <div class="row">
-                            <div class="col-12 d-inline-flex align-items-center">
-                                <div class="p">
-                                    Jadwal Nyala Selanjutnya :
-                                </div>
-                                <div class="p ml-auto">
-                                    17:20:00
+                                    1.0W
                                 </div>
                             </div>
                         </div>
@@ -82,17 +94,41 @@
                         </div>
                     </div>
                 </div>
+
                 <!-- Device status box content -->
                 <div class="row content">
                     <div class="col-12">
                         <!-- Row 1 Content -->
+                        <div class="row timerInput">
+                            <div class="col-12 d-inline-flex align-items-center">
+                                <div class="p">
+                                    Atur timer :
+                                </div>
+                                <div class="ml-auto">
+                                    <input type="text" id="t2" readonly="readonly">
+                                </div>
+                                <button id="timerButton" class="btn">Pause</button>
+                                <button id="timerButton" class="btn">Reset</button>
+                            </div>
+                        </div>
+                        <!-- Row 2 Content -->
+                        <div class="row">
+                            <div class="col-12 d-inline-flex align-items-center">
+                                <div class="progBar">
+                                    <div id="progBar2">
+                                        Tidak ada timer
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Row 3 Content -->
                         <div class="row">
                             <div class="col-12 d-inline-flex align-items-center">
                                 <div class="p">
                                     Pemakaian Daya :
                                 </div>
                                 <div class="p ml-auto">
-                                    230.5W
+                                    1.0W
                                 </div>
                             </div>
                         </div>
@@ -126,24 +162,36 @@
                 <div class="row content">
                     <div class="col-12">
                         <!-- Row 1 Content -->
+                        <div class="row timerInput">
+                            <div class="col-12 d-inline-flex align-items-center">
+                                <div class="p">
+                                    Atur timer :
+                                </div>
+                                <div class="ml-auto">
+                                    <input type="text" id="t3" readonly="readonly">
+                                </div>
+                                <button id="timerButton" class="btn">Pause</button>
+                                <button id="timerButton" class="btn">Reset</button>
+                            </div>
+                        </div>
+                        <!-- Row 2 Content -->
+                        <div class="row">
+                            <div class="col-12 d-inline-flex align-items-center">
+                                <div class="progBar">
+                                    <div id="progBar3">
+                                        Tidak ada timer
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Row 3 Content -->
                         <div class="row">
                             <div class="col-12 d-inline-flex align-items-center">
                                 <div class="p">
                                     Pemakaian Daya :
                                 </div>
                                 <div class="p ml-auto">
-                                    35.8W
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Row 2 Content -->
-                        <div class="row">
-                            <div class="col-12 d-inline-flex align-items-center">
-                                <div class="p">
-                                    Waktu Timer Tersisa :
-                                </div>
-                                <div class="p ml-auto">
-                                    00:03:25
+                                    1.0W
                                 </div>
                             </div>
                         </div>
@@ -173,13 +221,36 @@
                 <div class="row content">
                     <div class="col-12">
                         <!-- Row 1 Content -->
+                        <div class="row timerInput">
+                            <div class="col-12 d-inline-flex align-items-center">
+                                <div class="p">
+                                    Atur timer :
+                                </div>
+                                <div class="ml-auto">
+                                    <input type="text" id="t4" readonly="readonly">
+                                </div>
+                                <button id="timerButton" class="btn">Pause</button>
+                                <button id="timerButton" class="btn">Reset</button>
+                            </div>
+                        </div>
+                        <!-- Row 2 Content -->
+                        <div class="row">
+                            <div class="col-12 d-inline-flex align-items-center">
+                                <div class="progBar">
+                                    <div id="progBar4">
+                                        Tidak ada timer
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Row 3 Content -->
                         <div class="row">
                             <div class="col-12 d-inline-flex align-items-center">
                                 <div class="p">
                                     Pemakaian Daya :
                                 </div>
                                 <div class="p ml-auto">
-                                    40.2W
+                                    1.0W
                                 </div>
                             </div>
                         </div>

@@ -8,6 +8,9 @@
   --statusbox-color: #69b3b3;
   --text-color1: rgb(233, 233, 233);
   --switch-on-color: #0275d8;
+  --progbar-bg-color:#b1cac7;
+  --progbar-bar-color:#28c7bf;
+  --myblack:	#16252a;
 }
 
 @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
@@ -72,6 +75,7 @@ body {
   text-decoration: none;
   transition: all 0.3s;
 }
+
 #dashboard .navbar {
   background-color: var(--third-color);
   border: none;
@@ -274,6 +278,7 @@ body {
   position: relative;
   top: 0px;
   left: 5px;
+  white-space:none;
 }
 #dashboard #deviceheader .cog {
   font-size: 2rem;
@@ -303,21 +308,70 @@ body {
   font-size: 1.25rem;
   position: relative;
   top: 0px;
+  white-space:none;
 }
 #dashboard .device-status-box .header .setting {
   margin-right: 10px;
   font-size: 1.5rem;
-  position: relative;
-  top: -7.5px;
+  position: absolute;
+  top: 5px;
+  right:15px;
 }
 #dashboard .device-status-box .header .switch {
   margin-right: 20px;
-  position: relative;
-  top: -5px;
+  position: absolute;
+  top: 7.5px;
+  right:45px;
 }
 #dashboard .device-status-box .content {
   padding: 10px;
 }
+#dashboard .device-status-box .content .progBar{
+  width: 100%;
+  background-color: var(--progbar-bg-color);
+  border-radius:5px;
+  padding:3px;
+  margin-top:5px;
+  margin-bottom:5px;
+}
+#dashboard .device-status-box .content .progBar div {
+  /* width: 10%; */
+  height: 24px;
+  border-radius:5px;
+  background-color: var(--progbar-bar-color);
+  text-align: center; /* To center it horizontally (if you want) */
+  color: var(--text-color1);
+  white-space:nowrap;
+  transition: width 0.5s;
+}
+#dashboard .device-status-box .content .timerInput input[type=text]{
+  max-width:135px;
+  background-color: var(--text-color1);
+  
+  font-family: "Poppins", sans-serif;
+  font-size: 1em;
+  font-weight: 300;
+  line-height: 1.2em;
+  color:var(--myblack);
+  
+  min-height:30px;
+  max-height:30px;
+  
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  
+}
+#dashboard .device-status-box .content .timerInput #timerButton{
+  background-color: var(--progbar-bar-color);
+  color:var(--text-color1);
+  margin-left:10px;
+  max-height:34px;
+  border-color:var(--third-color);
+  padding:5px;
+}
+
 #dashboard .device-graph-box {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -342,6 +396,7 @@ body {
   position: relative;
   top: 0px;
   margin-right: 10px;
+  white-space:none;
 }
 #dashboard .device-graph-box .content {
   padding: 10px;
