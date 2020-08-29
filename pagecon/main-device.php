@@ -45,7 +45,7 @@
                                     Atur timer :
                                 </div>
                                 <div class="ml-auto">
-                                    <input type="text" id="t1" readonly="readonly">
+                                    <input type="text" id="t1" value="0h 0j 0m" readonly>
                                 </div>
                                 <button id="timerButton" class="btn">Pause</button>
                                 <button id="timerButton" class="btn">Reset</button>
@@ -105,7 +105,7 @@
                                     Atur timer :
                                 </div>
                                 <div class="ml-auto">
-                                    <input type="text" id="t2" readonly="readonly">
+                                    <input type="text" id="t2" value="0h 0j 0m" readonly>
                                 </div>
                                 <button id="timerButton" class="btn">Pause</button>
                                 <button id="timerButton" class="btn">Reset</button>
@@ -168,7 +168,7 @@
                                     Atur timer :
                                 </div>
                                 <div class="ml-auto">
-                                    <input type="text" id="t3" readonly="readonly">
+                                    <input type="text" id="t3" value="0h 0j 0m" readonly>
                                 </div>
                                 <button id="timerButton" class="btn">Pause</button>
                                 <button id="timerButton" class="btn">Reset</button>
@@ -227,7 +227,7 @@
                                     Atur timer :
                                 </div>
                                 <div class="ml-auto">
-                                    <input type="text" id="t4" readonly="readonly">
+                                    <input type="text" id="t4" value="0h 0j 0m" readonly>
                                 </div>
                                 <button id="timerButton" class="btn">Pause</button>
                                 <button id="timerButton" class="btn">Reset</button>

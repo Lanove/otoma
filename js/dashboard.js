@@ -25,24 +25,122 @@ $(document).ready(function () {
 });
 
 var deviceBelonging = document.getElementById("bigdevicebox");
-const check = setInterval(function () {
-  // Function to check every 0.1s if bondKey is available, then execute reloadStatus() and destroy itself.
-  if ($("#dashboard #deviceheader dummy").attr("class") != "") {
-    // reloadStatus();
-    reloadStatus();
-    clearInterval(check); // kill me
-  }
-}, 100);
 
 if (deviceBelonging) {
   // Check whether user had some device or not, if not then don't include the extra function that is specific for device.
   var myChart;
+
+  var oArrData = [];
+  function createDataSource() {
+    var oArrDataNum = [7, 23, 59],
+      iTempIndex1,
+      iTempIndex2;
+    for (iTempIndex1 = 0; iTempIndex1 < oArrDataNum.length; iTempIndex1++) {
+      var iNum = oArrDataNum[iTempIndex1],
+        oArrDataComp = [];
+      for (iTempIndex2 = 0; iTempIndex2 < iNum + 1; iTempIndex2++) {
+        oArrDataComp.push({
+          val: iTempIndex2.toString(),
+          label: iTempIndex2.toString(),
+        });
+      }
+      oArrData.push(oArrDataComp);
+    }
+  }
+  createDataSource();
+  var oArrComponents = [
+      {
+        component: 0,
+        name: "h",
+        label: "Hari",
+        width: "50%",
+        textAlign: "center",
+      },
+      {
+        component: 1,
+        name: "j",
+        label: "Jam",
+        width: "20%",
+        textAlign: "center",
+      },
+      {
+        component: 2,
+        name: "m",
+        label: "Menit",
+        width: "30%",
+        textAlign: "center",
+      },
+    ],
+    oArrDataSource = [
+      {
+        component: 0,
+        data: oArrData[0],
+      },
+      {
+        component: 1,
+        data: oArrData[1],
+      },
+      {
+        component: 2,
+        data: oArrData[2],
+      },
+    ];
+
+  function formatTimerInput(sElemValue) {
+    var matches = sElemValue.match(/\d+/g);
+    for (i in matches) {
+      if (
+        matches[i] === null ||
+        matches[i] === undefined ||
+        matches[i] === "" ||
+        matches[i] === "0"
+      )
+        matches[i] = "0";
+    }
+    return matches;
+  }
+
+  function formatTimerOutput(oSelectedValues) {
+    var stringBuffer = "",
+      numberPal = ["h ", "j ", "m"];
+    for (i in oSelectedValues.values) {
+      if (
+        oSelectedValues.values[i].val === null ||
+        oSelectedValues.values[i].val === undefined ||
+        oSelectedValues.values[i].val === "" ||
+        oSelectedValues.values[i].val === "0"
+      )
+        stringBuffer += "0" + numberPal[i];
+      else stringBuffer += oSelectedValues.values[i].val + numberPal[i];
+    }
+    return stringBuffer;
+  }
+
   $(document).ready(function () {
     loadDeviceInformation();
     createChart();
+    for (var a = 1; a < 5; a++) {
+      $("#t" + String(a)).AnyPicker({
+        mode: "select",
+        showComponentLabel: true,
+        components: oArrComponents,
+        dataSource: oArrDataSource,
+        parseInput: formatTimerInput,
+        formatOutput: formatTimerOutput,
+      });
+    }
+
     $(".settingDevice1").on("click", function () {
       // $("#content").html("");
     });
+    const check = setInterval(function () {
+      // Function to check every 0.1s if bondKey is available, then execute reloadStatus() and destroy itself.
+      if ($("#dashboard #deviceheader dummy").attr("class") != "") {
+        // reloadStatus();
+        reloadStatus();
+        clearInterval(check); // kill me
+      }
+    }, 100);
   });
 
   function reloadStatus() {
