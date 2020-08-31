@@ -26,7 +26,7 @@
                             <i class="fas fa-lightbulb icon"></i>
                             <p class="deviceName1 text"></p>
                             <div class="material-switch pull-right ml-auto switch">
-                                <input id="statusBoxSwitch1" type="checkbox" onclick='switchToggle(this.id)' />
+                                <input id="statusBoxSwitch1" type="checkbox" />
                                 <label for="statusBoxSwitch1" class="label-primary"></label>
                             </div>
                             <a href="#0" class="settingDevice1">
@@ -48,7 +48,7 @@
                                     <input type="text" id="t1" value="0h 0j 0m" readonly>
                                 </div>
                                 <button id="tbtns1" class="btn timerButton">Start</button>
-                                <button id="tbtnr1" class="btn timerButton">Reset</button>
+                                <button id="tbtnr1" class="btn timerButton">Stop</button>
                             </div>
                         </div>
                         <!-- Row 2 Content -->
@@ -85,7 +85,7 @@
                             <i class="fas fa-plug icon"></i>
                             <p class="deviceName2 text"></p>
                             <div class="material-switch pull-right ml-auto switch">
-                                <input id="statusBoxSwitch2" type="checkbox" onclick="switchToggle(this.id)" />
+                                <input id="statusBoxSwitch2" type="checkbox" />
                                 <label for="statusBoxSwitch2" class="label-primary"></label>
                             </div>
                             <a href="#0" class="settingDevice2">
@@ -108,7 +108,7 @@
                                     <input type="text" id="t2" value="0h 0j 0m" readonly>
                                 </div>
                                 <button id="tbtns2" class="btn timerButton">Start</button>
-                                <button id="tbtnr2" class="btn timerButton">Reset</button>
+                                <button id="tbtnr2" class="btn timerButton">Stop</button>
                             </div>
                         </div>
                         <!-- Row 2 Content -->
@@ -149,7 +149,7 @@
                             <i class="fas fa-blender icon"></i>
                             <p class="deviceName3 text"></p>
                             <div class="material-switch pull-right ml-auto switch">
-                                <input id="statusBoxSwitch3" type="checkbox" onclick="switchToggle(this.id)" />
+                                <input id="statusBoxSwitch3" type="checkbox" />
                                 <label for="statusBoxSwitch3" class="label-primary"></label>
                             </div>
                             <a href="#0" class="settingDevice3">
@@ -171,7 +171,7 @@
                                     <input type="text" id="t3" value="0h 0j 0m" readonly>
                                 </div>
                                 <button id="tbtns3" class="btn timerButton">Start</button>
-                                <button id="tbtnr3" class="btn timerButton">Reset</button>
+                                <button id="tbtnr3" class="btn timerButton">Stop</button>
                             </div>
                         </div>
                         <!-- Row 2 Content -->
@@ -208,7 +208,7 @@
                             <i class="fas fa-door-closed icon"></i>
                             <p class="deviceName4 text"></p>
                             <div class="material-switch pull-right ml-auto switch">
-                                <input id="statusBoxSwitch4" type="checkbox" onclick="switchToggle(this.id)" />
+                                <input id="statusBoxSwitch4" type="checkbox" />
                                 <label for="statusBoxSwitch4" class="label-primary"></label>
                             </div>
                             <a href="#0" class="settingDevice4">
@@ -230,7 +230,7 @@
                                     <input type="text" id="t4" value="0h 0j 0m" readonly>
                                 </div>
                                 <button id="tbtns4" class="btn timerButton">Start</button>
-                                <button id="tbtnr4" class="btn timerButton">Reset</button>
+                                <button id="tbtnr4" class="btn timerButton">Stop</button>
                             </div>
                         </div>
                         <!-- Row 2 Content -->

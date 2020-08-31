@@ -59,14 +59,14 @@ if (deviceBelonging) {
         component: 0,
         name: "h",
         label: "Hari",
-        width: "50%",
+        width: "40%",
         textAlign: "center",
       },
       {
         component: 1,
         name: "j",
         label: "Jam",
-        width: "20%",
+        width: "30%",
         textAlign: "center",
       },
       {
@@ -133,6 +133,37 @@ if (deviceBelonging) {
         dataSource: oArrDataSource,
         parseInput: formatTimerInput,
         formatOutput: formatTimerOutput,
+      });
+
+      $("#statusBoxSwitch" + a).on("click", function () {
+        switchToggle(this.id);
+      });
+
+      $("#tbtns" + a).on("click", function () {
+        var ajaxBuffer = {};
+        ajaxBuffer["val"] = $("#"+this.id).text();
+        ajaxBuffer["requestType"] = "timerButton";
+        ajaxBuffer["id"] = this.id;
+        ajaxBuffer["duration"] = $("#t" + this.id.substring(5, 6)).val();
+        ajaxBuffer["token"] = getMeta("token");
+        ajaxBuffer["masterDevice"] = $("#dashboard #deviceheader dummy").attr(
+          "class"
+        );
+        requestAJAX(ajaxBuffer, function () {
+          reloadStatus();
+        });
+      });
+      $("#tbtnr" + a).on("click", function () {
+        var ajaxBuffer = {};
+        ajaxBuffer["requestType"] = "timerButton";
+        ajaxBuffer["id"] = this.id;
+        ajaxBuffer["token"] = getMeta("token");
+        ajaxBuffer["masterDevice"] = $("#dashboard #deviceheader dummy").attr(
+          "class"
+        );
+        requestAJAX(ajaxBuffer, function () {
+          reloadStatus();
+        });
       });
     }
 
@@ -213,19 +244,28 @@ if (deviceBelonging) {
     }, 1000);
   });
 
-  function reloadStatus() {
+  function requestAJAX(jsonobject, callback = function () {}) {
     var xhr = new XMLHttpRequest();
-    var json = JSON.stringify({
-      requestType: "reloadStatus",
-      masterDevice: $("#dashboard #deviceheader dummy").attr("class"),
-      token: getMeta("token"),
-    });
+    var json = JSON.stringify(jsonobject);
     xhr.open("POST", "api/AjaxService.php");
     xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
     xhr.send(json);
     xhr.onload = function () {
       if (xhr.status == 200 && xhr.readyState == 4) {
-        var parseJson = JSON.parse(xhr.responseText);
+        callback(xhr.responseText);
+      }
+    };
+  }
+
+  function reloadStatus() {
+    requestAJAX(
+      {
+        requestType: "reloadStatus",
+        masterDevice: $("#dashboard #deviceheader dummy").attr("class"),
+        token: getMeta("token"),
+      },
+      function (response) {
+        var parseJson = JSON.parse(response);
         if (parseJson["status"]["deviceType"] == "main") {
           $("#statusBoxSwitch1").prop(
             "checked",
@@ -246,12 +286,35 @@ if (deviceBelonging) {
           var tData = [];
           for (var i = 1; i < 5; i++) {
             tData["t" + i] = parseJson["status"]["t" + i + "Data"].split("%");
-            $("#t" + i).val(tData["t" + i][4]);
             timerData["t" + i]["status"] = tData["t" + i][0];
             timerData["t" + i]["startedAt"] = tData["t" + i][1];
             timerData["t" + i]["endAt"] = tData["t" + i][2];
             timerData["t" + i]["pausedAt"] = tData["t" + i][3];
-            if (tData["t" + i][0] == "started") {
+            timerData["t" + i]["duration"] = tData["t" + i][4];
+            
+            $("#t" + i).val(timerData["t" + i]["duration"]);
+            if (timerData["t" + i]["status"] == "started") {
+              if (
+                timerData["t" + i]["startedAt"] - Math.floor(Date.now() / 1000)
+              ) {
+                // If the result of time now and started time of timer is negative, the timer is expired, update the database
+                var ajaxBuffer = {};
+                ajaxBuffer["t" + i + "Data"] =
+                  "idle%" +
+                  timerData["t" + i]["startedAt"] +
+                  "%" +
+                  timerData["t" + i]["endAt"] +
+                  "%" +
+                  timerData["t" + i]["pausedAt"] +
+                  "%" +
+                  $("#t" + i).val();
+                ajaxBuffer["requestType"] = "changeTimerStatus";
+                ajaxBuffer["token"] = getMeta("token");
+                ajaxBuffer["masterDevice"] = $(
+                  "#dashboard #deviceheader dummy"
+                ).attr("class");
+                requestAJAX(ajaxBuffer);
+              }
               $("#tbtns" + i).text("Pause");
               $("#progBar" + i).css(
                 "background-color",
@@ -267,21 +330,16 @@ if (deviceBelonging) {
           }
         }
       }
-    };
+    );
   }
-
   function loadDeviceInformation() {
-    var xhr = new XMLHttpRequest();
-    var json = JSON.stringify({
-      requestType: "loadDeviceInformation",
-      token: getMeta("token"),
-    });
-    xhr.open("POST", "api/AjaxService.php");
-    xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
-    xhr.send(json);
-    xhr.onload = function () {
-      if (xhr.status == 200 && xhr.readyState == 4) {
-        var parseJson = JSON.parse(xhr.responseText);
+    requestAJAX(
+      {
+        requestType: "loadDeviceInformation",
+        token: getMeta("token"),
+      },
+      function (response) {
+        var parseJson = JSON.parse(response);
         $("#dashboard #deviceheader dummy").addClass(
           parseJson["main"]["bondKey"]
         );
@@ -331,7 +389,6 @@ if (deviceBelonging) {
         $("#dashboard .device-graph-box .name .dropdown-menu").append(
           "<a href='#' class='dropdown-item totalAmount'>" + "Total" + "</a>"
         );
-
         var dataPlot = [];
         var totalEnergy = 0;
         for (c in parseJson["plot"]) {
@@ -371,7 +428,7 @@ if (deviceBelonging) {
           dataPlot
         );
       }
-    };
+    );
   }
 
   function getMeta(metaName) {
@@ -386,17 +443,13 @@ if (deviceBelonging) {
 
   function switchToggle(id) {
     var checkBox = document.getElementById(id);
-    var xhr = new XMLHttpRequest();
-    var json = JSON.stringify({
+    requestAJAX({
       requestType: "changeStatus",
       masterDevice: $("#dashboard #deviceheader dummy").attr("class"),
       id: id,
       status: String(checkBox.checked),
       token: getMeta("token"),
     });
-    xhr.open("POST", "api/AjaxService.php");
-    xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
-    xhr.send(json);
   }
 
   function createChart() {
