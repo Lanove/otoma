@@ -198,12 +198,12 @@ body.noscroll
 
 .ap-content-switch-tab
 {
-	border: 1px solid #009688;
+	border: 1px solid var(--third-color);
 	padding: 5px 16px;
 
 	cursor: pointer;
 	font-size: 0.6em;
-	color: #009688;
+	color: var(--third-color);
 }
 
 .ap-dir-ltr .ap-content-switch-date
@@ -716,7 +716,7 @@ body.noscroll
 
 .ap-theme-default
 {
-	color: #009688;
+	color: var(--third-color);
 }
 
 .ap-component-plus, .ap-component-minus
@@ -807,8 +807,8 @@ body.noscroll
 	width: 100%;
 	height: 40px;
 
-	border-top: 1px solid #009688;
-	border-bottom: 1px solid #009688;
+	border-top: 1px solid var(--third-color);
+	border-bottom: 1px solid var(--third-color);
 }
 
 .ap-theme-default .ap-component-selector

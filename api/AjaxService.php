@@ -24,8 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
         $username = base64_decode($explodeDecode[1]); // Get username
         $isLoggedIn = base64_decode($explodeDecode[2]); // Get isLoggedIn value
         ///////////////////////////////////////////////////////////////////////
-        if (hash_equals($_SESSION['ajaxToken'], $ajaxToken)) {
-
+        if (hash_equals($_SESSION['ajaxToken'], $ajaxToken) && $username === $_SESSION["username"]) {
             require "DatabaseController.php";
             $dbHandler = new DatabaseController(); // Open database
             if ($requestType === "loadDeviceInformation") { // Request is first page load
@@ -79,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
             } else if ($requestType === "reloadStatus") {
                 $bondKey = $json["masterDevice"];
                 // Fetch row from status table
-                $fetchResult["status"] = $dbHandler->runQuery("SELECT deviceType,data1,data2,data3,data4,data5,data6,data7,data8 FROM status WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                $fetchResult["status"] = $dbHandler->runQuery("SELECT deviceType,data1,data2,data3,data4,data5,data6,data7,data8,t1Data,t2Data,t3Data,t4Data FROM status WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                 // Merge array
                 $mergeResult = array_merge($fetchResult);
                 echo json_encode($mergeResult);

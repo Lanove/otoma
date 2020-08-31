@@ -51,9 +51,6 @@ if ($fetchResult) {
   <!-- Bootstrap CSS CDN -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous" />
 
-  <link rel="stylesheet" type="text/css" href="style/anypicker-font.css" />
-  <link rel="stylesheet" type="text/css" href="style/anypicker.css" />
-
   <!-- Our Custom CSS -->
   <link rel="stylesheet" type="text/css" href="style/style.css?<?php echo date('l jS \of F Y h:i:s A'); ?>" />
   <!-- Scrollbar Custom CSS -->
@@ -169,10 +166,13 @@ if ($fetchResult) {
   <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
   <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js" integrity="sha512-G8JE1Xbr0egZE5gNGyUm1fF764iHVfRXshIoUWCTPAbKkkItp/6qal5YAHXrxEu4HNfPTQs6HOu3D5vCGS1j3w==" crossorigin="anonymous"></script>
-  <!-- Anypicker JS -->
+  <!-- Anypicker -->
+
+  <link rel="stylesheet" type="text/css" href="style/anypicker-font.css?<?php echo date('l jS \of F Y h:i:s A'); ?>" />
+  <link rel="stylesheet" type="text/css" href="style/anypicker.css?<?php echo date('l jS \of F Y h:i:s A'); ?>" />
   <script type="text/javascript" src="js/anypicker.js"></script>
 
-  <script src="js/dashboard.js"></script>
+  <script src="js/dashboard.js?<?php echo date('l jS \of F Y h:i:s A'); ?>"></script>
 </body>
 
 </html>

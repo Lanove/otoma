@@ -47,8 +47,8 @@
                                 <div class="ml-auto">
                                     <input type="text" id="t1" value="0h 0j 0m" readonly>
                                 </div>
-                                <button id="timerButton" class="btn">Pause</button>
-                                <button id="timerButton" class="btn">Reset</button>
+                                <button id="tbtns1" class="btn timerButton">Start</button>
+                                <button id="tbtnr1" class="btn timerButton">Reset</button>
                             </div>
                         </div>
                         <!-- Row 2 Content -->
@@ -107,8 +107,8 @@
                                 <div class="ml-auto">
                                     <input type="text" id="t2" value="0h 0j 0m" readonly>
                                 </div>
-                                <button id="timerButton" class="btn">Pause</button>
-                                <button id="timerButton" class="btn">Reset</button>
+                                <button id="tbtns2" class="btn timerButton">Start</button>
+                                <button id="tbtnr2" class="btn timerButton">Reset</button>
                             </div>
                         </div>
                         <!-- Row 2 Content -->
@@ -170,8 +170,8 @@
                                 <div class="ml-auto">
                                     <input type="text" id="t3" value="0h 0j 0m" readonly>
                                 </div>
-                                <button id="timerButton" class="btn">Pause</button>
-                                <button id="timerButton" class="btn">Reset</button>
+                                <button id="tbtns3" class="btn timerButton">Start</button>
+                                <button id="tbtnr3" class="btn timerButton">Reset</button>
                             </div>
                         </div>
                         <!-- Row 2 Content -->
@@ -229,8 +229,8 @@
                                 <div class="ml-auto">
                                     <input type="text" id="t4" value="0h 0j 0m" readonly>
                                 </div>
-                                <button id="timerButton" class="btn">Pause</button>
-                                <button id="timerButton" class="btn">Reset</button>
+                                <button id="tbtns4" class="btn timerButton">Start</button>
+                                <button id="tbtnr4" class="btn timerButton">Reset</button>
                             </div>
                         </div>
                         <!-- Row 2 Content -->

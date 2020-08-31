@@ -29,8 +29,14 @@ var deviceBelonging = document.getElementById("bigdevicebox");
 if (deviceBelonging) {
   // Check whether user had some device or not, if not then don't include the extra function that is specific for device.
   var myChart;
-
   var oArrData = [];
+  var timerData = {
+    t1: {},
+    t2: {},
+    t3: {},
+    t4: {},
+  };
+
   function createDataSource() {
     var oArrDataNum = [7, 23, 59],
       iTempIndex1,
@@ -141,6 +147,70 @@ if (deviceBelonging) {
         clearInterval(check); // kill me
       }
     }, 100);
+
+    const interval = setInterval(function () {
+      if ($("#dashboard #deviceheader dummy").attr("class") != "") {
+        reloadStatus();
+      }
+    }, 5000);
+
+    const timerBarUpdate = setInterval(function () {
+      const now = Math.floor(Date.now() / 1000);
+      for (var i = 1; i < 5; i++) {
+        if (timerData["t" + i]["status"] == "started") {
+          var elem = document.getElementById("progBar" + i),
+            deltaNow = timerData["t" + i]["endAt"] - now,
+            width = Math.round(
+              ((now - timerData["t" + i]["startedAt"]) /
+                (timerData["t" + i]["endAt"] -
+                  timerData["t" + i]["startedAt"])) *
+                100
+            );
+          if (width > 100) {
+            width = 100;
+          }
+          if (width < 0) {
+            width = 0;
+          }
+          elem.style.width = width + "%";
+          var stringBuffer = "";
+          if (deltaNow >= 86400) {
+            stringBuffer += Math.floor(deltaNow / 86400) + "h ";
+          }
+          if (deltaNow >= 3600) {
+            stringBuffer += Math.floor((deltaNow % 86400) / 3600) + "j ";
+          }
+          if (deltaNow >= 60) {
+            stringBuffer += Math.floor((deltaNow % 3600) / 60) + "m ";
+          }
+          if (deltaNow >= 0) {
+            stringBuffer += (deltaNow % 60) + "s ";
+          }
+          elem.innerHTML = stringBuffer + "(" + width + "%" + ")";
+        } else if (timerData["t" + i]["status"] == "paused") {
+          var elem = document.getElementById("progBar" + i),
+            width = Math.round(
+              ((timerData["t" + i]["pausedAt"] -
+                timerData["t" + i]["startedAt"]) /
+                (timerData["t" + i]["endAt"] -
+                  timerData["t" + i]["startedAt"])) *
+                100
+            );
+          if (width > 100) {
+            width = 100;
+          }
+          if (width < 0) {
+            width = 0;
+          }
+          elem.style.width = width + "%";
+          elem.innerHTML = "Timer terpause";
+        } else {
+          var elem = document.getElementById("progBar" + i);
+          document.getElementById("progBar" + i).style.width = 100 + "%";
+          elem.innerHTML = "Tidak ada timer";
+        }
+      }
+    }, 1000);
   });
 
   function reloadStatus() {
@@ -173,15 +243,32 @@ if (deviceBelonging) {
             "checked",
             Boolean(Number(parseJson["status"]["data4"]))
           );
+          var tData = [];
+          for (var i = 1; i < 5; i++) {
+            tData["t" + i] = parseJson["status"]["t" + i + "Data"].split("%");
+            $("#t" + i).val(tData["t" + i][4]);
+            timerData["t" + i]["status"] = tData["t" + i][0];
+            timerData["t" + i]["startedAt"] = tData["t" + i][1];
+            timerData["t" + i]["endAt"] = tData["t" + i][2];
+            timerData["t" + i]["pausedAt"] = tData["t" + i][3];
+            if (tData["t" + i][0] == "started") {
+              $("#tbtns" + i).text("Pause");
+              $("#progBar" + i).css(
+                "background-color",
+                "var(--progbar-bar-color)"
+              );
+            } else {
+              $("#dashboard .device-graph-box .name .text").text("Start");
+              $("#progBar" + i).css(
+                "background-color",
+                "var(--progbar-bar-paused-color)"
+              );
+            }
+          }
         }
       }
     };
   }
-  const interval = setInterval(function () {
-    if ($("#dashboard #deviceheader dummy").attr("class") != "") {
-      reloadStatus();
-    }
-  }, 5000);
 
   function loadDeviceInformation() {
     var xhr = new XMLHttpRequest();
