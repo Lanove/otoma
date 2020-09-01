@@ -83,10 +83,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                         if (!(empty($json["masterDevice"]))) {
                             $bondKey = $json["masterDevice"];
                             // Fetch row from status table
-                            $fetchResult["status"] = $dbHandler->runQuery("SELECT deviceType,data1,data2,data3,data4,data5,data6,data7,data8,t1Data,t2Data,t3Data,t4Data FROM status WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                            $fetchResult["status"] = $dbHandler->runQuery("SELECT deviceType,data1,data2,data3,data4,data5,data6,data7,data8 FROM status WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                            $result["timer"] = $dbHandler->runQuery("SELECT t1Data,t2Data,t3Data,t4Data FROM status WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                            for ($i = 1; $i < 5; $i++) {
+                                $timerExplode["t" . $i] = explode('%', $result["timer"]["t" . $i . "Data"] . "%", -1);
+                            }
                             // Merge array
                             if ($fetchResult["status"]) {
-                                $mergeResult = array_merge($fetchResult);
+                                $mergeResult = array_merge($fetchResult, $timerExplode);
                                 echo json_encode($mergeResult);
                             } else {
                                 // Report invalid device token
@@ -96,40 +100,88 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                         }
                     } else if ($requestType === "changeTimerStatus") {
                         $succesFlag = false;
-                        for ($i = 1; $i < 5; $i++) {
+                        for ($i = 1; $i < 5; $i++) { // Loop through every timer (1 to 4)
                             $columnName = "t" . $i . "Data";
-                            if (!empty($json[$columnName])) {
+                            if (!empty($json[$columnName])) { // Update column that is passed by ajax.
                                 $bondKey = $json["masterDevice"];
                                 $data = $json[$columnName];
-                                $successFlag = true;
-                                $dbHandler->runQuery("UPDATE status SET {$columnName}='{$data}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                                if ($data === "idle") {
+                                    $fetchResult = $dbHandler->runQuery("SELECT {$columnName} FROM status WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                                    $timerExplode = explode('%', $fetchResult[$columnName] . "%", -1);
+                                    // Update the timer status data and leave the rest.
+                                    $stringBuffer = "idle%" . $timerExplode[1] . "%" . $timerExplode[2] . "%" . $timerExplode[3] . "%" . $timerExplode[4];
+                                    $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                                    $successFlag = true;
+                                }
                             }
                         }
                         if (!$successFlag) {
                         }
                     } else if ($requestType === "timerButton") {
-                        if (!empty($json["masterDevice"]) && !empty($json["id"])) {
+                        if (!empty($json["masterDevice"]) && !empty($json["id"])) { // Check if the prerequisite variable is there
                             $id = $json["id"];
                             $bondKey = $json["masterDevice"];
-                            if (strpos($id, 'tbtns') !== false && !empty($json["val"])) {
+                            if (strpos($id, 'tbtns') !== false && !empty($json["val"])) { // If it was tbtns button.
                                 $btnVal = $json["val"];
-                                $now = time(); // get unix time now
-                                if ($btnVal === "Start") {
-                                    if (!empty($json["val"])) {
+                                $now = time(); // Get unix time now
+                                if ($btnVal === "Start") { // If it was a start button
+                                    if (!empty($json["duration"])) { // If the duration is not empty
                                         $duration = $json["duration"];
-                                        preg_match_all('!\d+!', $duration, $matches); // Convert "xh xj xm" format to array[][].
-                                        if (isset($matches[0][0]) && isset($matches[0][1]) && isset($matches[0][2])) {
-                                            $second1 = $matches[0][0] * 86400; // Add total seconds for the day duration
-                                            $second1 += $matches[0][1] * 3600; // Add total seconds for the hour duration
-                                            $second1 += $matches[0][2] * 60; // Add total seconds for the minutes duration
-                                            // The syntax is status%startAt%endAt%pausedAt%
-                                            $stringBuffer = "started%" . $now . "%" . ($now + $second1) . "%0%" . $duration;
-                                            preg_match_all('/\d/', $id, $matches);
-                                            if (isset($matches[0][0])) {
-                                                $columnName = "t" . $matches[0][0] . "Data";
+                                        preg_match_all('/\d/', $id, $matches);
+                                        if (isset($matches[0][0]) && $matches[0][0] > 0 && $matches[0][0] < 5) {
+                                            // Get the corresponding column data and fetch.
+                                            $columnName = "t" . $matches[0][0] . "Data";
+                                            $fetchResult = $dbHandler->runQuery("SELECT {$columnName} FROM status WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                                            $timerExplode = explode('%', $fetchResult[$columnName] . "%", -1);
+                                            if ($timerExplode[0] == "idle") { // If the timer is idle, then start the timer from 0%
+                                                preg_match_all('!\d+!', $duration, $matches); // Convert "xh xj xm" format to array[][].
+                                                if (isset($matches[0][0]) && isset($matches[0][1]) && isset($matches[0][2])) {
+                                                    $second1 = $matches[0][0] * 86400; // Add total seconds for the day duration
+                                                    $second1 += $matches[0][1] * 3600; // Add total seconds for the hour duration
+                                                    $second1 += $matches[0][2] * 60; // Add total seconds for the minutes duration
+                                                    // The syntax is status%startAt%endAt%pausedAt%duration
+                                                    // Update the timer status,startedAt,endedAt and duration data based to user input
+                                                    $stringBuffer = "started%" . $now . "%" . ($now + $second1) . "%0%" . $duration;
+                                                    $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                                                }
+                                            } else if ($timerExplode[0] == "paused") { // If the timer is started from paused condition, resume the timer.
+                                                // Change startedAt to now-(pausedAt-startedAt_prev)
+                                                // Change endAt to now+(endAt_prev-pausedAt)
+                                                // Change the status of the timer to started
+                                                $stringBuffer = "started%" . ($now - ($timerExplode[3] - $timerExplode[1])) . "%" . ($now + ($timerExplode[2] - $timerExplode[3])) . "%0%" . $timerExplode[4];
                                                 $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                                             }
                                         }
+                                    }
+                                } else if ($btnVal == "Pause") { // If it was a pause button
+                                    // Get the related timer number from passed button id
+                                    preg_match_all('/\d/', $id, $matches);
+                                    echo "you";
+                                    if (isset($matches[0][0]) && $matches[0][0] > 0 && $matches[0][0] < 5) {
+                                        echo "are";
+                                        // If the number is set and the value is make sense aka 1 to 4
+                                        $columnName = "t" . $matches[0][0] . "Data";
+                                        // Extract data from database
+                                        $fetchResult = $dbHandler->runQuery("SELECT {$columnName} FROM status WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                                        $timerExplode = explode('%', $fetchResult[$columnName] . "%", -1);
+                                        // Update the timer status and pausedAt data and leave the rest.
+                                        $stringBuffer = "paused%" . $timerExplode[1] . "%" . $timerExplode[2] . "%" . $now . "%" . $timerExplode[4];
+                                        $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                                    }
+                                }
+                            } else if (strpos($id, 'tbtnr') !== false) { // If it was a stop button
+                                // Get the related timer number from passed button id
+                                preg_match_all('/\d/', $id, $matches);
+                                if (isset($matches[0][0]) && $matches[0][0] > 0 && $matches[0][0] < 5) {
+                                    // If the number is set and the value is make sense aka 1 to 4
+                                    $columnName = "t" . $matches[0][0] . "Data";
+                                    // Extract data from database
+                                    $fetchResult = $dbHandler->runQuery("SELECT {$columnName} FROM status WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                                    $timerExplode = explode('%', $fetchResult[$columnName] . "%", -1);
+                                    if ($timerExplode[0] !== "idle") { // If the timer status is not idle
+                                        // Change status to idle and leave the rest of the data
+                                        $stringBuffer = "idle%" . $timerExplode[1] . "%" . $timerExplode[2] . "%" . $timerExplode[3] . "%" . $timerExplode[4];
+                                        $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                                     }
                                 }
                             }

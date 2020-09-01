@@ -167,9 +167,9 @@ if ($fetchResult) {
   <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js" integrity="sha512-G8JE1Xbr0egZE5gNGyUm1fF764iHVfRXshIoUWCTPAbKkkItp/6qal5YAHXrxEu4HNfPTQs6HOu3D5vCGS1j3w==" crossorigin="anonymous"></script>
   <!-- Anypicker -->
-
   <link rel="stylesheet" type="text/css" href="style/anypicker-font.css?<?php echo date('l jS \of F Y h:i:s A'); ?>" />
   <link rel="stylesheet" type="text/css" href="style/anypicker.css?<?php echo date('l jS \of F Y h:i:s A'); ?>" />
+  
   <script type="text/javascript" src="js/anypicker.js"></script>
 
   <script src="js/dashboard.js?<?php echo date('l jS \of F Y h:i:s A'); ?>"></script>

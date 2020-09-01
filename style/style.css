@@ -8,9 +8,9 @@
   --statusbox-color: #69b3b3;
   --text-color1: rgb(233, 233, 233);
   --switch-on-color: #0275d8;
-  --progbar-bg-color: #b1cac7;
+  --progbar-bg-color: #89cecb;
   --progbar-bar-color: #3aafa9;
-  --progbar-bar-paused-color: #6c757d;
+  --progbar-bar-paused-color: #2b7a78;
   --myblack: #16252a;
 }
 
@@ -340,8 +340,8 @@ body {
   /* width: 10%; */
   height: 24px;
   border-radius: 5px;
-  background-color: var(--progbar-bar-paused-color);
-  text-align: center; /* To center it horizontally (if you want) */
+  background-color: var(--progbar-bg-color);
+  text-align: center;
   color: var(--text-color1);
   white-space: nowrap;
   transition: width 0.5s;

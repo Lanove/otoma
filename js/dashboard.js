@@ -127,6 +127,7 @@ if (deviceBelonging) {
     createChart();
     for (var a = 1; a < 5; a++) {
       $("#t" + String(a)).AnyPicker({
+        // Add anypicker to every timer
         mode: "select",
         showComponentLabel: true,
         components: oArrComponents,
@@ -136,12 +137,14 @@ if (deviceBelonging) {
       });
 
       $("#statusBoxSwitch" + a).on("click", function () {
+        // Add event listener to status toggle
         switchToggle(this.id);
       });
 
       $("#tbtns" + a).on("click", function () {
+        // Add event listener to every timer start/pause button
         var ajaxBuffer = {};
-        ajaxBuffer["val"] = $("#"+this.id).text();
+        ajaxBuffer["val"] = $("#" + this.id).text();
         ajaxBuffer["requestType"] = "timerButton";
         ajaxBuffer["id"] = this.id;
         ajaxBuffer["duration"] = $("#t" + this.id.substring(5, 6)).val();
@@ -154,6 +157,7 @@ if (deviceBelonging) {
         });
       });
       $("#tbtnr" + a).on("click", function () {
+        // Add event listener to every timer stop button
         var ajaxBuffer = {};
         ajaxBuffer["requestType"] = "timerButton";
         ajaxBuffer["id"] = this.id;
@@ -170,54 +174,69 @@ if (deviceBelonging) {
     $(".settingDevice1").on("click", function () {
       // $("#content").html("");
     });
+
     const check = setInterval(function () {
       // Function to check every 0.1s if bondKey is available, then execute reloadStatus() and destroy itself.
       if ($("#dashboard #deviceheader dummy").attr("class") != "") {
-        // reloadStatus();
         reloadStatus();
-        clearInterval(check); // kill me
+        clearInterval(check); // kill after executed
       }
     }, 100);
 
     const interval = setInterval(function () {
+      // If the page had bondKey, reload the status of the device every 5s
       if ($("#dashboard #deviceheader dummy").attr("class") != "") {
         reloadStatus();
       }
     }, 5000);
 
     const timerBarUpdate = setInterval(function () {
-      const now = Math.floor(Date.now() / 1000);
+      const now = Math.floor(Date.now() / 1000); // Get time now in unixtime second
       for (var i = 1; i < 5; i++) {
+        // Loop through every proggress bar 1~4
         if (timerData["t" + i]["status"] == "started") {
+          // If the timer is started
+
           var elem = document.getElementById("progBar" + i),
-            deltaNow = timerData["t" + i]["endAt"] - now,
+            deltaNow = timerData["t" + i]["endAt"] - now, // Get timer remaining second
             width = Math.round(
               ((now - timerData["t" + i]["startedAt"]) /
                 (timerData["t" + i]["endAt"] -
                   timerData["t" + i]["startedAt"])) *
                 100
             );
+          if (timerData["t" + i]["endAt"] - Math.floor(Date.now() / 1000) < 0) {
+            // If the result of time now and started time of timer is negative, the timer is expired, update the database
+            reloadStatus();
+          }
+
           if (width > 100) {
+            // Limit the width to 100 when go pass 100
             width = 100;
           }
           if (width < 0) {
+            // Limit the width to 0 when it goes lower than 0
             width = 0;
           }
-          elem.style.width = width + "%";
           var stringBuffer = "";
           if (deltaNow >= 86400) {
+            // Calculate day remained when timer remaining second is higher than 86400s or 1 day
             stringBuffer += Math.floor(deltaNow / 86400) + "h ";
           }
           if (deltaNow >= 3600) {
+            // Calculate hour remained when timer remaining second is higher than 3600s or one hour
             stringBuffer += Math.floor((deltaNow % 86400) / 3600) + "j ";
           }
           if (deltaNow >= 60) {
+            // Calculate minutes remained when timer remaining second is higher than 60s or one minute
             stringBuffer += Math.floor((deltaNow % 3600) / 60) + "m ";
           }
+
           if (deltaNow >= 0) {
             stringBuffer += (deltaNow % 60) + "s ";
           }
-          elem.innerHTML = stringBuffer + "(" + width + "%" + ")";
+          elem.style.width = width + "%"; // Adjust proggress bar width
+          elem.innerHTML = stringBuffer + "(" + width + "%" + ")"; // Print remaining time in xh xj xm format and it's percentage to complete
         } else if (timerData["t" + i]["status"] == "paused") {
           var elem = document.getElementById("progBar" + i),
             width = Math.round(
@@ -226,19 +245,41 @@ if (deviceBelonging) {
                 (timerData["t" + i]["endAt"] -
                   timerData["t" + i]["startedAt"])) *
                 100
-            );
+            ),
+            deltaNow =
+              timerData["t" + i]["endAt"] - timerData["t" + i]["pausedAt"]; // Get timer remained after paused;
+
           if (width > 100) {
+            // Limit the width to 100 when go pass 100
             width = 100;
           }
           if (width < 0) {
+            // Limit the width to 0 when it goes lower than 0
             width = 0;
           }
-          elem.style.width = width + "%";
-          elem.innerHTML = "Timer terpause";
+          var stringBuffer = "";
+          if (deltaNow >= 86400) {
+            // Calculate day remained when timer remaining second is higher than 86400s or 1 day
+            stringBuffer += Math.floor(deltaNow / 86400) + "h ";
+          }
+          if (deltaNow >= 3600) {
+            // Calculate hour remained when timer remaining second is higher than 3600s or one hour
+            stringBuffer += Math.floor((deltaNow % 86400) / 3600) + "j ";
+          }
+          if (deltaNow >= 60) {
+            // Calculate minutes remained when timer remaining second is higher than 60s or one minute
+            stringBuffer += Math.floor((deltaNow % 3600) / 60) + "m ";
+          }
+          if (deltaNow >= 0) {
+            stringBuffer += (deltaNow % 60) + "s ";
+          }
+          elem.style.width = width + "%"; // Adjust progress bar width
+          elem.innerHTML = stringBuffer + "(Terpause)"; // Print remaining time before paused
         } else {
+          // No timer here.
           var elem = document.getElementById("progBar" + i);
-          document.getElementById("progBar" + i).style.width = 100 + "%";
           elem.innerHTML = "Tidak ada timer";
+          elem.style.width = 0 + "%";
         }
       }
     }, 1000);
@@ -283,31 +324,22 @@ if (deviceBelonging) {
             "checked",
             Boolean(Number(parseJson["status"]["data4"]))
           );
-          var tData = [];
           for (var i = 1; i < 5; i++) {
-            tData["t" + i] = parseJson["status"]["t" + i + "Data"].split("%");
-            timerData["t" + i]["status"] = tData["t" + i][0];
-            timerData["t" + i]["startedAt"] = tData["t" + i][1];
-            timerData["t" + i]["endAt"] = tData["t" + i][2];
-            timerData["t" + i]["pausedAt"] = tData["t" + i][3];
-            timerData["t" + i]["duration"] = tData["t" + i][4];
-            
+            var tData = parseJson["t" + i];
+            timerData["t" + i]["status"] = tData[0];
+            timerData["t" + i]["startedAt"] = tData[1];
+            timerData["t" + i]["endAt"] = tData[2];
+            timerData["t" + i]["pausedAt"] = tData[3];
+            timerData["t" + i]["duration"] = tData[4];
             $("#t" + i).val(timerData["t" + i]["duration"]);
             if (timerData["t" + i]["status"] == "started") {
               if (
-                timerData["t" + i]["startedAt"] - Math.floor(Date.now() / 1000)
+                timerData["t" + i]["endAt"] - Math.floor(Date.now() / 1000) <
+                0
               ) {
                 // If the result of time now and started time of timer is negative, the timer is expired, update the database
                 var ajaxBuffer = {};
-                ajaxBuffer["t" + i + "Data"] =
-                  "idle%" +
-                  timerData["t" + i]["startedAt"] +
-                  "%" +
-                  timerData["t" + i]["endAt"] +
-                  "%" +
-                  timerData["t" + i]["pausedAt"] +
-                  "%" +
-                  $("#t" + i).val();
+                ajaxBuffer["t" + i + "Data"] = "idle";
                 ajaxBuffer["requestType"] = "changeTimerStatus";
                 ajaxBuffer["token"] = getMeta("token");
                 ajaxBuffer["masterDevice"] = $(
@@ -320,11 +352,17 @@ if (deviceBelonging) {
                 "background-color",
                 "var(--progbar-bar-color)"
               );
-            } else {
-              $("#dashboard .device-graph-box .name .text").text("Start");
+            } else if (timerData["t" + i]["status"] == "paused") {
+              $("#tbtns" + i).text("Start");
               $("#progBar" + i).css(
                 "background-color",
                 "var(--progbar-bar-paused-color)"
+              );
+            } else if (timerData["t" + i]["status"] == "idle") {
+              $("#tbtns" + i).text("Start");
+              $("#progBar" + i).css(
+                "background-color"
+                // "var(--progbar-bg-color)"
               );
             }
           }
