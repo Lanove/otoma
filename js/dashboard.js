@@ -138,7 +138,41 @@ if (deviceBelonging) {
 
       $("#statusBoxSwitch" + a).on("click", function () {
         // Add event listener to status toggle
-        switchToggle(this.id);
+        var matches = this.id.match(/\d+/g);
+        var elem = this.id;
+        var check = $("#" + this.id).prop("checked");
+        $("#" + elem).prop("checked", !check);
+        if (timerData["t" + matches]["status"] !== "idle") {
+          if (check == false) {
+            bootbox.confirm({
+              title: "Nonaktifkan status perangkat?",
+              className: "bootBoxPop",
+              message: `Menonaktifkan status perangkat saat timer sedang aktif dapat menjadikan fungsi timer terganggu, aktifkan status perangkat sebelum timer kadaluarsa atau anda dapat mereset timer`,
+              buttons: {
+                cancel: {
+                  label: '<i class="fa fa-times"></i> Tidak',
+                  className: "bootBoxCancelButton",
+                },
+                confirm: {
+                  label: '<i class="fa fa-check"></i> Ya',
+                  className: "bootBoxConfirmButton",
+                },
+              },
+              callback: function (result) {
+                if (result) {
+                  $("#" + elem).prop("checked", check);
+                  switchToggle(elem);
+                }
+              },
+            });
+          } else {
+            $("#" + elem).prop("checked", check);
+            switchToggle(elem);
+          }
+        } else {
+          $("#" + elem).prop("checked", check);
+          switchToggle(elem);
+        }
       });
 
       $("#tbtns" + a).on("click", function () {

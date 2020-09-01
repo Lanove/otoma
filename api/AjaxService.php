@@ -48,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                             $fetchResult = $dbHandler->runQuery("SELECT bondKey FROM status WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                             // Check whether status column of the device and user has been created
                             if ($fetchResult) { // If exist
-                                $columnData = "";
+                                $columnData = "data1";
                                 // Convert button id into column data of database
                                 switch ($id) {
                                     case "statusBoxSwitch1":
@@ -104,15 +104,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                             $columnName = "t" . $i . "Data";
                             if (!empty($json[$columnName])) { // Update column that is passed by ajax.
                                 $bondKey = $json["masterDevice"];
-                                $data = $json[$columnName];
-                                if ($data === "idle") {
-                                    $fetchResult = $dbHandler->runQuery("SELECT {$columnName} FROM status WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
-                                    $timerExplode = explode('%', $fetchResult[$columnName] . "%", -1);
-                                    // Update the timer status data and leave the rest.
-                                    $stringBuffer = "idle%" . $timerExplode[1] . "%" . $timerExplode[2] . "%" . $timerExplode[3] . "%" . $timerExplode[4];
-                                    $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
-                                    $successFlag = true;
-                                }
+                                $bitData = "data" . $i;
+                                $fetchResult = $dbHandler->runQuery("SELECT {$columnName} FROM status WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                                $timerExplode = explode('%', $fetchResult[$columnName] . "%", -1);
+                                // Turn off bit status of corresponding expired timer
+                                // Update the timer status data and leave the rest.
+                                $stringBuffer = "idle%" . $timerExplode[1] . "%" . $timerExplode[2] . "%" . $timerExplode[3] . "%" . $timerExplode[4];
+                                $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}',{$bitData}='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                                $successFlag = true;
                             }
                         }
                         if (!$successFlag) {
@@ -131,6 +130,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                                         if (isset($matches[0][0]) && $matches[0][0] > 0 && $matches[0][0] < 5) {
                                             // Get the corresponding column data and fetch.
                                             $columnName = "t" . $matches[0][0] . "Data";
+                                            $bitData = "data" . $matches[0][0];
                                             $fetchResult = $dbHandler->runQuery("SELECT {$columnName} FROM status WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                                             $timerExplode = explode('%', $fetchResult[$columnName] . "%", -1);
                                             if ($timerExplode[0] == "idle") { // If the timer is idle, then start the timer from 0%
@@ -139,34 +139,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                                                     $second1 = $matches[0][0] * 86400; // Add total seconds for the day duration
                                                     $second1 += $matches[0][1] * 3600; // Add total seconds for the hour duration
                                                     $second1 += $matches[0][2] * 60; // Add total seconds for the minutes duration
-                                                    // The syntax is status%startAt%endAt%pausedAt%duration
+                                                    // Turn off the bit status of corresponding output
+                                                    // ie. for timer 1 it was data1
                                                     // Update the timer status,startedAt,endedAt and duration data based to user input
+                                                    // The syntax is status%startAt%endAt%pausedAt%duration
                                                     $stringBuffer = "started%" . $now . "%" . ($now + $second1) . "%0%" . $duration;
-                                                    $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                                                    $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}',{$bitData}='1' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                                                 }
                                             } else if ($timerExplode[0] == "paused") { // If the timer is started from paused condition, resume the timer.
+                                                $bitData = "data" . $matches[0][0];
+                                                // Turn off the bit status of corresponding output
+                                                // ie. for timer 1 it was data1
                                                 // Change startedAt to now-(pausedAt-startedAt_prev)
                                                 // Change endAt to now+(endAt_prev-pausedAt)
                                                 // Change the status of the timer to started
                                                 $stringBuffer = "started%" . ($now - ($timerExplode[3] - $timerExplode[1])) . "%" . ($now + ($timerExplode[2] - $timerExplode[3])) . "%0%" . $timerExplode[4];
-                                                $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                                                $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}',{$bitData}='1' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                                             }
                                         }
                                     }
                                 } else if ($btnVal == "Pause") { // If it was a pause button
                                     // Get the related timer number from passed button id
                                     preg_match_all('/\d/', $id, $matches);
-                                    echo "you";
                                     if (isset($matches[0][0]) && $matches[0][0] > 0 && $matches[0][0] < 5) {
-                                        echo "are";
                                         // If the number is set and the value is make sense aka 1 to 4
                                         $columnName = "t" . $matches[0][0] . "Data";
                                         // Extract data from database
                                         $fetchResult = $dbHandler->runQuery("SELECT {$columnName} FROM status WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                                         $timerExplode = explode('%', $fetchResult[$columnName] . "%", -1);
+                                        $bitData = "data" . $matches[0][0];
+                                        // Turn off the bit status of corresponding output
+                                        // ie. for timer 1 it was data1
                                         // Update the timer status and pausedAt data and leave the rest.
                                         $stringBuffer = "paused%" . $timerExplode[1] . "%" . $timerExplode[2] . "%" . $now . "%" . $timerExplode[4];
-                                        $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                                        $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}',{$bitData}='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                                     }
                                 }
                             } else if (strpos($id, 'tbtnr') !== false) { // If it was a stop button
@@ -179,9 +185,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                                     $fetchResult = $dbHandler->runQuery("SELECT {$columnName} FROM status WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                                     $timerExplode = explode('%', $fetchResult[$columnName] . "%", -1);
                                     if ($timerExplode[0] !== "idle") { // If the timer status is not idle
+                                        $bitData = "data" . $matches[0][0];
+                                        // Turn off the bit status of corresponding output
+                                        // ie. for timer 1 it was data1
                                         // Change status to idle and leave the rest of the data
                                         $stringBuffer = "idle%" . $timerExplode[1] . "%" . $timerExplode[2] . "%" . $timerExplode[3] . "%" . $timerExplode[4];
-                                        $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                                        $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}',{$bitData}='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                                     }
                                 }
                             }

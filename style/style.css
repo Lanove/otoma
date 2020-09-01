@@ -346,6 +346,21 @@ body {
   white-space: nowrap;
   transition: width 0.5s;
 }
+#dashboard .bootBoxConfirmButton{
+  color:var(--text-color1);
+  background-color:var(--third-color);
+}
+#dashboard .modal-footer{
+  border-top: 1px solid var(--second-color);
+}
+#dashboard .modal-header{
+  border-bottom: 1px solid var(--second-color);
+}
+
+#dashboard .modal-content{
+  border-radius:0px;
+}
+
 #dashboard .device-status-box .content .timerInput input[type="text"] {
   max-width: 90px;
   background-color: var(--text-color1);

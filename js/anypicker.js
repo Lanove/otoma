@@ -132,7 +132,7 @@ $.AnyPicker = $.AnyPicker || {
 
 		setButton: 
 		{
-			markup: "<a id='ap-button-set' class='ap-button'>Set</a>",
+			markup: "<a id='ap-button-set' class='ap-button'>OK</a>",
 			markupContentWindows: "<span class='ap-button-icon ap-icon-set'></span><span class='ap-button-text'>set</span>",
 			type: "Button"
 			// action: function(){}
@@ -140,7 +140,7 @@ $.AnyPicker = $.AnyPicker || {
 
 		clearButton: 
 		{
-			markup: "<a id='ap-button-clear' class='ap-button'>Clear</a>",
+			markup: "<a id='ap-button-clear' class='ap-button'>Hapus</a>",
 			markupContentWindows: "<span class='ap-button-icon ap-icon-clear'></span><span class='ap-button-text'>clear</span>",
 			type: "Button"
 			// action: function(){}
@@ -148,7 +148,7 @@ $.AnyPicker = $.AnyPicker || {
 
 		nowButton: 
 		{
-			markup: "<a id='ap-button-now' class='ap-button'>Now</a>",
+			markup: "<a id='ap-button-now' class='ap-button'>Sekarang</a>",
 			markupContentWindows: "<span class='ap-button-icon ap-icon-now'></span><span class='ap-button-text'>now</span>",
 			type: "Button"
 			// action: function(){}
@@ -156,7 +156,7 @@ $.AnyPicker = $.AnyPicker || {
 
 		cancelButton: 
 		{
-			markup: "<a id='ap-button-cancel' class='ap-button'>Cancel</a>",
+			markup: "<a id='ap-button-cancel' class='ap-button'>Batal</a>",
 			markupContentWindows: "<span class='ap-button-icon ap-icon-cancel'></span><span class='ap-button-text'>cancel</span>",
 			type: "Button"
 			// action: function(){}
@@ -164,7 +164,7 @@ $.AnyPicker = $.AnyPicker || {
 
 		headerTitle:
 		{
-			markup: "<span class='ap-header__title'>Select</span>",
+			markup: "<span class='ap-header__title'>Pilih</span>",
 			type: "Text",
 			contentBehaviour: "Static", // Static or Dynamic
 			format: "" // DateTime Format
@@ -182,13 +182,13 @@ $.AnyPicker = $.AnyPicker || {
 
 		i18n:
 		{
-			headerTitle: "Select",
-			setButton: "Set",
-			clearButton: "Clear",
-			nowButton: "Now",
-			cancelButton: "Cancel",
-			dateSwitch: "Date",
-			timeSwitch: "Time"
+			headerTitle: "Pilih",
+			setButton: "OK",
+			clearButton: "Hapus",
+			nowButton: "Sekarang",
+			cancelButton: "Batal",
+			dateSwitch: "Tanggal",
+			timeSwitch: "Waktu"
 		},
 
 		theme: "Default",
