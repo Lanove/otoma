@@ -1,22 +1,20 @@
 <?php
 // https://phpsecurity.readthedocs.io/en/latest/Cross-Site-Scripting-(XSS).html
 require "nocache.php";
-// Initialize the session
-session_start();
 
-// Check if the user is logged in, if not then redirect him to login page
-if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
-  header("location: login.php");
-  exit;
+// Initialize the session
+require_once "api/authCookieSessionValidate.php";
+
+if (!$isLoggedIn) {
+  $util->redirect("login.php");
 }
+
 require "api/CryptographyFunction.php";
 if (empty($_SESSION['ajaxToken'])) {
   $_SESSION['ajaxToken'] = bin2hex(random_bytes(16));
 }
 $token = encryptAes($aesKey, base64_encode($_SESSION['ajaxToken']) . "%" . base64_encode($_SESSION["username"]) . "%" . base64_encode($_SESSION["loggedin"]));
 
-
-require "api/DatabaseController.php";
 $dbHandler = new DatabaseController(); // Open database
 
 $fetchResult = $dbHandler->runQuery("SELECT deviceType,bondKey FROM bond WHERE username = :name;", ["name" => $_SESSION["username"]]);
@@ -58,6 +56,16 @@ if ($fetchResult) {
 </head>
 
 <body id="dashboard">
+
+  <div class="absolute-overlay">
+    <div class="myLoader">
+      <div class="loader quantum-spinner">
+
+      </div>
+    </div>
+    <div class="right section"></div>
+    <div class="left section"></div>
+  </div>
   <div class="wrapper">
     <!-- Sidebar  -->
     <!-- Sidebar  -->
@@ -111,7 +119,7 @@ if ($fetchResult) {
           <i class="fas fa-times icon close"></i>
         </button>
         <a href="#">
-          <img alt="Otoma" src="img/logo/otoma_withtext_small.png">
+          <img alt="Otoma" src="img/logo/otoma_withtext.png" height="45">
         </a>
         <a href="logout.php">
           <button type="button" id="topnavButton" class="btn btn-info">
@@ -123,8 +131,8 @@ if ($fetchResult) {
     </nav>
     <!-- Page Content  -->
     <div id="content">
-      <!-- <input type="text" id="t1" readonly="readonly"> -->
       <?php
+      // require "pagecon/main-device-settings.php";
       if ($deviceBelonging) {
         if ($deviceBelongingType == "main") {
           require "pagecon/main-device.php";
@@ -149,7 +157,8 @@ if ($fetchResult) {
       </div>
     </div>
   </div>
-  <div class="overlay"></div>
+  <div class="overlay">
+  </div>
   <!--Bottom Footer-->
   <!--Bottom Footer-->
 

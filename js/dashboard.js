@@ -123,7 +123,7 @@ if (deviceBelonging) {
   }
 
   $(document).ready(function () {
-    loadDeviceInformation();
+    loadDeviceInformation("main");
     createChart();
     for (var a = 1; a < 5; a++) {
       $("#t" + String(a)).AnyPicker({
@@ -142,12 +142,12 @@ if (deviceBelonging) {
         var elem = this.id;
         var check = $("#" + this.id).prop("checked");
         $("#" + elem).prop("checked", !check);
-        if (timerData["t" + matches]["status"] !== "idle") {
+        if (timerData["t" + matches]["status"] === "started") {
           if (check == false) {
             bootbox.confirm({
               title: "Nonaktifkan status perangkat?",
               className: "bootBoxPop",
-              message: `Menonaktifkan status perangkat saat timer sedang aktif dapat menjadikan fungsi timer terganggu, aktifkan status perangkat sebelum timer kadaluarsa atau anda dapat mereset timer`,
+              message: `Menonaktifkan status perangkat saat timer sedang dimulai dapat menjadikan fungsi timer terganggu, timer menonaktifkan perangkat saat timer kadaluarsa, jika perangkat sudah nonaktif, perangkat akan tetap nonaktif walaupun timer sudah kadaluarsa`,
               buttons: {
                 cancel: {
                   label: '<i class="fa fa-times"></i> Tidak',
@@ -169,7 +169,34 @@ if (deviceBelonging) {
             $("#" + elem).prop("checked", check);
             switchToggle(elem);
           }
-        } else {
+        } else if (timerData["t" + matches]["status"] === "paused") {
+          if (check == true) {
+            bootbox.confirm({
+              title: "Aktifkan status perangkat?",
+              className: "bootBoxPop",
+              message: `Mengaktifkan status perangkat saat timer sedang terpause dapat menjadikan fungsi timer terganggu, timer mengaktifkan perangkat kembali saat timer dimulai kembali dari keadaan pause, jika perangkat sudah aktif, perangkat akan tetap aktif walaupun timer dimulai kembali dari keadaan pause, dan nonaktif setelah timer kadaluarsa`,
+              buttons: {
+                cancel: {
+                  label: '<i class="fa fa-times"></i> Tidak',
+                  className: "bootBoxCancelButton",
+                },
+                confirm: {
+                  label: '<i class="fa fa-check"></i> Ya',
+                  className: "bootBoxConfirmButton",
+                },
+              },
+              callback: function (result) {
+                if (result) {
+                  $("#" + elem).prop("checked", check);
+                  switchToggle(elem);
+                }
+              },
+            });
+          } else {
+            $("#" + elem).prop("checked", check);
+            switchToggle(elem);
+          }
+        } else if (timerData["t" + matches]["status"] === "idle") {
           $("#" + elem).prop("checked", check);
           switchToggle(elem);
         }
@@ -213,6 +240,8 @@ if (deviceBelonging) {
       // Function to check every 0.1s if bondKey is available, then execute reloadStatus() and destroy itself.
       if ($("#dashboard #deviceheader dummy").attr("class") != "") {
         reloadStatus();
+
+        $(".absolute-overlay").addClass("loaded");
         clearInterval(check); // kill after executed
       }
     }, 100);
@@ -404,14 +433,16 @@ if (deviceBelonging) {
       }
     );
   }
-  function loadDeviceInformation() {
+  function loadDeviceInformation(controller) {
     requestAJAX(
       {
         requestType: "loadDeviceInformation",
+        master: controller,
         token: getMeta("token"),
       },
       function (response) {
         var parseJson = JSON.parse(response);
+        $("#dashboard #deviceheader dummy").removeClass();
         $("#dashboard #deviceheader dummy").addClass(
           parseJson["main"]["bondKey"]
         );
@@ -428,6 +459,7 @@ if (deviceBelonging) {
           "<i class = 'fas fa-caret-down'></i>"
         );
         var i = 1;
+        $("#dashboard #deviceheader .dropdown-menu").html("");
         for (c in parseJson) {
           if (c != "main" && c != "plot") {
             $("#dashboard #deviceheader .dropdown-menu").append(
@@ -438,10 +470,25 @@ if (deviceBelonging) {
                 parseJson[c]["masterName"] +
                 "</a>"
             );
+            $(".subMasterName" + String(i)).on("click", function () {
+              $(".absolute-overlay").removeClass("loaded");
+              loadDeviceInformation(
+                $("." + $(this).attr("class").split(/\s+/)[1]).text()
+              );
+              const check = setInterval(function () {
+                // Function to check every 0.1s if bondKey is available, then execute reloadStatus() and destroy itself.
+                if ($("#dashboard #deviceheader dummy").attr("class") != "") {
+                  reloadStatus();
+                  $(".absolute-overlay").addClass("loaded");
+                  clearInterval(check); // kill after executed
+                }
+              }, 100);
+            });
             i++;
           }
         }
         i = 1;
+        $("#dashboard .device-graph-box .name .dropdown-menu").html("");
         for (c in parseJson["main"]) {
           if (c.includes("deviceName")) {
             $("#dashboard .device-graph-box .name .dropdown-menu").append(
@@ -470,6 +517,9 @@ if (deviceBelonging) {
         $("#dashboard .device-graph-box .totalenergy span").text(
           String(totalEnergy) + "Wh"
         );
+        myChart.destroy();
+
+        createChart();
         updateChart(
           myChart,
           [

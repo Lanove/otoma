@@ -30,16 +30,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                     require "DatabaseController.php";
                     $dbHandler = new DatabaseController(); // Open database
                     if ($requestType === "loadDeviceInformation") { // Request is first page load
-                        // Get every name of device including masterName and deviceName
-                        $fetchResult["main"] = $dbHandler->runQuery("SELECT deviceType,bondKey,masterName,deviceName1,deviceName2,deviceName3,deviceName4 FROM bond WHERE username = :name ORDER BY id ASC;", ["name" => $username]);
-                        // Get every name of masterDevice with fetchAll
-                        $masterNameList = $dbHandler->runQuery("SELECT masterName FROM bond WHERE username = :name AND masterName != :exception ORDER BY id ASC;", ["name" => $username, "exception" => $fetchResult["main"]["masterName"]], "ALL");
-                        // Get daily plot data if it exist.
-                        $fetchResult["plot"] = $dbHandler->runQuery("SELECT plotStamp,timeStamp,deviceType,data1 FROM dailyplot WHERE bondKey = :bondkey;", ["bondkey" => $fetchResult["main"]["bondKey"]], "ALL");
-                        // Merge array
-                        $mergeResult = array_merge($masterNameList, $fetchResult);
-                        // Return JSON array
-                        echo json_encode($mergeResult);
+                        if (!empty($json["master"])) {
+
+                            if ($json["master"] == "main") {
+                                // Get every name of device including masterName and deviceName
+                                $fetchResult["main"] = $dbHandler->runQuery("SELECT deviceType,bondKey,masterName,deviceName1,deviceName2,deviceName3,deviceName4 FROM bond WHERE username = :name ORDER BY id ASC;", ["name" => $username]);
+                            } else {
+                                // Get every name of device including masterName and deviceName
+                                $fetchResult["main"] = $dbHandler->runQuery("SELECT deviceType,bondKey,masterName,deviceName1,deviceName2,deviceName3,deviceName4 FROM bond WHERE username = :name AND masterName = :master;", ["name" => $username, "master" => $json["master"]]);
+                            }
+
+                            // Get every name of masterDevice with fetchAll
+                            $masterNameList = $dbHandler->runQuery("SELECT masterName FROM bond WHERE username = :name AND masterName != :exception ORDER BY id ASC;", ["name" => $username, "exception" => $fetchResult["main"]["masterName"]], "ALL");
+                            // Get daily plot data if it exist.
+                            $fetchResult["plot"] = $dbHandler->runQuery("SELECT plotStamp,timeStamp,deviceType,data1 FROM dailyplot WHERE bondKey = :bondkey;", ["bondkey" => $fetchResult["main"]["bondKey"]], "ALL");
+                            // Merge array
+                            $mergeResult = array_merge($masterNameList, $fetchResult);
+                            // Return JSON array
+                            echo json_encode($mergeResult);
+                        }
                     } else if ($requestType === "changeStatus") {
                         if (!(empty($json["masterDevice"])) && !(empty($json["id"])) && !(empty($json["id"]))) {
                             $bondKey = $json["masterDevice"];
@@ -70,7 +79,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                                 else
                                     $status = "0";
                                 // Update the status of database
-                                $dbHandler->runQuery("UPDATE status SET {$columnData}='{$status}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                                $filterString = filter_var($status, FILTER_SANITIZE_STRING);
+                                $dbHandler->runQuery("UPDATE status SET {$columnData}='{$filterString}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                             } else { // If not exist
                                 // Setup status table for bond
                                 $fetchResult = $dbHandler->runQuery("SELECT deviceType FROM bond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]); // Get deviceType from bond table
@@ -110,7 +120,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                                 // Turn off bit status of corresponding expired timer
                                 // Update the timer status data and leave the rest.
                                 $stringBuffer = "idle%" . $timerExplode[1] . "%" . $timerExplode[2] . "%" . $timerExplode[3] . "%" . $timerExplode[4];
-                                $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}',{$bitData}='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                                $filterString = filter_var($stringBuffer, FILTER_SANITIZE_STRING);
+                                $dbHandler->runQuery("UPDATE status SET {$columnName}='{$filterString}',{$bitData}='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                                 $successFlag = true;
                             }
                         }
@@ -144,7 +155,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                                                     // Update the timer status,startedAt,endedAt and duration data based to user input
                                                     // The syntax is status%startAt%endAt%pausedAt%duration
                                                     $stringBuffer = "started%" . $now . "%" . ($now + $second1) . "%0%" . $duration;
-                                                    $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}',{$bitData}='1' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+
+                                                    $filterString = filter_var($stringBuffer, FILTER_SANITIZE_STRING);
+                                                    $dbHandler->runQuery("UPDATE status SET {$columnName}='{$filterString}',{$bitData}='1' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                                                 }
                                             } else if ($timerExplode[0] == "paused") { // If the timer is started from paused condition, resume the timer.
                                                 $bitData = "data" . $matches[0][0];
@@ -154,7 +167,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                                                 // Change endAt to now+(endAt_prev-pausedAt)
                                                 // Change the status of the timer to started
                                                 $stringBuffer = "started%" . ($now - ($timerExplode[3] - $timerExplode[1])) . "%" . ($now + ($timerExplode[2] - $timerExplode[3])) . "%0%" . $timerExplode[4];
-                                                $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}',{$bitData}='1' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+
+                                                $filterString = filter_var($stringBuffer, FILTER_SANITIZE_STRING);
+                                                $dbHandler->runQuery("UPDATE status SET {$columnName}='{$filterString}',{$bitData}='1' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                                             }
                                         }
                                     }
@@ -172,7 +187,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                                         // ie. for timer 1 it was data1
                                         // Update the timer status and pausedAt data and leave the rest.
                                         $stringBuffer = "paused%" . $timerExplode[1] . "%" . $timerExplode[2] . "%" . $now . "%" . $timerExplode[4];
-                                        $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}',{$bitData}='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+
+                                        $filterString = filter_var($stringBuffer, FILTER_SANITIZE_STRING);
+                                        $dbHandler->runQuery("UPDATE status SET {$columnName}='{$filterString}',{$bitData}='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                                     }
                                 }
                             } else if (strpos($id, 'tbtnr') !== false) { // If it was a stop button
@@ -190,7 +207,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                                         // ie. for timer 1 it was data1
                                         // Change status to idle and leave the rest of the data
                                         $stringBuffer = "idle%" . $timerExplode[1] . "%" . $timerExplode[2] . "%" . $timerExplode[3] . "%" . $timerExplode[4];
-                                        $dbHandler->runQuery("UPDATE status SET {$columnName}='{$stringBuffer}',{$bitData}='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+
+                                        $filterString = filter_var($stringBuffer, FILTER_SANITIZE_STRING);
+                                        $dbHandler->runQuery("UPDATE status SET {$columnName}='{$filterString}',{$bitData}='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                                     }
                                 }
                             }

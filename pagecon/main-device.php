@@ -29,8 +29,8 @@
                                 <input id="statusBoxSwitch1" type="checkbox" />
                                 <label for="statusBoxSwitch1" class="label-primary"></label>
                             </div>
-                            <a href="#0" class="settingDevice1">
-                                <i class="fas fa-bars setting"></i>
+                            <a href="#0" class="settingDevice1 setting">
+                                <i class="fas fa-bars"></i>
                             </a>
                         </div>
                     </div>
@@ -88,8 +88,8 @@
                                 <input id="statusBoxSwitch2" type="checkbox" />
                                 <label for="statusBoxSwitch2" class="label-primary"></label>
                             </div>
-                            <a href="#0" class="settingDevice2">
-                                <i class="fas fa-bars setting"></i>
+                            <a href="#0" class="settingDevice2 setting">
+                                <i class="fas fa-bars"></i>
                             </a>
                         </div>
                     </div>
@@ -152,8 +152,8 @@
                                 <input id="statusBoxSwitch3" type="checkbox" />
                                 <label for="statusBoxSwitch3" class="label-primary"></label>
                             </div>
-                            <a href="#0" class="settingDevice3">
-                                <i class="fas fa-bars setting"></i>
+                            <a href="#0" class="settingDevice3 setting">
+                                <i class="fas fa-bars"></i>
                             </a>
                         </div>
                     </div>
@@ -211,8 +211,8 @@
                                 <input id="statusBoxSwitch4" type="checkbox" />
                                 <label for="statusBoxSwitch4" class="label-primary"></label>
                             </div>
-                            <a href="#0" class="settingDevice4">
-                                <i class="fas fa-bars setting"></i>
+                            <a href="#0" class="settingDevice4 setting">
+                                <i class="fas fa-bars"></i>
                             </a>
                         </div>
                     </div>
@@ -275,7 +275,7 @@
                                     <div class="dropdown-menu"></div>
                                 </a>
                             </div>
-                            <div class="dropdown ml-auto">
+                            <div class="dropdown selector">
                                 <a href="#0" data-toggle="dropdown">
                                     <p class="text">
                                         Harian

@@ -3,12 +3,18 @@
 require "nocache.php";
 
 // Initialize the session
-session_start();
-// Check if the user is already logged in, if yes then redirect him to welcome page
-if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
-    header("location: dashboard.php");
-    exit;
+require_once "api/authCookieSessionValidate.php";
+
+require_once "api/Auth.php";
+require_once "api/Util.php";
+
+$auth = new Auth();
+$util = new Util();
+
+if ($isLoggedIn) {
+    $util->redirect("dashboard.php");
 }
+
 if (empty($_SESSION['logtoken'])) {
     $_SESSION['logtoken'] = bin2hex(random_bytes(32));
 }
@@ -18,7 +24,6 @@ $token = $_SESSION['logtoken'];
 $username = $password = "";
 $username_err = $password_err = "";
 
-require "api/DatabaseController.php";
 $dbHandler = new DatabaseController();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($_POST['token'])) {
@@ -74,6 +79,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $_SESSION["id"] = $id;
                         $_SESSION["username"] = $username;
 
+                        // If the user check the remember me checkbox
+                        if (!empty($_POST["remme"])) {
+                            setcookie("member_login", $username, $cookie_expiration_time);
+
+                            $random_password = $util->getToken(16);
+                            setcookie("random_password", $random_password, $cookie_expiration_time);
+
+                            $random_selector = $util->getToken(32);
+                            setcookie("random_selector", $random_selector, $cookie_expiration_time);
+
+                            $random_password_hash = password_hash($random_password, PASSWORD_DEFAULT);
+                            $random_selector_hash = password_hash($random_selector, PASSWORD_DEFAULT);
+
+                            $expiry_date = date("Y-m-d H:i:s", $cookie_expiration_time);
+
+                            // mark existing token as expired
+                            $userToken = $auth->getTokenByUsername($username, 0);
+                            if (!empty($userToken["id"])) {
+                                $auth->markAsExpired($userToken["id"]);
+                            }
+                            // Insert new token
+                            $auth->insertToken($username, $random_password_hash, $random_selector_hash, $expiry_date);
+                        } else {
+                            $util->clearAuthCookie();
+                        }
                         // Redirect user to welcome page
                         header("location: dashboard.php");
                     } else {
@@ -112,7 +142,7 @@ $dbHandler->close();
     <title>Masuk ke Otoma</title>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-    <link href="style/style.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="style/style.css?<?php echo date('l jS \of F Y h:i:s A'); ?>" />
 </head>
 
 <body id="login">
@@ -135,6 +165,11 @@ $dbHandler->close();
                             <input type="password" name="password" class="form-control">
                             <span class="help-block"><?php echo
                                                             htmlspecialchars($password_err, ENT_QUOTES, 'UTF-8'); ?></span>
+
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input" id="customCheck" name="remme">
+                                <label class="custom-control-label" for="customCheck">Ingat saya</label>
+                            </div>
                         </div>
                         <div class="form-group">
                             <button type="submit" name="submit" class="btn">Masuk</button>
