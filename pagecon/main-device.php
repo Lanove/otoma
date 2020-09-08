@@ -268,6 +268,8 @@
                 <div class="header">
                     <div class="row">
                         <div class="col-12 d-inline-flex align-items-center">
+                            <div class="calendar">
+                                <input type="button" class="btn btn-info" value="&#61447;"></div>
                             <i class="fas fa-chart-bar icon"></i>
                             <div class="dropdown name">
                                 <a href="#" data-toggle="dropdown">

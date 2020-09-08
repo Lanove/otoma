@@ -521,8 +521,22 @@ box-shadow: inset 0px 0px 37px -5px rgba(43,122,120,0.75);
   border-radius: 4px;
   box-sizing: border-box;
 }
+
+.calendar:before {
+  font-family: 'Font Awesome\ 5 Free';
+  font-weight: 900;
+  font-style: normal;
+  color:red;
+  content: "\f007";
+}
+.calendar input[type="button"] {
+  font-family: 'Font Awesome\ 5 Free';
+  font-weight: 900;
+  font-style: normal;
+}
+
 #dashboard .device-status-box .content .timerInput .timerButton {
-  background-color: var(--progbar-bar-color);
+  background-color: var(--info);
   color: var(--text-color1);
   margin-left: 10px;
   max-height: 34px;
@@ -554,6 +568,7 @@ box-shadow: inset 0px 0px 37px -5px rgba(43,122,120,0.75);
 #dashboard .device-graph-box .header .text {
   font-size: 1.25rem;
   position: relative;
+  line-height:1.2em;
   top: 7px;
   word-wrap: break-word;
   width:100%;
@@ -562,11 +577,14 @@ box-shadow: inset 0px 0px 37px -5px rgba(43,122,120,0.75);
   position:absolute;
   right:-75px;
 }
+#dashbaord .device-graph-box .input-group{
+  width:30%;
+}
 #dashboard .device-graph-box .content {
   padding: 10px;
 }
 #dashboard .device-graph-box .totalenergy {
-  margin-bottom: -15px;
+  margin-bottom: -10px;
 }
 #dashboard .device-graph-box .content .chart {
   position: relative;
