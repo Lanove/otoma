@@ -178,9 +178,10 @@ if ($fetchResult) {
   <!-- Anypicker -->
   <link rel="stylesheet" type="text/css" href="style/anypicker-font.css?<?php echo date('l jS \of F Y h:i:s A'); ?>" />
   <link rel="stylesheet" type="text/css" href="style/anypicker.css?<?php echo date('l jS \of F Y h:i:s A'); ?>" />
+  <script type="text/javascript" src="js/anypicker.js"></script>
+  <script type="text/javascript" src="js/i18n/anypicker-i18n-id.js"></script>
   <!-- Bootbox -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.4.0/bootbox.min.js" integrity="sha512-8vfyGnaOX2EeMypNMptU+MwwK206Jk1I/tMQV4NkhOz+W8glENoMhGyU6n/6VgQUhQcJH8NqQgHhMtZjJJBv3A==" crossorigin="anonymous"></script>
-  <script type="text/javascript" src="js/anypicker.js"></script>
 
   <script src="js/dashboard.js?<?php echo date('l jS \of F Y h:i:s A'); ?>"></script>
 </body>

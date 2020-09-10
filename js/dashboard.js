@@ -129,6 +129,7 @@ if (deviceBelonging) {
       $("#t" + String(a)).AnyPicker({
         // Add anypicker to every timer
         mode: "select",
+        lang: "id",
         showComponentLabel: true,
         components: oArrComponents,
         dataSource: oArrDataSource,
@@ -508,6 +509,22 @@ if (deviceBelonging) {
         $("#dashboard .device-graph-box .name .dropdown-menu").append(
           "<a href='#' class='dropdown-item totalAmount'>" + "Total" + "</a>"
         );
+        var oldest = parseJson["plot"]["oldest"]["oldestPlot"].split("-");
+        var newest = parseJson["plot"]["newest"]["newestPlot"].split("-");
+        for (index in newest) {
+          newest[index] = parseInt(newest[index]);
+          oldest[index] = parseInt(oldest[index]);
+        }
+        oldest[1]--;
+        newest[1]--;
+        $("#dateselector").AnyPicker({
+          mode: "datetime",
+          dateTimeFormat: "yyyy-MM-dd",
+          lang: "id",
+          minValue: new Date(oldest[0], oldest[1], 01),
+          maxValue: new Date(newest[0], newest[1], newest[2]),
+          selectedDate: "2020-09-10",
+        });
         var dataPlot = [];
         var totalEnergy = 0;
         for (c in parseJson["plot"]) {

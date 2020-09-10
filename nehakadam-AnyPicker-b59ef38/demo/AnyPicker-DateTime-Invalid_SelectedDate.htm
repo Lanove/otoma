@@ -1,206 +1,177 @@
 <!DOCTYPE html>
 
 <html>
+  <head>
+    <title>Disabled Days - DateTime</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <meta name="msapplication-tap-highlight" content="no" />
 
-	<head>
-	
-		<title>Disabled Days - DateTime</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-		<meta name="msapplication-tap-highlight" content="no" />
+    <style type="text/css">
+      body {
+        margin: 0px;
+      }
 
-		<style type="text/css">
+      .input-cont {
+        width: 300px;
+        padding: 20px;
+      }
 
-			body
-			{
-				margin: 0px;
-			}
+      input {
+        width: 200px;
+        height: 30px;
+        padding: 3px 10px;
 
-			.input-cont
-            {
-                width: 300px;
-                padding: 20px;
-            }
+        margin-bottom: 16px;
+      }
+    </style>
 
-            input
-            {
-            	width: 200px;
-            	height: 30px;
-            	padding: 3px 10px;
+    <link rel="stylesheet" type="text/css" href="../src/anypicker-font.css" />
+    <link rel="stylesheet" type="text/css" href="../src/anypicker.css" />
 
-            	margin-bottom: 16px;
-            }
+    <link rel="stylesheet" type="text/css" href="../src/anypicker-ios.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="../src/anypicker-android.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="../src/anypicker-windows.css"
+    />
 
-		</style>
+    <script type="text/javascript" src="vendors/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="../src/anypicker.js"></script>
 
-		<link rel="stylesheet" type="text/css" href="../src/anypicker-font.css" />
-		<link rel="stylesheet" type="text/css" href="../src/anypicker.css" />
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $("#ip-de").AnyPicker({
+          mode: "datetime",
 
-		<link rel="stylesheet" type="text/css" href="../src/anypicker-ios.css" />
-		<link rel="stylesheet" type="text/css" href="../src/anypicker-android.css" />
-		<link rel="stylesheet" type="text/css" href="../src/anypicker-windows.css" />
+          dateTimeFormat: "MMM dd,yyyy hh:mm AA",
 
-		<script type="text/javascript" src="vendors/jquery-1.11.1.min.js"></script>
-		<script type="text/javascript" src="../src/anypicker.js"></script>
+          selectedDate: "May 02,2015 12:00 PM",
 
-		<script type="text/javascript">
-					
-			$(document).ready(function()
-			{
-				$("#ip-de").AnyPicker(
-				{
-					mode: "datetime",
+          disableValues: {
+            date: [
+              {
+                val: "01-01-2015",
+              },
+              {
+                start: "01-03-2015",
+                end: "31-03-2015",
+              },
+            ],
+          },
+        });
 
-					dateTimeFormat: "MMM dd,yyyy hh:mm AA",
+        $("#ip-ios").AnyPicker({
+          mode: "datetime",
 
-					selectedDate: "May 02,2015 12:00 PM", 
-					
-					disableValues: 
-					{
-						datetime: [
-							{
-								val: "May 06,2015 02:30 AM"
-							}
-						],
+          dateTimeFormat: "MMMM dd,yyyy hh:mm AA",
 
-						day: [0, 6]						
-					}
-				});
+          selectedDate: "May 02,2015 12:00 PM",
 
-				$("#ip-ios").AnyPicker(
-				{
-					mode: "datetime",
+          disableValues: {
+            datetime: [
+              {
+                val: "May 06,2015 02:30 AM",
+              },
+            ],
 
-					dateTimeFormat: "MMMM dd,yyyy hh:mm AA",
+            day: [0, 6],
+          },
 
-					selectedDate: "May 02,2015 12:00 PM", 
-					
-					disableValues: 
-					{
-						datetime: [
-							{
-								val: "May 06,2015 02:30 AM"
-							}
-						],
+          theme: "iOS", // "Default", "iOS", "Android", "Windows"
+        });
 
-						day: [0, 6]						
-					},
+        $("#ip-android").AnyPicker({
+          mode: "datetime",
 
-					theme: "iOS" // "Default", "iOS", "Android", "Windows"
-				});
+          dateTimeFormat: "MMM dd,yyyy hh:mm AA",
 
-				$("#ip-android").AnyPicker(
-				{
-					mode: "datetime",
+          selectedDate: "May 02,2015 12:00 PM",
 
-					dateTimeFormat: "MMM dd,yyyy hh:mm AA",
+          disableValues: {
+            datetime: [
+              {
+                val: "May 06,2015 02:30 AM",
+              },
+            ],
 
-					selectedDate: "May 02,2015 12:00 PM", 
-					
-					disableValues: 
-					{
-						datetime: [
-							{
-								val: "May 06,2015 02:30 AM"
-							}
-						],
+            day: [0, 6],
+          },
 
-						day: [0, 6]						
-					},
+          theme: "Android", // "Default", "iOS", "Android", "Windows"
+        });
 
-					theme: "Android" // "Default", "iOS", "Android", "Windows"
-				});
+        $("#ip-wp").AnyPicker({
+          mode: "datetime",
 
-				$("#ip-wp").AnyPicker(
-				{
-					mode: "datetime",
+          dateTimeFormat: "MMM dd,yyyy hh:mm AA",
 
-					dateTimeFormat: "MMM dd,yyyy hh:mm AA",
+          selectedDate: "May 02,2015 12:00 PM",
 
-					selectedDate: "May 02,2015 12:00 PM", 
-					
-					disableValues: 
-					{
-						datetime: [
-							{
-								val: "May 06,2015 02:30 AM"
-							}
-						],
+          disableValues: {
+            datetime: [
+              {
+                val: "May 06,2015 02:30 AM",
+              },
+            ],
 
-						day: [0, 6]						
-					},
+            day: [0, 6],
+          },
 
-					theme: "Windows" // "Default", "iOS", "Android", "Windows"
-				});
+          theme: "Windows", // "Default", "iOS", "Android", "Windows"
+        });
+      });
+    </script>
+  </head>
 
+  <body>
+    <table class="input-cont">
+      <tr>
+        <td>DateTime : (Default)</td>
+      </tr>
 
-			});
+      <tr>
+        <td>
+          <input type="text" id="ip-de" readonly />
+        </td>
+      </tr>
 
-		</script>
+      <tr>
+        <td>DateTime : (iOS)</td>
+      </tr>
 
-	</head>
+      <tr>
+        <td>
+          <input type="text" id="ip-ios" readonly />
+        </td>
+      </tr>
 
-	<body>
+      <tr>
+        <td>DateTime : (Android)</td>
+      </tr>
 
-		<table class="input-cont">
-        
-        	<tr>
+      <tr>
+        <td>
+          <input type="text" id="ip-android" readonly />
+        </td>
+      </tr>
 
-        		<td>DateTime : (Default)</td>
+      <tr>
+        <td>DateTime : (Windows)</td>
+      </tr>
 
-        	</tr>
-
-        	<tr>
-
-            	<td>
-            		<input type="text" id="ip-de" readonly>
-            	</td>
-        
-        	</tr>
-
-        	<tr>
-
-        		<td>DateTime : (iOS)</td>
-
-        	</tr>
-
-        	<tr>
-
-            	<td>
-            		<input type="text" id="ip-ios" readonly>
-            	</td>
-        
-        	</tr>
-
-        	<tr>
-
-        		<td>DateTime : (Android)</td>
-
-        	</tr>
-
-        	<tr>
-
-            	<td>
-            		<input type="text" id="ip-android" readonly>
-            	</td>
-        
-        	</tr>
-
-        	<tr>
-
-        		<td>DateTime : (Windows)</td>
-
-        	</tr>
-
-        	<tr>
-
-            	<td>
-            		<input type="text" id="ip-wp" readonly>
-            	</td>
-        
-        	</tr>
-
-        </table>
-	
-	</body>
-
+      <tr>
+        <td>
+          <input type="text" id="ip-wp" readonly />
+        </td>
+      </tr>
+    </table>
+  </body>
 </html>

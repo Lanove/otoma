@@ -267,27 +267,43 @@
                 <!-- Device status box status -->
                 <div class="header">
                     <div class="row">
-                        <div class="col-12 d-inline-flex align-items-center">
-                            <div class="calendar">
-                                <input type="button" class="btn btn-info" value="&#61447;"></div>
-                            <i class="fas fa-chart-bar icon"></i>
-                            <div class="dropdown name">
-                                <a href="#" data-toggle="dropdown">
-                                    <p class="text"></p>
-                                    <div class="dropdown-menu"></div>
-                                </a>
-                            </div>
-                            <div class="dropdown selector">
-                                <a href="#0" data-toggle="dropdown">
-                                    <p class="text">
-                                        Harian
-                                        <i class="fas fa-caret-down"></i>
-                                    </p>
-                                    <div class="dropdown-menu">
-                                        <a href="#0" class="dropdown-item">Bulanan</a>
-                                        <a href="#0" class="dropdown-item">Tahunan</a>
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-lg-10 col-md-9 col-8 d-inline-flex align-items-center">
+                                    <i class="fas fa-chart-bar icon"></i>
+                                    <div class="dropdown name">
+                                        <a href="#" data-toggle="dropdown">
+                                            <p class="text"></p>
+                                            <div class="dropdown-menu"></div>
+                                        </a>
                                     </div>
-                                </a>
+                                </div>
+                                <div class="col-lg-2 col-md-3 col-4 sub2">
+                                    <div class="row sub4">
+                                        <div class="col-12 ctn">
+                                            <div class="dropdown selector">
+                                                <a href="#0" data-toggle="dropdown">
+                                                    <p class="txt">
+                                                        Harian
+                                                        <i class="fas fa-caret-down"></i>
+                                                    </p>
+                                                    <div class="dropdown-menu">
+                                                        <a href="#0" class="dropdown-item">Bulanan</a>
+                                                        <a href="#0" class="dropdown-item">Tahunan</a>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row sub3">
+                                        <div class="col-12 ctn">
+                                            <button class="btn btn-info" id="dateselector">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

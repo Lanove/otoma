@@ -1,92 +1,81 @@
 <!DOCTYPE html>
 
 <html>
+  <head>
+    <title>Date Picker - AnyPicker</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <meta name="msapplication-tap-highlight" content="no" />
 
-	<head>
-	
-		<title>Date Picker - AnyPicker</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-		<meta name="msapplication-tap-highlight" content="no" />
+    <style type="text/css">
+      body {
+        margin: 0px;
+      }
 
-		<style type="text/css">
+      .input-cont {
+        width: 300px;
+        padding: 20px;
+      }
 
-			body
-			{
-				margin: 0px;
-			}
+      input {
+        width: 200px;
+        height: 30px;
+        padding: 3px 10px;
 
-			.input-cont
-            {
-                width: 300px;
-                padding: 20px;
-            }
+        margin-bottom: 16px;
+      }
+    </style>
 
-            input
-            {
-            	width: 200px;
-            	height: 30px;
-            	padding: 3px 10px;
+    <link rel="stylesheet" type="text/css" href="../src/anypicker-font.css" />
+    <link rel="stylesheet" type="text/css" href="../src/anypicker.css" />
 
-            	margin-bottom: 16px;
-            }
+    <link rel="stylesheet" type="text/css" href="../src/anypicker-ios.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="../src/anypicker-android.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="../src/anypicker-windows.css"
+    />
 
-		</style>
+    <script type="text/javascript" src="vendors/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="../src/anypicker.js"></script>
 
-		<link rel="stylesheet" type="text/css" href="../src/anypicker-font.css" />
-		<link rel="stylesheet" type="text/css" href="../src/anypicker.css" />
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $("#ip-de").AnyPicker({
+          mode: "datetime",
 
-		<link rel="stylesheet" type="text/css" href="../src/anypicker-ios.css" />
-		<link rel="stylesheet" type="text/css" href="../src/anypicker-android.css" />
-		<link rel="stylesheet" type="text/css" href="../src/anypicker-windows.css" />
+          dateTimeFormat: "yyyy-MM-dd",
 
-		<script type="text/javascript" src="vendors/jquery-1.11.1.min.js"></script>
-		<script type="text/javascript" src="../src/anypicker.js"></script>
+          minValue: new Date(1920, 08, 00),
 
-		<script type="text/javascript">
-		
-			$(document).ready(function()
-			{
-				$("#ip-de").AnyPicker(
-				{
-					mode: "datetime",
+          maxValue: new Date(1920, 09, 99),
 
-					dateTimeFormat: "yyyy-MM-dd",
+          //minValue: new Date(2016, 02, 06),
 
-					minValue: new Date(1920, 01, 19),
+          //maxValue: new Date(2017, 01, 31),
+        });
+      });
+    </script>
+  </head>
 
-					maxValue: new Date(2017, 01, 19)
+  <body>
+    <table class="input-cont">
+      <tr>
+        <td>Date : (Default)</td>
+      </tr>
 
-					// minValue: new Date(2016, 02, 06),
-
-					// maxValue: new Date(2017, 01, 31)
-					
-				});
-			});
-
-		</script>
-
-	</head>
-
-	<body>
-
-		<table class="input-cont">
-        
-        	<tr>
-
-        		<td>Date : (Default) </td>
-
-        	</tr>
-
-        	<tr>
-
-            	<td>
-            		<input type="text" id="ip-de" readonly>
-            	</td>
-        
-        	</tr>
-
-        </table>
-	
-	</body>
-
+      <tr>
+        <td>
+          <input type="text" id="ip-de" readonly />
+        </td>
+      </tr>
+    </table>
+  </body>
 </html>

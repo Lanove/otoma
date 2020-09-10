@@ -43,7 +43,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                             // Get every name of masterDevice with fetchAll
                             $masterNameList = $dbHandler->runQuery("SELECT masterName FROM bond WHERE username = :name AND masterName != :exception ORDER BY id ASC;", ["name" => $username, "exception" => $fetchResult["main"]["masterName"]], "ALL");
                             // Get daily plot data if it exist.
-                            $fetchResult["plot"] = $dbHandler->runQuery("SELECT plotStamp,timeStamp,deviceType,data1 FROM dailyplot WHERE bondKey = :bondkey;", ["bondkey" => $fetchResult["main"]["bondKey"]], "ALL");
+                            $fetchResult["plot"] = $dbHandler->runQuery("SELECT * FROM dailyplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $fetchResult["main"]["bondKey"], "date" => "2020-08-26"/*date("y-m-d")*/], "ALL");
+
+                            $fetchResult["plot"]["oldest"] = $dbHandler->runQuery("SELECT MIN(date) AS oldestPlot FROM dailyplot WHERE bondKey = :bondkey;", ["bondkey" => $fetchResult["main"]["bondKey"]]);
+                            $fetchResult["plot"]["newest"] = $dbHandler->runQuery("SELECT MAX(date) AS newestPlot FROM dailyplot WHERE bondKey = :bondkey;", ["bondkey" => $fetchResult["main"]["bondKey"]]);
+                            if ($fetchResult["plot"]["newest"]["newestPlot"] !== date("Y-m-d")) {
+                                for ($j = 1; $j < 25; $j++) {
+                                    $dbHandler->runQuery("INSERT INTO dailyplot (bondKey, date, timestamp, deviceType, data1, data2, data3, data4) VALUES (:bondKey, :now, :timej, 'main', '0', '0', '0', '0');", ["bondKey" => $fetchResult["main"]["bondKey"], "now" => date("Y-m-d"), "timej" => "0" . $j . ":00:00"]);
+                                }
+                                $fetchResult["plot"]["newest"] = $dbHandler->runQuery("SELECT MAX(date) AS newestPlot FROM dailyplot WHERE bondKey = :bondkey;", ["bondkey" => $fetchResult["main"]["bondKey"]]);
+                            }
                             // Merge array
                             $mergeResult = array_merge($masterNameList, $fetchResult);
                             // Return JSON array

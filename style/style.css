@@ -554,14 +554,13 @@ box-shadow: inset 0px 0px 37px -5px rgba(43,122,120,0.75);
   border-radius: 10px 10px 0px 0px;
   max-width: 100%;
   padding-left:40px;
-  padding-right:100px;
+  padding-right:15px;
 }
 #dashboard .device-graph-box .header .icon {
   font-size: 1.5rem;
   position: absolute;
   left:-15px;
 }
-
 #dashboard .device-graph-box .header .dropdown {
   max-width:100%;
 }
@@ -573,12 +572,37 @@ box-shadow: inset 0px 0px 37px -5px rgba(43,122,120,0.75);
   word-wrap: break-word;
   width:100%;
 }
-#dashboard .device-graph-box .header .selector{
-  position:absolute;
-  right:-75px;
+#dashboard .sub2{
+  min-height:100%;
 }
-#dashbaord .device-graph-box .input-group{
-  width:30%;
+#dashboard .sub3{
+  min-height:45px;
+  height:calc(100% - 2rem);
+}
+#dashboard .sub4{
+  max-height:2rem;
+}
+#dashboard .sub4 .ctn{
+  max-height:2rem;
+  display: flex;
+  justify-content: center;
+}
+#dashboard .sub4 .ctn .txt{
+  font-size: 1.25rem;
+  line-height: 1.2em;
+  position:relative;
+  top:4px;
+  word-wrap: break-word;
+  width: 100%;
+}
+#dashboard .sub3 .ctn{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#dashboard .device-graph-box .header .selector{
+  /* position:absolute;
+  right:-75px; */
 }
 #dashboard .device-graph-box .content {
   padding: 10px;
