@@ -31,7 +31,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                     $dbHandler = new DatabaseController(); // Open database
                     if ($requestType === "loadDeviceInformation") { // Request is first page load
                         if (!empty($json["master"])) {
-
                             if ($json["master"] == "main") {
                                 // Get every name of device including masterName and deviceName
                                 $fetchResult["main"] = $dbHandler->runQuery("SELECT deviceType,bondKey,masterName,deviceName1,deviceName2,deviceName3,deviceName4 FROM bond WHERE username = :name ORDER BY id ASC;", ["name" => $username]);
@@ -43,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                             // Get every name of masterDevice with fetchAll
                             $masterNameList = $dbHandler->runQuery("SELECT masterName FROM bond WHERE username = :name AND masterName != :exception ORDER BY id ASC;", ["name" => $username, "exception" => $fetchResult["main"]["masterName"]], "ALL");
                             // Get daily plot data if it exist.
-                            $fetchResult["plot"] = $dbHandler->runQuery("SELECT * FROM dailyplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $fetchResult["main"]["bondKey"], "date" => "2020-08-26"/*date("y-m-d")*/], "ALL");
+                            $fetchResult["plot"]["data"] = $dbHandler->runQuery("SELECT * FROM dailyplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $fetchResult["main"]["bondKey"], "date" => "2020-08-26"/*date("y-m-d")*/], "ALL");
 
                             $fetchResult["plot"]["oldest"] = $dbHandler->runQuery("SELECT MIN(date) AS oldestPlot FROM dailyplot WHERE bondKey = :bondkey;", ["bondkey" => $fetchResult["main"]["bondKey"]]);
                             $fetchResult["plot"]["newest"] = $dbHandler->runQuery("SELECT MAX(date) AS newestPlot FROM dailyplot WHERE bondKey = :bondkey;", ["bondkey" => $fetchResult["main"]["bondKey"]]);
@@ -221,6 +220,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                                         $dbHandler->runQuery("UPDATE status SET {$columnName}='{$filterString}',{$bitData}='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                                     }
                                 }
+                            }
+                        }
+                    } else if ($requestType === "updateTimerVal") {
+                        if (!empty($json["bondKey"]) && !empty($json["value"]) && !empty($json["id"])) {
+                            $id = filter_var($json["id"], FILTER_SANITIZE_STRING);
+                            $value = filter_var($json["value"], FILTER_SANITIZE_STRING);
+                            $bondKey = filter_var($json["bondKey"], FILTER_SANITIZE_STRING);
+                            if ($id === "t1" || $id === "t2" || $id === "t3" || $id === "t4") {
+                                $id .= "Data";
+                                $fetchResult = $dbHandler->runQuery("SELECT {$id} FROM status WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                                $timerExplode = explode('%', $fetchResult[$id] . "%", -1);
+                                $stringBuffer = $timerExplode[0] . "%" . $timerExplode[1] . "%" . $timerExplode[2] . "%" . $timerExplode[3] . "%" . $value;
+                                $stringBuffer = filter_var($stringBuffer, FILTER_SANITIZE_STRING);
+                                $dbHandler->runQuery("UPDATE status SET {$id}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
                             }
                         }
                     }

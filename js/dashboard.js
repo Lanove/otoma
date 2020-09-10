@@ -36,6 +36,12 @@ if (deviceBelonging) {
     t3: {},
     t4: {},
   };
+  var plotData = {
+    date: {},
+    data: {},
+    total: null,
+    label: {},
+  };
 
   function createDataSource() {
     var oArrDataNum = [7, 23, 59],
@@ -119,6 +125,13 @@ if (deviceBelonging) {
         stringBuffer += "0" + numberPal[i];
       else stringBuffer += oSelectedValues.values[i].val + numberPal[i];
     }
+    requestAJAX({
+      requestType: "updateTimerVal",
+      bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+      token: getMeta("token"),
+      value: stringBuffer,
+      id: oSelectedValues.id,
+    });
     return stringBuffer;
   }
 
@@ -434,6 +447,28 @@ if (deviceBelonging) {
       }
     );
   }
+  function getDateNowLong() {
+    const monthNames = [
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "Juli",
+      "Agustus",
+      "September",
+      "Oktober",
+      "November",
+      "Desember",
+    ];
+    let dateObj = new Date();
+    let month = monthNames[dateObj.getMonth()];
+    let day = String(dateObj.getDate()).padStart(2, "0");
+    let year = dateObj.getFullYear();
+    let output = day + " " + month + " " + year;
+    return output;
+  }
   function loadDeviceInformation(controller) {
     requestAJAX(
       {
@@ -516,27 +551,24 @@ if (deviceBelonging) {
           oldest[index] = parseInt(oldest[index]);
         }
         oldest[1]--;
-        newest[1]--;
         $("#dateselector").AnyPicker({
           mode: "datetime",
           dateTimeFormat: "yyyy-MM-dd",
           lang: "id",
           minValue: new Date(oldest[0], oldest[1], 01),
-          maxValue: new Date(newest[0], newest[1], newest[2]),
-          selectedDate: "2020-09-10",
+          maxValue: new Date(newest[0], newest[1], 00),
+          selectedDate: new Date(Date.now()),
         });
-        var dataPlot = [];
-        var totalEnergy = 0;
-        for (c in parseJson["plot"]) {
-          dataPlot[c] = parseInt(parseJson["plot"][c]["data1"]);
-          totalEnergy += dataPlot[c];
+
+        for (c in parseJson["plot"]["data"]) {
+          plotData.data[c] = parseInt(parseJson["plot"]["data"][c]["data1"]);
+          plotData.total += plotData.data[c];
         }
         $("#dashboard .device-graph-box .totalenergy span").text(
-          String(totalEnergy) + "Wh"
+          String(plotData.total) + "Wh"
         );
         myChart.destroy();
-
-        createChart();
+        createChart(getDateNowLong());
         updateChart(
           myChart,
           [
@@ -564,7 +596,7 @@ if (deviceBelonging) {
             "22:00",
             "23:00",
           ],
-          dataPlot
+          plotData.data
         );
       }
     );
@@ -591,7 +623,7 @@ if (deviceBelonging) {
     });
   }
 
-  function createChart() {
+  function createChart(date) {
     var ctx = document.getElementById("graph").getContext("2d");
     Chart.defaults.global.defaultFontColor = "white";
     Chart.defaults.global.elements.rectangle.borderWidth = 2;
@@ -600,7 +632,7 @@ if (deviceBelonging) {
       data: {
         datasets: [
           {
-            label: "Penggunaan Energi (Wh)",
+            label: "Penggunaan Energi (Wh) untuk " + date,
             backgroundColor: "rgba(2, 117, 216, 1)",
             borderColor: "rgba(2, 117, 216, 1)",
             borderWidth: 1,
