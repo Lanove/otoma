@@ -137,7 +137,6 @@ if (deviceBelonging) {
 
   $(document).ready(function () {
     loadDeviceInformation("main");
-    createChart();
     for (var a = 1; a < 5; a++) {
       $("#t" + String(a)).AnyPicker({
         // Add anypicker to every timer
@@ -563,41 +562,17 @@ if (deviceBelonging) {
         for (c in parseJson["plot"]["data"]) {
           plotData.data[c] = parseInt(parseJson["plot"]["data"][c]["data1"]);
           plotData.total += plotData.data[c];
+          plotData.label[c] = parseJson["plot"]["data"][c]["timestamp"].slice(
+            0,
+            5
+          );
         }
+        plotData.date = getDateNowLong();
         $("#dashboard .device-graph-box .totalenergy span").text(
           String(plotData.total) + "Wh"
         );
-        myChart.destroy();
-        createChart(getDateNowLong());
-        updateChart(
-          myChart,
-          [
-            "1:00",
-            "2:00",
-            "3:00",
-            "4:00",
-            "5:00",
-            "6:00",
-            "7:00",
-            "8:00",
-            "9:00",
-            "10:00",
-            "11:00",
-            "12:00",
-            "13:00",
-            "14:00",
-            "15:00",
-            "16:00",
-            "17:00",
-            "18:00",
-            "19:00",
-            "20:00",
-            "21:00",
-            "22:00",
-            "23:00",
-          ],
-          plotData.data
-        );
+        createChart();
+        refreshChart(plotData);
       }
     );
   }
@@ -681,5 +656,11 @@ if (deviceBelonging) {
     var elem = document.getElementById(id);
     elem.style.width = percentage + "%";
     elem.innerHTML = label;
+  }
+
+  function refreshChart(apoPlot) {
+    myChart.destroy();
+    createChart(apoPlot.date);
+    updateChart(myChart, apoPlot.label, apoPlot.data);
   }
 }

@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                             // Get every name of masterDevice with fetchAll
                             $masterNameList = $dbHandler->runQuery("SELECT masterName FROM bond WHERE username = :name AND masterName != :exception ORDER BY id ASC;", ["name" => $username, "exception" => $fetchResult["main"]["masterName"]], "ALL");
                             // Get daily plot data if it exist.
-                            $fetchResult["plot"]["data"] = $dbHandler->runQuery("SELECT * FROM dailyplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $fetchResult["main"]["bondKey"], "date" => "2020-08-26"/*date("y-m-d")*/], "ALL");
+                            $fetchResult["plot"]["data"] = $dbHandler->runQuery("SELECT * FROM dailyplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $fetchResult["main"]["bondKey"], "date" => date("y-m-d")], "ALL");
 
                             $fetchResult["plot"]["oldest"] = $dbHandler->runQuery("SELECT MIN(date) AS oldestPlot FROM dailyplot WHERE bondKey = :bondkey;", ["bondkey" => $fetchResult["main"]["bondKey"]]);
                             $fetchResult["plot"]["newest"] = $dbHandler->runQuery("SELECT MAX(date) AS newestPlot FROM dailyplot WHERE bondKey = :bondkey;", ["bondkey" => $fetchResult["main"]["bondKey"]]);
