@@ -226,29 +226,36 @@ if (deviceBelonging) {
       $("#tbtns" + a).on("click", function () {
         // Add event listener to every timer start/pause button
         var ajaxBuffer = {};
-        ajaxBuffer["val"] = $("#" + this.id).text();
+        var apo = this;
+        ajaxBuffer["val"] = $("#" + apo.id).text();
         ajaxBuffer["requestType"] = "timerButton";
-        ajaxBuffer["id"] = this.id;
-        ajaxBuffer["duration"] = $("#t" + this.id.substring(5, 6)).val();
+        ajaxBuffer["id"] = apo.id;
+        ajaxBuffer["duration"] = $("#t" + apo.id.substring(5, 6)).val();
         ajaxBuffer["token"] = getMeta("token");
         ajaxBuffer["masterDevice"] = $("#dashboard #deviceheader dummy").attr(
           "class"
         );
+        $("#statusBoxOverlay" + apo.id.substring(5, 6)).addClass("active");
         requestAJAX(ajaxBuffer, function () {
           reloadStatus();
+          $("#statusBoxOverlay" + apo.id.substring(5, 6)).removeClass("active");
         });
       });
       $("#tbtnr" + a).on("click", function () {
         // Add event listener to every timer stop button
         var ajaxBuffer = {};
+        var apo = this;
         ajaxBuffer["requestType"] = "timerButton";
-        ajaxBuffer["id"] = this.id;
+        ajaxBuffer["id"] = apo.id;
         ajaxBuffer["token"] = getMeta("token");
         ajaxBuffer["masterDevice"] = $("#dashboard #deviceheader dummy").attr(
           "class"
         );
+        $("#statusBoxOverlay" + apo.id.substring(5, 6)).addClass("active");
+        console.log("#statusBoxOverlay" + apo.id.substring(5, 6));
         requestAJAX(ajaxBuffer, function () {
           reloadStatus();
+          $("#statusBoxOverlay" + apo.id.substring(5, 6)).removeClass("active");
         });
       });
     }
@@ -487,6 +494,8 @@ if (deviceBelonging) {
     else if (type.search(/bulanan/i)) type = "Bulanan";
     else type = "Tahunan;";
     $("#dateselector").val(sOutput);
+    $("#graphoverlay").addClass("active");
+    var success = false;
     requestAJAX(
       {
         requestType: "getChart",
@@ -497,6 +506,8 @@ if (deviceBelonging) {
       },
       function (response) {
         var parseJson = JSON.parse(response);
+        success = true;
+        $("#graphoverlay").removeClass("active");
         plotData.total = 0;
         for (c in parseJson) {
           plotData.data[c] = parseInt(parseJson[c]["data1"]);

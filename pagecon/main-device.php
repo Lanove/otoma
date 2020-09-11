@@ -19,6 +19,14 @@
         <!-- Status box 1 -->
         <div class="col-lg-6">
             <div class="device-status-box">
+                <div class="mini-overlay" id="statusBoxOverlay1" style="top:5px;padding:4px 15px;">
+                    <div class="mino">
+                        <div class="myLoader">
+                            <div class="loader quantum-spinner">
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- Device status box status -->
                 <div class="header">
                     <div class="row">
@@ -78,6 +86,14 @@
         </div>
         <div class="col-lg-6">
             <div class="device-status-box">
+                <div class="mini-overlay" id="statusBoxOverlay2" style="top:5px;padding:4px 15px;">
+                    <div class="mino">
+                        <div class="myLoader">
+                            <div class="loader quantum-spinner">
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- Device status box status -->
                 <div class="header">
                     <div class="row">
@@ -142,6 +158,15 @@
         <!-- Status box 3 -->
         <div class="col-lg-6">
             <div class="device-status-box">
+
+                <div class="mini-overlay" id="statusBoxOverlay3" style="top:5px;padding:4px 15px;">
+                    <div class="mino">
+                        <div class="myLoader">
+                            <div class="loader quantum-spinner">
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- Device status box status -->
                 <div class="header">
                     <div class="row">
@@ -201,6 +226,14 @@
         </div>
         <div class="col-lg-6">
             <div class="device-status-box">
+                <div class="mini-overlay" id="statusBoxOverlay4" style="top:5px;padding:4px 15px;">
+                    <div class="mino">
+                        <div class="myLoader">
+                            <div class="loader quantum-spinner">
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- Device status box status -->
                 <div class="header">
                     <div class="row">
@@ -264,6 +297,14 @@
         <!-- Status box 3 -->
         <div class="col-md-12">
             <div class="device-graph-box">
+                <div class="mini-overlay" id="graphoverlay">
+                    <div class="mino">
+                        <div class="myLoader">
+                            <div class="loader quantum-spinner">
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- Device status box status -->
                 <div class="header">
                     <div class="row">
