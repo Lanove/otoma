@@ -130,12 +130,20 @@ if (deviceBelonging) {
       bondKey: $("#dashboard #deviceheader dummy").attr("class"),
       token: getMeta("token"),
       value: stringBuffer,
-      id: oSelectedValues.id,
+      id: this.elem.id,
     });
     return stringBuffer;
   }
 
   $(document).ready(function () {
+    createChart();
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, "0");
+    var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = yyyy + "-" + mm + "-" + dd;
+    $("#dateselector").val(today);
     loadDeviceInformation("main");
     for (var a = 1; a < 5; a++) {
       $("#t" + String(a)).AnyPicker({
@@ -446,21 +454,21 @@ if (deviceBelonging) {
       }
     );
   }
+  const monthNames = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
   function getDateNowLong() {
-    const monthNames = [
-      "Januari",
-      "Februari",
-      "Maret",
-      "April",
-      "Mei",
-      "Juni",
-      "Juli",
-      "Agustus",
-      "September",
-      "Oktober",
-      "November",
-      "Desember",
-    ];
     let dateObj = new Date();
     let month = monthNames[dateObj.getMonth()];
     let day = String(dateObj.getDate()).padStart(2, "0");
@@ -468,6 +476,42 @@ if (deviceBelonging) {
     let output = day + " " + month + " " + year;
     return output;
   }
+  function convertToDateLong(arg) {
+    var buffer = arg.split("-");
+    let month = monthNames[parseInt(buffer[1]) - 1];
+    return buffer[2] + " " + month + " " + buffer[0];
+  }
+  function setTrigger(sOutput) {
+    var type = $("#dashboard .sub4 .ctn .txt").text();
+    if (type.search(/harian/i)) type = "Harian";
+    else if (type.search(/bulanan/i)) type = "Bulanan";
+    else type = "Tahunan;";
+    $("#dateselector").val(sOutput);
+    requestAJAX(
+      {
+        requestType: "getChart",
+        bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+        token: getMeta("token"),
+        type: type,
+        value: sOutput,
+      },
+      function (response) {
+        var parseJson = JSON.parse(response);
+        plotData.total = 0;
+        for (c in parseJson) {
+          plotData.data[c] = parseInt(parseJson[c]["data1"]);
+          plotData.total += plotData.data[c];
+          plotData.label[c] = parseJson[c]["timestamp"].slice(0, 5);
+        }
+        plotData.date = convertToDateLong(sOutput);
+        $("#dashboard .device-graph-box .totalenergy span").text(
+          String(plotData.total) + "Wh"
+        );
+        refreshChart(plotData);
+      }
+    );
+  }
+
   function loadDeviceInformation(controller) {
     requestAJAX(
       {
@@ -550,15 +594,17 @@ if (deviceBelonging) {
           oldest[index] = parseInt(oldest[index]);
         }
         oldest[1]--;
+        $("#dateselector").unbind().removeData();
         $("#dateselector").AnyPicker({
           mode: "datetime",
           dateTimeFormat: "yyyy-MM-dd",
           lang: "id",
           minValue: new Date(oldest[0], oldest[1], 01),
           maxValue: new Date(newest[0], newest[1], 00),
-          selectedDate: new Date(Date.now()),
+          setOutput: setTrigger,
         });
 
+        plotData.total = 0;
         for (c in parseJson["plot"]["data"]) {
           plotData.data[c] = parseInt(parseJson["plot"]["data"][c]["data1"]);
           plotData.total += plotData.data[c];
@@ -571,7 +617,6 @@ if (deviceBelonging) {
         $("#dashboard .device-graph-box .totalenergy span").text(
           String(plotData.total) + "Wh"
         );
-        createChart();
         refreshChart(plotData);
       }
     );

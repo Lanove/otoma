@@ -1,5 +1,6 @@
 <?php
 require "originandreferer.php";
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is POST
     if (isset($_SERVER['HTTP_ORIGIN'])) { // Check if HTTP Origin is set.
         $address = 'http://' . $origin;
@@ -41,15 +42,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
 
                             // Get every name of masterDevice with fetchAll
                             $masterNameList = $dbHandler->runQuery("SELECT masterName FROM bond WHERE username = :name AND masterName != :exception ORDER BY id ASC;", ["name" => $username, "exception" => $fetchResult["main"]["masterName"]], "ALL");
-                            // Get daily plot data if it exist.
+                            // Get current date plot data.
                             $fetchResult["plot"]["data"] = $dbHandler->runQuery("SELECT * FROM dailyplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $fetchResult["main"]["bondKey"], "date" => date("y-m-d")], "ALL");
-
+                            // Get the oldest record from daily plot data.
                             $fetchResult["plot"]["oldest"] = $dbHandler->runQuery("SELECT MIN(date) AS oldestPlot FROM dailyplot WHERE bondKey = :bondkey;", ["bondkey" => $fetchResult["main"]["bondKey"]]);
+                            // Get the newest record from daily plot data.
                             $fetchResult["plot"]["newest"] = $dbHandler->runQuery("SELECT MAX(date) AS newestPlot FROM dailyplot WHERE bondKey = :bondkey;", ["bondkey" => $fetchResult["main"]["bondKey"]]);
+                            // If the newest record from daily plot data is not current date, then create the frame of the current date.
                             if ($fetchResult["plot"]["newest"]["newestPlot"] !== date("Y-m-d")) {
                                 for ($j = 1; $j < 25; $j++) {
                                     $dbHandler->runQuery("INSERT INTO dailyplot (bondKey, date, timestamp, deviceType, data1, data2, data3, data4) VALUES (:bondKey, :now, :timej, 'main', '0', '0', '0', '0');", ["bondKey" => $fetchResult["main"]["bondKey"], "now" => date("Y-m-d"), "timej" => "0" . $j . ":00:00"]);
                                 }
+                                // Refresh the newest record
                                 $fetchResult["plot"]["newest"] = $dbHandler->runQuery("SELECT MAX(date) AS newestPlot FROM dailyplot WHERE bondKey = :bondkey;", ["bondkey" => $fetchResult["main"]["bondKey"]]);
                             }
                             // Merge array
@@ -234,6 +238,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                                 $stringBuffer = $timerExplode[0] . "%" . $timerExplode[1] . "%" . $timerExplode[2] . "%" . $timerExplode[3] . "%" . $value;
                                 $stringBuffer = filter_var($stringBuffer, FILTER_SANITIZE_STRING);
                                 $dbHandler->runQuery("UPDATE status SET {$id}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                            }
+                        }
+                    } else if ($requestType === "getChart") {
+                        if (!empty($json["bondKey"]) && !empty($json["value"]) && !empty($json["type"])) {
+                            $bondKey = filter_var($json["bondKey"], FILTER_SANITIZE_STRING);
+                            $date = filter_var($json["value"], FILTER_SANITIZE_STRING);
+                            $type = filter_var($json["type"], FILTER_SANITIZE_STRING);
+                            if ($type === "Harian") {
+
+                                $fetchResult = $dbHandler->runQuery("SELECT * FROM dailyplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $bondKey, "date" => $date], "ALL");
+                                if (!$fetchResult) {
+                                    for ($j = 1; $j < 25; $j++) {
+                                        $dbHandler->runQuery("INSERT INTO dailyplot (bondKey, date, timestamp, deviceType, data1, data2, data3, data4) VALUES (:bondKey, :date, :timej, 'main', '0', '0', '0', '0');", ["bondKey" => $bondKey, "date" => $date, "timej" => "0" . $j . ":00:00"]);
+                                    }
+
+                                    $fetchResult = $dbHandler->runQuery("SELECT * FROM dailyplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $bondKey, "date" => $date], "ALL");
+                                }
+                                echo json_encode($fetchResult);
                             }
                         }
                     }

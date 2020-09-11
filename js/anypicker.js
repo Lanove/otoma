@@ -1306,7 +1306,7 @@ AnyPicker.prototype = {
 
 		if($.CF.isValid(apo.setting.formatOutput))
 		{
-			sOutput = apo.setting.formatOutput.call(apo, {...apo.tmp.selectedValues,"id":apo.elem.id}, apo.tmp.bIsManualDraggingAfterShow);
+			sOutput = apo.setting.formatOutput.call(apo, apo.tmp.selectedValues, apo.tmp.bIsManualDraggingAfterShow);
 		}
 		else
 		{
