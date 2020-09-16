@@ -42,17 +42,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
 
                             // Get every name of masterDevice with fetchAll
                             $masterNameList = $dbHandler->runQuery("SELECT masterName FROM bond WHERE username = :name AND masterName != :exception ORDER BY id ASC;", ["name" => $username, "exception" => $fetchResult["main"]["masterName"]], "ALL");
-                            // Get current date plot data.
-                            $fetchResult["plot"]["data"] = $dbHandler->runQuery("SELECT * FROM dailyplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $fetchResult["main"]["bondKey"], "date" => date("y-m-d")], "ALL");
                             // Get the oldest record from daily plot data.
                             $fetchResult["plot"]["oldest"] = $dbHandler->runQuery("SELECT MIN(date) AS oldestPlot FROM dailyplot WHERE bondKey = :bondkey;", ["bondkey" => $fetchResult["main"]["bondKey"]]);
                             // Get the newest record from daily plot data.
                             $fetchResult["plot"]["newest"] = $dbHandler->runQuery("SELECT MAX(date) AS newestPlot FROM dailyplot WHERE bondKey = :bondkey;", ["bondkey" => $fetchResult["main"]["bondKey"]]);
                             // If the newest record from daily plot data is not current date, then create the frame of the current date.
-                            if ($fetchResult["plot"]["newest"]["newestPlot"] !== date("Y-m-d")) {
+                            // Get current date plot data.
+                            $isTodayPlotExist = $dbHandler->runQuery("SELECT * FROM dailyplot WHERE bondKey = :bondkey AND date = :date LIMIT 1;", ["bondkey" => $fetchResult["main"]["bondKey"], "date" => date("y-m-d")]);
+
+                            if (!$isTodayPlotExist) {
                                 for ($j = 1; $j < 25; $j++) {
                                     $dbHandler->runQuery("INSERT INTO dailyplot (bondKey, date, timestamp, deviceType, data1, data2, data3, data4) VALUES (:bondKey, :now, :timej, 'main', '0', '0', '0', '0');", ["bondKey" => $fetchResult["main"]["bondKey"], "now" => date("Y-m-d"), "timej" => "0" . $j . ":00:00"]);
                                 }
+                            }
+                            $fetchResult["plot"]["data"] = $dbHandler->runQuery("SELECT * FROM dailyplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $fetchResult["main"]["bondKey"], "date" => date("y-m-d")], "ALL");
+                            if ($fetchResult["plot"]["newest"]["newestPlot"] !== date("Y-m-d")) {
                                 // Refresh the newest record
                                 $fetchResult["plot"]["newest"] = $dbHandler->runQuery("SELECT MAX(date) AS newestPlot FROM dailyplot WHERE bondKey = :bondkey;", ["bondkey" => $fetchResult["main"]["bondKey"]]);
                             }

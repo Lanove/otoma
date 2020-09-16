@@ -132,11 +132,12 @@ if ($fetchResult) {
     <!-- Page Content  -->
     <div id="content">
       <?php
-      // require "pagecon/main-device-settings.php";
+      //require "pagecon/main-device-settings.php";
       if ($deviceBelonging) {
-        if ($deviceBelongingType == "main") {
+        if ($deviceBelongingType == "main")
           require "pagecon/main-device.php";
-        }
+        else if ($deviceBelongingType == "nexus")
+          require "pagecon/nexus-device.php";
       } else {
         require "pagecon/no-device-found.php";
       }

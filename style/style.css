@@ -643,10 +643,6 @@ body {
   justify-content: center;
   align-items: center;
 }
-#dashboard .device-graph-box .header .selector {
-  /* position:absolute;
-  right:-75px; */
-}
 #dashboard .device-graph-box .content {
   padding: 10px;
 }
@@ -770,6 +766,50 @@ body {
 }
 #dashboard #maindev-setting .setting-box .content .block-but {
   margin-top: 15px;
+}
+
+#dashboard .nexusthspbox{
+  margin-top: 20px;
+  background-color: var(--statusbox-color);
+  border-radius: 5px;
+}
+#dashboard .nexusthspbox .header {
+  background-color: var(--third-color);
+  border-radius: 10px 10px 0px 0px;
+  max-width: 100%;
+  padding-left: 10px;
+  padding-right: 10px;
+  min-height:40px;
+}
+#dashboard .nexusthspbox .header .text {
+  font-size: 24px;
+  line-height: 1.2em;
+  position:relative;
+  top:calc(50% - 10px);
+  width: 100%;
+  color: var(--text-color1);
+}
+#dashboard .nexusthspbox .udbutton{
+  font-size:1.2rem;
+  margin-left:5px;
+}
+#dashboard .nexusthspbox .content {
+  padding-top: 20px;
+}
+
+#dashboard .nexusthspbox .content span{
+  font-size: 3rem;
+  color: var(--text-color1);
+}
+
+#dashboard .nexusthspbox .content .icon{
+font-size: 3rem;
+}
+
+#dashboard .nexusthspbox .centerme{
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Dashboard Styling - END */

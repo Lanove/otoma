@@ -1,4 +1,4 @@
-<div class="container-fluid" id="bigdevicebox">
+<div class="container-fluid maindevice" id="bigdevicebox">
     <!-- Box gedi perangkat -->
     <div class="row" id="deviceheader">
         <dummy class=""></dummy>
@@ -31,7 +31,7 @@
                 <div class="header">
                     <div class="row">
                         <div class="col-12 d-inline-flex align-items-center">
-                            <i class="fas fa-lightbulb icon"></i>
+                            <!-- <i class="fas fa-lightbulb icon"></i> -->
                             <p class="deviceName1 text"></p>
                             <div class="material-switch pull-right ml-auto switch">
                                 <input id="statusBoxSwitch1" type="checkbox" />
@@ -98,7 +98,7 @@
                 <div class="header">
                     <div class="row">
                         <div class="col-12 d-inline-flex align-items-center">
-                            <i class="fas fa-plug icon"></i>
+                            <!-- <i class="fas fa-plug icon"></i> -->
                             <p class="deviceName2 text"></p>
                             <div class="material-switch pull-right ml-auto switch">
                                 <input id="statusBoxSwitch2" type="checkbox" />
@@ -171,7 +171,7 @@
                 <div class="header">
                     <div class="row">
                         <div class="col-12 d-inline-flex align-items-center">
-                            <i class="fas fa-blender icon"></i>
+                            <!-- <i class="fas fa-blender icon"></i> -->
                             <p class="deviceName3 text"></p>
                             <div class="material-switch pull-right ml-auto switch">
                                 <input id="statusBoxSwitch3" type="checkbox" />
@@ -238,7 +238,7 @@
                 <div class="header">
                     <div class="row">
                         <div class="col-12 d-inline-flex align-items-center">
-                            <i class="fas fa-door-closed icon"></i>
+                            <!-- <i class="fas fa-door-closed icon"></i> -->
                             <p class="deviceName4 text"></p>
                             <div class="material-switch pull-right ml-auto switch">
                                 <input id="statusBoxSwitch4" type="checkbox" />
