@@ -11,7 +11,7 @@
                         </a>
                     </div>
                     <a href="#0" class="cog">
-                        <i class="fas fa-cog ml-auto"></i>
+                        <i class="fas fa-cog ml-auto ibcolor"></i>
                     </a>
                 </div>
             </div>
@@ -51,7 +51,7 @@
                         <div class="content">
                             <div class="row">
                                 <div class="col-12 centerme">
-                                    <i class="fas fa-thermometer-half icon"></i>
+                                    <i class="fas fa-thermometer-half icon ibcolor"></i>
                                 </div>
                             </div>
                             <div class="row">
@@ -74,7 +74,7 @@
                         <div class="content">
                             <div class="row">
                                 <div class="col-12 centerme">
-                                    <i class="fas fa-tint icon"></i>
+                                    <i class="fas fa-tint icon ibcolor"></i>
                                 </div>
                             </div>
                             <div class="row">
@@ -102,8 +102,8 @@
                         <div class="content">
                             <div class="row">
                                 <div class="col-12 centerme">
-                                    <i class="fas fa-thermometer-half icon"></i>
-                                    <i class="fas fa-cog" style="position:relative;top:-14px;"></i>
+                                    <i class="fas fa-thermometer-half icon ibcolor"></i>
+                                    <i class="fas fa-cog ibcolor" style="position:relative;top:-14px;"></i>
                                 </div>
                             </div>
                             <div class="row">
@@ -137,7 +137,7 @@
                         <div class="header">
                             <div class="row">
                                 <div class="col-12 d-inline-flex align-items-center" style="min-height: 55px;">
-                                    <i class="fas fa-chart-bar icon"></i>
+                                    <i class="fas fa-chart-bar icon ibcolor"></i>
                                     <div class="dropdown name">
                                         <p class="text">Grafik Suhu</p>
                                     </div>
@@ -173,7 +173,7 @@
                         <div class="header">
                             <div class="row">
                                 <div class="col-12 d-inline-flex align-items-center" style="min-height: 55px;">
-                                    <i class="fas fa-chart-bar icon"></i>
+                                    <i class="fas fa-chart-bar icon ibcolor"></i>
                                     <div class="dropdown name">
                                         <p class="text">Grafik Humiditas</p>
                                     </div>
@@ -206,8 +206,8 @@
                         <div class="header">
                             <div class="row">
                                 <div class="col-12 d-inline-flex align-items-center" style="min-height: 55px;">
-                                    <i class="fas fa-fire icon"></i>
-                                    <i class="fas fa-snowflake snowflake"></i>
+                                    <i class="fas fa-fire icon ibcolor"></i>
+                                    <i class="fas fa-snowflake snowflake ibcolor"></i>
                                     <div class="dropdown name">
                                         <p class="text">Thermal Controller</p>
                                     </div>
@@ -227,6 +227,9 @@
                                         </div>
                                     </div>
 
+                                    <a href="#" data-toggle="popover" title="Informasi" data-content="Some content inside the popover">
+                                        <i class="fas fa-info-circle infocon"></i>
+                                    </a>
                                 </div>
                                 <div class="col-md-6 d-inline-flex">
                                     <p>Mode : </p>
@@ -240,8 +243,9 @@
                                             <label for="dualmd">Dual</label>
                                         </div>
                                     </div>
-
-
+                                    <a href="#" data-toggle="popover" title="Informasi" data-content="Some content inside the popover">
+                                        <i class="fas fa-info-circle infocon"></i>
+                                    </a>
                                 </div>
                             </div>
                             <div class="row">
@@ -249,7 +253,7 @@
                                     <div class="childbox">
                                         <div class="row header" style="margin-left:0px;">
                                             <div class="col-12 d-inline-flex align-items-center" style="padding:0;">
-                                                <i class="fas fa-fire icon"></i>
+                                                <i class="fas fa-fire icon ibcolor"></i>
                                                 <span class="text">Pemanas</span>
                                                 <div class="material-switch pull-right ml-auto switch">
                                                     <input id="heaterSwitch" type="checkbox" />
@@ -260,6 +264,7 @@
                                         <div class="content">
                                             <div class="row">
                                                 <div class="col-12">
+                                                    
                                                 </div>
                                             </div>
                                             <div class="row">
@@ -281,7 +286,7 @@
                                     <div class="childbox">
                                         <div class="row header" style="margin-left:0px;">
                                             <div class="col-12 d-inline-flex align-items-center" style="padding:0;">
-                                                <i class="fas fa-snowflake icon"></i>
+                                                <i class="fas fa-snowflake icon ibcolor"></i>
                                                 <span class="text">Pendingin</span>
                                                 <div class="material-switch pull-right ml-auto switch">
                                                     <input id="coolerSwitch" type="checkbox" />
