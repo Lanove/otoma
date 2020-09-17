@@ -7,13 +7,13 @@
   --bigdevicebox-color: #89cecb;
   --statusbox-color: #69b3b3;
   --text-color1: rgb(233, 233, 233);
+  --text-color3: rgb(233, 233, 233,0.4);
   --text-color2: rgb(223, 219, 219);
   --switch-on-color: #0275d8;
   --progbar-bg-color: #89cecb;
   --progbar-bar-color: #3aafa9;
   --progbar-bar-paused-color: #2b7a78;
   --myblack: #16252a;
-
   --loader-width: 120px;
   --loader-height: 120px;
   --loader-color-primary: #3aafa9;
@@ -21,6 +21,7 @@
   --line-width: 3px;
   --animation-duration: 2s;
   --loader-initial-scale: 0.1;
+  --childbox-tcon:#5fa1a1;
 }
 
 /*
@@ -768,6 +769,26 @@ body {
   margin-top: 15px;
 }
 
+
+#dashboard .nexusdevice #deviceheader #tabs {
+  background-color: var(--third-color);
+  color: var(--text-color1);
+  font-size: 1.1em;
+}
+#dashboard .nexusdevice #deviceheader #tabs .nav-link {
+  border: 5px solid transparent;
+}
+#dashboard .nexusdevice #deviceheader #tabs .nav-link:hover {
+  transform: translateY(-3px);
+}
+#dashboard .nexusdevice #deviceheader #tabs .nav-link.active {
+  border-bottom: 5px solid var(--text-color1);
+  background-color: var(--third-color);
+}
+#dashboard .nexusdevice #deviceheader #tabs .nav-tabs {
+  border-bottom: 2px solid var(--text-color1);
+}
+
 #dashboard .nexusthspbox{
   margin-top: 20px;
   background-color: var(--statusbox-color);
@@ -812,6 +833,101 @@ font-size: 3rem;
   align-items: center;
 }
 
+#dashboard .nexustcon{
+  margin-top: 10px;
+  margin-bottom: 10px;
+  background-color: var(--statusbox-color);
+  border-radius: 5px;
+}
+#dashboard .nexustcon .header {
+  background-color: var(--third-color);
+  border-radius: 10px 10px 0px 0px;
+  max-width: 100%;
+  padding-left: 10px;
+  padding-right: 10px;
+  min-height:40px;
+}
+#dashboard .nexustcon .header .text {
+  font-size: 24px;
+  line-height: 1.2em;
+  width: 100%;
+  color: var(--text-color1);
+  margin:0px;
+}
+#dashboard .nexustcon .header .icon {
+  font-size: 26px;
+}
+#dashboard .nexustcon .header .snowflake{
+  font-size:14px;
+  position:relative;
+  top:-7px;
+  right:3px;
+}
+#dashboard .nexustcon .switch-field {
+	display: flex;
+  overflow: hidden;
+}
+
+#dashboard .nexustcon .content {
+  background-color: var(--status-box-color);
+  padding:10px;
+}
+#dashboard .nexustcon .content .childbox .content {
+  background-color: var(--childbox-tcon);
+  border-radius: 0px 0px 10px 10px;
+  margin-bottom:10px;
+}
+#dashboard .nexustcon .content .childbox .header .text{
+  margin-left:10px;
+  font-size:20px;
+}
+#dashboard .nexustcon .content .childbox .header .icon{
+  font-size:24px;
+}
+
+#dashboard .nexustcon .content .childbox .header .switch{
+  position:relative;
+  top:3px;
+}
+#dashboard .nexustcon .switch-field input {
+	position: absolute !important;
+	clip: rect(0, 0, 0, 0);
+	height: 1px;
+	width: 1px;
+	border: 0;
+	overflow: hidden;
+}
+#dashboard .nexustcon .switch-field label {
+  background-color: var(--first-color);
+  color: var(--text-color3);
+  font-size: 14px;
+  line-height: 1;
+  text-align: center;
+  padding: 8px 16px;
+  margin-right: -1px;
+  border: 1px solid var(--info);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+  transition: all 0.1s ease-in-out;
+  margin-bottom:0;
+}
+
+#dashboard .nexustcon .switch-field label:hover {
+	cursor: pointer;
+}
+
+#dashboard .nexustcon .switch-field input:checked + label {
+	background-color:var(--info);
+  box-shadow: none;
+  color:var(--text-color1);
+}
+
+#dashboard .nexustcon .switch-field label:first-of-type {
+	border-radius: 4px 0 0 4px;
+}
+
+#dashboard .nexustcon .switch-field label:last-of-type {
+	border-radius: 0 4px 4px 0;
+}
 /* Dashboard Styling - END */
 
 /* Login and Register Styling - START */
