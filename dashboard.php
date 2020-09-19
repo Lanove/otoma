@@ -115,8 +115,8 @@ if ($fetchResult) {
     <nav class="navbar nav-fill w-100 navbar-dark fixed-top">
       <div class="container-fluid d-flex justify-content-between">
         <button type="button" id="topnavButton" class="sidebarCollapse btn btn-info">
-          <i class="fas fa-align-justify icon active open"></i>
-          <i class="fas fa-times icon close"></i>
+          <i class="fas fa-align-justify icone active open"></i>
+          <i class="fas fa-times icone close"></i>
         </button>
         <a href="#">
           <img alt="Otoma" src="img/logo/otoma_withtext.png" height="45">

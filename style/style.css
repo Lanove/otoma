@@ -10,7 +10,8 @@
   --text-color1: rgb(233, 233, 233);
   --text-color3: rgb(233, 233, 233,0.4);
   --text-color2: rgb(223, 219, 219);
-  --switch-on-color: #F24C00;
+  --switch-on-color: #f98f45;
+  --switch-hover-color:#da8141;
   --progbar-bg-color: #89cecb;
   --progbar-bar-color: #0547fd;
   --progbar-bar-paused-color: #2b7a78;
@@ -159,6 +160,27 @@ variables above and don't change anything in the actual loader code
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1032;
+}
+
+#dashboard .btn-primary{
+  background-color:var(--switch-on-color);
+  border: 0;
+}
+#dashboard .btn-primary:hover,.btn-primary:focus,.btn-primary:active, 
+.btn-primary:active:focus:not(:disabled):not(.disabled),
+.btn:focus, .btn:active, .btn:hover{
+    box-shadow: none!important;
+    outline: 0;
+}
+#dashboard .btn-primary:hover, 
+.btn-primary:active,
+.btn-primary:focus,
+.btn-primary:visited{
+    background-color:var(--switch-hover-color);
+    border-color: transparent;
+    background-image: none;
+    border: 0;
+    outline:none;  
 }
 
 /* Loaded styles */
@@ -329,7 +351,7 @@ body {
   min-width: 40px;
   transition: all 0.5s ease-in-out;
 }
-#dashboard #topnavButton .icon {
+#dashboard #topnavButton .icone {
   opacity: 0;
   display: none;
 }
@@ -487,6 +509,7 @@ body {
 #dashboard #bigdevicebox {
   background-color: var(--bigdevicebox-color);
   border-radius: 10px;
+  padding-bottom:10px;
   -webkit-box-shadow: inset 0px 0px 37px -5px rgba(43, 122, 120, 0.75);
   -moz-box-shadow: inset 0px 0px 37px -5px rgba(43, 122, 120, 0.75);
   box-shadow: inset 0px 0px 37px -5px rgba(43, 122, 120, 0.75);
@@ -623,7 +646,6 @@ body {
 }
 #dashboard .device-graph-box {
   margin-top: 10px;
-  margin-bottom: 10px;
   border-radius: 10px;
   background-color: var(--statusbox-color);
 }
@@ -649,9 +671,6 @@ body {
   top: 7px;
   word-wrap: break-word;
   width: 100%;
-}
-#dashboard .device-graph-box .header .btn{
-  background-color:var(--switch-on-color);
 }
 #dashboard .sub2 {
   min-height: 100%;
@@ -813,21 +832,19 @@ body {
   font-size: 1.1em;
 }
 #dashboard .nexusdevice #deviceheader #tabs .nav-link {
-  border: 5px solid transparent;
+  border: 0px solid transparent;
 }
-#dashboard .nexusdevice #deviceheader #tabs .nav-link:hover {
-  transform: translateY(-3px);
-}
-#dashboard .nexusdevice #deviceheader #tabs .nav-link.active {
-  border-bottom: 5px solid var(--text-color1);
-  background-color: var(--third-color);
+#dashboard .nexusdevice #deviceheader #tabs .nav-link.active {  
+  background-color: var(--text-color1);
+  border-radius:5px 5px 0px 0px;
+  color:var(--third-color);
 }
 #dashboard .nexusdevice #deviceheader #tabs .nav-tabs {
-  border-bottom: 2px solid var(--text-color1);
+  border-bottom: 3px solid var(--text-color1);
 }
 
 #dashboard .nexusthspbox{
-  margin-top: 20px;
+  margin-top: 10px;
   background-color: var(--statusbox-color);
   border-radius: 5px;
 }
@@ -844,6 +861,26 @@ body {
   line-height: 1.2em;
   position:relative;
   top:calc(50% - 10px);
+  width: 100%;
+  color: var(--text-color1);
+}
+
+#dashboard .auxheader {
+  background-color: var(--third-color);
+  border-radius: 10px 10px 10px 10px;
+  max-width: 100%;
+  min-height:40px;
+  margin-top:10px;
+  position:relative;
+  left:15px;
+}
+#dashboard .icon{
+  font-size:26px;
+}
+#dashboard .auxheader .text {
+  font-size: 24px;
+  line-height: 1.2em;
+  position:relative;
   width: 100%;
   color: var(--text-color1);
 }
@@ -914,6 +951,16 @@ font-size: 3rem;
   background-color: var(--childbox-tcon);
   border-radius: 0px 0px 10px 10px;
   margin-bottom:10px;
+  position:relative;
+}
+#dashboard .nexustcon .content .childbox .content .mini-overlay{
+  top: -10px;
+  left: -15px;
+  height: calc(100% + 20px);
+  width: calc(100% + 30px);
+}
+#dashboard .nexustcon .content .childbox .content .mini-overlay .mino{
+  border-radius:0px 0px 10px 10px;
 }
 #dashboard .nexustcon .content .childbox .header .text{
   margin-left:10px;
@@ -948,6 +995,24 @@ font-size: 3rem;
   transition: all 0.1s ease-in-out;
   margin-bottom:0;
 }
+#dashboard .nexustcon .content .childbox input[type="text"] {
+  max-width: 180px;
+  background-color: var(--text-color1);
+
+  font-family: "Poppins", sans-serif;
+  font-size: 1em;
+  font-weight: 300;
+  line-height: 1.2em;
+  color: var(--myblack);
+
+  min-height: 30px;
+  max-height: 30px;
+
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
 
 #dashboard .nexustcon .switch-field label:hover {
 	cursor: pointer;
@@ -965,6 +1030,28 @@ font-size: 3rem;
 
 #dashboard .nexustcon .switch-field label:last-of-type {
 	border-radius: 0 4px 4px 0;
+}
+
+#dashboard .nexuscond{
+  margin-top: 10px;
+  margin-bottom: 10px;
+  background-color: var(--statusbox-color);
+  border-radius: 5px;
+  min-height:60px;
+  width:100%;
+}
+#dashboard .nexuscond .numbox{    
+  background-color: red;
+  width: 60px;
+  height: 100%;
+}
+
+#dashboard #addcond{
+  font-size:32px;
+  margin-top:10px;
+  border-radius:50%;
+  width:60px;
+  height:60px;
 }
 /* Dashboard Styling - END */
 
