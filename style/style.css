@@ -771,14 +771,14 @@ body {
 #dashboard #maindev-setting .setting-box {
   margin-top: 20px;
   background-color: var(--statusbox-color);
-  border-radius: 5px;
+  border-radius: 10px;
 }
 #dashboard #maindev-setting .setting-box .header {
   padding-top: 10px;
   padding-left: 10px;
   padding-right: 10px;
   background-color: inherit;
-  border-radius: 5px 5px 0px 0px;
+  border-radius: 10px 10px 0px 0px;
   font-size: 1.25rem;
   color: var(--text-color2);
 }
@@ -846,7 +846,7 @@ body {
 #dashboard .nexusthspbox{
   margin-top: 10px;
   background-color: var(--statusbox-color);
-  border-radius: 5px;
+  border-radius: 10px;
 }
 #dashboard .nexusthspbox .header {
   background-color: var(--third-color);
@@ -912,7 +912,7 @@ font-size: 3rem;
   margin-top: 10px;
   margin-bottom: 10px;
   background-color: var(--statusbox-color);
-  border-radius: 5px;
+  border-radius: 10px;
 }
 #dashboard .nexustcon .header {
   background-color: var(--third-color);
@@ -1036,16 +1036,43 @@ font-size: 3rem;
   margin-top: 10px;
   margin-bottom: 10px;
   background-color: var(--statusbox-color);
-  border-radius: 5px;
+  border-radius: 10px;
   min-height:60px;
   width:100%;
 }
-#dashboard .nexuscond .numbox{    
-  background-color: red;
-  width: 60px;
-  height: 100%;
+#dashboard .nexuscond .content{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  color:var(--text-color1);
+  font-size:1.1em;
+  padding:15px;
 }
-
+#dashboard .numbox{    
+  background-color: var(--third-color);
+  color:var(--text-color1);
+  font-size:1.25rem;
+  min-height:40px;
+  border-radius: 10px 10px 0 0;
+}
+#dashboard .nexuscond .form-control {    
+  max-width: 180px;
+  background-color: var(--text-color1);
+  font-family: "Poppins", sans-serif;
+  font-size: 1em;
+  font-weight: 300;
+  line-height: 1.2em;
+  color: var(--myblack);
+  min-height: 30px;
+  max-height: 30px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+#dashboard .nexuscond .item{
+  margin-top:10px;
+}
 #dashboard #addcond{
   font-size:32px;
   margin-top:10px;

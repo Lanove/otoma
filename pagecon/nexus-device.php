@@ -315,25 +315,25 @@
                                             <div class="row">
                                                 <div class="col-12 d-inline-flex">
                                                     <p>Kp :</p>
-                                                    <input type="text" class="ml-auto">
+                                                    <input type="text" class="form-control ml-auto">
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-12 d-inline-flex">
                                                     <p>Ki :</p>
-                                                    <input type="text" class="ml-auto">
+                                                    <input type="text" class="ml-auto form-control">
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-12 d-inline-flex">
                                                     <p>Kd :</p>
-                                                    <input type="text" class="ml-auto">
+                                                    <input type="text" class="ml-auto form-control">
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-12 d-inline-flex">
                                                     <p>Durasi Siklus :</p>
-                                                    <input type="text" class="ml-auto">
+                                                    <input type="text" class="ml-auto form-control">
                                                 </div>
                                             </div>
                                             <div class="row">
@@ -383,13 +383,13 @@
                                             <div class="row">
                                                 <div class="col-12 d-inline-flex">
                                                     <p>Batas Atas :</p>
-                                                    <input type="text" class="ml-auto">
+                                                    <input type="text" class="ml-auto form-control">
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-12 d-inline-flex">
                                                     <p>Batas Bawah :</p>
-                                                    <input type="text" class="ml-auto">
+                                                    <input type="text" class="ml-auto form-control">
                                                 </div>
                                             </div>
                                             <div class="row">
@@ -408,10 +408,38 @@
         </div>
         <div class="tab-pane fade" id="menu3" role="tabpanel" aria-labelledby="contact-tab">
             <div class="row">
-                <div class="col-12 d-inline-flex">
+                <div class="col-12">
                     <div class="nexuscond">
-                        <div class="numbox">
-                            <span>1</span>
+                        <div class="numbox d-flex align-items-center justify-content-center">
+                            <span>Kondisi 1</span>
+                        </div>
+                        <div class="d-flex content justify-content-center">
+                            <div class="item">
+                                <span>Maka</span>
+                                <input type="text" class="form-control">
+                            </div>
+                            <div class="item">
+                                <span>Maka</span>
+                                <input type="text" class="form-control" style="width:150px;">
+                                <button class="btn btn-primary">Start</button>
+                                <button class="btn btn-primary">Reset</button>
+                            </div>
+                            <div class="item">
+                                <span>Maka</span>
+                                <input type="text" class="form-control">
+                            </div>
+                            <div class="item">
+                                <span>Maka</span>
+                                <input type="text" class="form-control">
+                            </div>
+                            <div class="item">
+                                <span>Maka</span>
+                                <input type="text" class="form-control">
+                            </div>
+                            <div class="item">
+                                <span>Maka</span>
+                                <input type="text" class="form-control">
+                            </div>
                         </div>
                     </div>
                 </div>
