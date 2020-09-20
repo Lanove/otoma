@@ -723,6 +723,7 @@ body {
   height: 40vh;
   width: 100%;
 }
+
 #dashboard .dropdown-menu {
   background-color: var(--second-color);
   border-style: solid;
@@ -853,6 +854,14 @@ body {
 }
 #dashboard .nexusdevice #deviceheader #tabs .nav-tabs {
   border-bottom: 3px solid var(--text-color1);
+}
+#dashboard #spsetting{
+  height: 50px;
+  width: 160px;
+  position: absolute;
+  top: calc(50% - 25px);
+  left: calc(50% - 80px);
+  opacity:0;
 }
 
 #dashboard .nexusthspbox{

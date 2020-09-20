@@ -104,7 +104,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="nexusthspbox">
-                        <div class="mini-overlay active" id="setpointoverlay" style="height: calc(100% + 10px);">
+                        <div class="mini-overlay" id="setpointoverlay" style="height: calc(100% + 10px);">
                             <div class="mino d-flex align-items-center justify-content-center text-center">
                                 <p>Pengaturan set point suhu hanya dapat dilakukan dalam thermal controller mode auto</p>
                             </div>
@@ -124,13 +124,14 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-12 centerme">
-                                    <a href="#0" class="d-inline-flex">
-                                        <span>37°C</span>
-                                        <div class="btn-group-vertical">
-                                            <i class="fas fa-caret-square-up udbutton"></i>
-                                            <i class="fas fa-caret-square-down udbutton"></i>
-                                        </div>
+                                <div class="col-12 centerme d-inline-flex">
+                                    <span id="spvalue">37°C</span>
+                                    <div class="btn-group-vertical">
+                                        <i class="fas fa-caret-square-up udbutton"></i>
+                                        <i class="fas fa-caret-square-down udbutton"></i>
+                                    </div>
+                                    <a href="#0" class="d-inline-flex" id="spsetting">
+                                        10
                                     </a>
                                 </div>
                             </div>
@@ -194,7 +195,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="chart">
-                                        <canvas id="graph"></canvas>
+                                        <canvas id="tempgraph"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -230,7 +231,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="chart">
-                                        <canvas id="graph"></canvas>
+                                        <canvas id="humidgraph"></canvas>
                                     </div>
                                 </div>
                             </div>
