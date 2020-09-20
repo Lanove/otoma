@@ -79,7 +79,7 @@ if (deviceBelonging) {
     chartConfig,
     apoPlot
   ) {
-    chartApo.destroy();
+    chartApo[chartObj].destroy();
     createChart(chartApo, chartElement, chartConfig, chartObj);
     updateChart(chartApo[chartObj], apoPlot.label, apoPlot.data);
   }
@@ -127,37 +127,44 @@ if (deviceBelonging) {
   if (deviceBelonging.hasClass("maindevice")) {
   } else if (deviceBelonging.hasClass("nexusdevice")) {
     var nexuschart = { temp: null, humid: null },
+      options = {
+        maintainAspectRatio: false,
+        responsive: true,
+        title: {
+          display: true,
+          text: "Grafik Suhu pada tanggal 16 Agustus 2020",
+          fontFamily: "'Poppins',sans-serif",
+          fontStyle: "normal",
+        },
+        tooltips: {
+          mode: "index",
+          intersect: false,
+        },
+        hover: {
+          mode: "nearest",
+          intersect: true,
+        },
+      },
       tempConfig = {
         type: "line",
         data: {
           datasets: [
             {
-              label: "Suhu pada " /*+ date*/,
-              backgroundColor: "rgba(33, 145, 251, 1)",
-              borderColor: "rgba(33, 145, 251, 1)",
-              borderWidth: 1,
+              fill: false,
+              label: "Suhu " /*+ date*/,
+              backgroundColor: "#002bb8",
+              borderColor: "#002bb8",
             },
           ],
         },
-        options: {
-          maintainAspectRatio: false,
-          responsive: true,
-          scales: {
-            yAxes: [
-              {
-                ticks: {
-                  beginAtZero: true,
-                },
-              },
-            ],
-          },
-        },
+        options: options,
       },
       humidConfig = {
         type: "line",
         data: {
           datasets: [
             {
+              fill: false,
               label: "Humiditas pada " /*+ date*/,
               backgroundColor: "rgba(33, 145, 251, 1)",
               borderColor: "rgba(33, 145, 251, 1)",
@@ -165,21 +172,17 @@ if (deviceBelonging) {
             },
           ],
         },
-        options: {
-          maintainAspectRatio: false,
-          responsive: true,
-          scales: {
-            yAxes: [
-              {
-                ticks: {
-                  beginAtZero: true,
-                },
-              },
-            ],
-          },
-        },
+        options: options,
       };
-
+    function getLabel() {
+      labeltable = [];
+      for (var x = 0; x < 24; x++) {
+        for (var i = 0; i < 2; i++) {
+          labeltable[x * 4 + i] = String(x) + ":" + String(i * 30);
+        }
+      }
+      return labeltable;
+    }
     function spsetOut(oSelectedValues) {
       $("#spvalue").text(String(oSelectedValues.values[0].label) + "°C");
       return oSelectedValues.values[0].label;
@@ -196,6 +199,113 @@ if (deviceBelonging) {
         document.getElementById("humidgraph").getContext("2d"),
         humidConfig,
         "humid"
+      );
+      refreshChart(
+        nexuschart,
+        "temp",
+        document.getElementById("tempgraph").getContext("2d"),
+        tempConfig,
+        {
+          label: getLabel(),
+          data: [
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+            Math.random() * 100,
+          ],
+        }
       );
       // Enable popover
       $('[data-toggle="popover"]').popover({ html: true });

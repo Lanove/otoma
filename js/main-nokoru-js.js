@@ -569,3 +569,4 @@ function loadDeviceInformation(controller) {
     }
   );
 }
+
