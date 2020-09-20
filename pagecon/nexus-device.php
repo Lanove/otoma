@@ -1,6 +1,7 @@
 <div class="container-fluid nexusdevice" id="bigdevicebox">
     <div class="row" id="deviceheader">
         <dummy class=""></dummy>
+
         <div class="col-12">
             <div class="row">
                 <div class="col-12 d-inline-flex align-items-center">
@@ -40,6 +41,20 @@
     </div>
     <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="menu1" role="tabpanel" aria-labelledby="contact-tab">
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="row auxheader">
+                        <div class="col-12 d-inline-flex align-items-center" style="margin-left:-5px;padding-right:5px;">
+                            <div class="progBar">
+                                <div id="progBar2">
+                                    Tidak ada timer
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-4">
                     <div class="nexusthspbox">
@@ -253,8 +268,7 @@
                                             <label for="autoop">Auto</label>
                                         </div>
                                     </div>
-
-                                    <a href="#" data-toggle="popover" title="Informasi" data-content="Some content inside the popover">
+                                    <a href="#" data-toggle="popover" title="Informasi" data-trigger="focus" data-placement="left" data-content="Operasi yang digunakan oleh kontroller.<br> Jika <b>Manual</b> maka keadaan nyala dan mati dari pemanas dan pendingin dapat dikontrol dengan saklar dari web.<br> Jika <b>Auto</b> maka kontroller akan menstabilkan suhu secara otomatis sesuai setpoint.">
                                         <i class="fas fa-info-circle infocon"></i>
                                     </a>
                                 </div>
@@ -270,15 +284,14 @@
                                             <label for="dualmd">Dual</label>
                                         </div>
                                     </div>
-                                    <a href="#" data-toggle="popover" title="Informasi" data-content="Some content inside the popover">
+                                    <a href="#" data-toggle="popover" title="Informasi" data-trigger="focus" data-placement="left" data-content="Output yang akan digunakan untuk menyetabilkan suhu secara otomatis. <br> Jika <b>Heating</b> maka output yang akan digunakan hanyalah pemanas.<br>Jika <b>Cooling</b> maka output yang akan digunakan hanyalah pendingin.<br>Jika <b>Dual</b> maka output yang akan digunakan pemanas dan pendingin.">
                                         <i class="fas fa-info-circle infocon"></i>
                                     </a>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
-
-                                    <div class="childbox">
+                                    <div class="childbox" id="heaterbox">
                                         <div class="row header" style="margin-left:0px;">
                                             <div class="col-12 d-inline-flex align-items-center" style="padding:0;">
                                                 <i class="fas fa-fire icon ibcolor"></i>
@@ -300,52 +313,73 @@
                                                     <p>Mode : </p>
                                                     <div class="ml-auto">
                                                         <div class="switch-field">
-                                                            <input type="radio" id="hpidmd" name="hmode" value="yes" checked />
+                                                            <input type="radio" id="hpidmd" name="hmode" value="pid" checked />
                                                             <label for="hpidmd">PID</label>
-                                                            <input type="radio" id="hhysteresismd" name="hmode" value="no" />
+                                                            <input type="radio" id="hhysteresismd" name="hmode" value="hys" />
                                                             <label for="hhysteresismd">Hysteresis</label>
-
                                                         </div>
                                                     </div>
-                                                    <a href="#" data-toggle="popover" title="Informasi" data-content="Some content inside the popover">
+                                                    <a href="#" data-toggle="popover" title="Informasi" data-trigger="focus" data-placement="left" data-content="Mode algoritma yang digunakan untuk pemanas. Cari tau informasi perbedaan antara mode PID dengan Hysteresis klik <a href='#'class='infolink'>disini</a>.">
                                                         <i class="fas fa-info-circle infocon"></i>
                                                     </a>
                                                 </div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-12 d-inline-flex">
-                                                    <p>Kp :</p>
-                                                    <input type="text" class="form-control ml-auto">
+
+                                            <div class="pidmenu active">
+                                                <div class="row">
+                                                    <div class="col-12 d-inline-flex">
+                                                        <p>Kp :</p>
+                                                        <input type="text" class="form-control ml-auto" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="Konstanta Proporsional dari algoritma PID, hanya dapat berupa <b>angka positif atau angka negatif</b>, untuk informasi lengkap cara mengatur PID klik <a href='#'class='infolink'>disini</a>.">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 d-inline-flex">
+                                                        <p>Ki :</p>
+                                                        <input type="text" class="form-control ml-auto" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="Konstanta Derivatif dari algoritma PID, hanya dapat berupa <b>angka positif atau angka negatif</b>, untuk informasi lengkap cara mengatur PID klik <a href='#'class='infolink'>disini</a>.">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 d-inline-flex">
+                                                        <p>Kd :</p>
+                                                        <input type="text" class="form-control ml-auto" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="Konstanta Integral dari algoritma PID, hanya dapat berupa <b>angka positif atau angka negatif</b>, untuk informasi lengkap cara mengatur PID klik <a href='#'class='infolink'>disini</a>.">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 d-inline-flex">
+                                                        <p>Durasi Siklus :</p>
+                                                        <input type="text" class="form-control ml-auto" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="Durasi dari siklus algoritma PID dalam satuan milidetik (1 detik = 1000 milidetik), untuk informasi lengkap cara mengatur PID klik <a href='#'class='infolink'>disini</a>.">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 d-inline-flex">
+                                                        <button class="btn btn-primary">Update</button>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-12 d-inline-flex">
-                                                    <p>Ki :</p>
-                                                    <input type="text" class="ml-auto form-control">
+                                            <div class="hysteresismenu">
+                                                <div class="row">
+                                                    <div class="col-12 d-inline-flex">
+                                                        <p>Batas Atas :</p>
+                                                        <input type="text" class="form-control ml-auto" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="<u>Batas atas</u> dari setpoint, hanya dapat diisi <b>angka positif</b>. Jika suhu sekarang naik dari <u>setpoint</u> ditambah <u>batas atas</u> maka pemanas akan mati. Untuk informasi lengkap cara mengatur Hysteresis klik <a href='#'class='infolink'>disini</a>.">
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-12 d-inline-flex">
-                                                    <p>Kd :</p>
-                                                    <input type="text" class="ml-auto form-control">
+                                                <div class="row">
+                                                    <div class="col-12 d-inline-flex">
+                                                        <p>Batas Bawah :</p>
+                                                        <input type="text" class="form-control ml-auto" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="<u>Batas bawah</u> dari setpoint, hanya dapat diisi <b>angka positif</b>. Jika suhu sekarang turun dari <u>setpoint</u> dikurang <u>batas bawah</u> maka pemanas akan nyala. Untuk informasi lengkap cara mengatur Hysteresis klik <a href='#'class='infolink'>disini</a>.">
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-12 d-inline-flex">
-                                                    <p>Durasi Siklus :</p>
-                                                    <input type="text" class="ml-auto form-control">
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-12 d-inline-flex">
-                                                    <button class="btn btn-primary">Update</button>
+                                                <div class="row">
+                                                    <div class="col-12 d-inline-flex">
+                                                        <button class="btn btn-primary">Update</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="childbox">
+                                    <div class="childbox" id="coolerbox">
                                         <div class="row header" style="margin-left:0px;">
                                             <div class="col-12 d-inline-flex align-items-center" style="padding:0;">
                                                 <i class="fas fa-snowflake icon ibcolor"></i>
@@ -369,32 +403,66 @@
                                                     <p>Mode : </p>
                                                     <div class="ml-auto">
                                                         <div class="switch-field">
-                                                            <input type="radio" id="cpidmd" name="cmode" value="yes" checked />
+                                                            <input type="radio" id="cpidmd" name="cmode" value="pid" checked />
                                                             <label for="cpidmd">PID</label>
-                                                            <input type="radio" id="chysteresismd" name="cmode" value="no" />
+                                                            <input type="radio" id="chysteresismd" name="cmode" value="hys" />
                                                             <label for="chysteresismd">Hysteresis</label>
                                                         </div>
                                                     </div>
-                                                    <a href="#" data-toggle="popover" title="Informasi" data-content="Some content inside the popover">
+                                                    <a href="#" data-toggle="popover" title="Informasi" data-trigger="focus" data-placement="left" data-content="Mode algoritma yang digunakan untuk pendingin. Cari tau informasi perbedaan antara mode PID dengan Hysteresis klik <a href='#'class='infolink'>disini</a>.">
                                                         <i class="fas fa-info-circle infocon"></i>
                                                     </a>
                                                 </div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-12 d-inline-flex">
-                                                    <p>Batas Atas :</p>
-                                                    <input type="text" class="ml-auto form-control">
+
+                                            <div class="pidmenu active">
+                                                <div class="row">
+                                                    <div class="col-12 d-inline-flex">
+                                                        <p>Kp :</p>
+                                                        <input type="text" class="form-control ml-auto" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="Konstanta Proporsional dari algoritma PID, hanya dapat berupa <b>angka positif atau angka negatif</b>, untuk informasi lengkap cara mengatur PID klik <a href='#'class='infolink'>disini</a>.">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 d-inline-flex">
+                                                        <p>Ki :</p>
+                                                        <input type="text" class="form-control ml-auto" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="Konstanta Derivatif dari algoritma PID, hanya dapat berupa <b>angka positif atau angka negatif</b>, untuk informasi lengkap cara mengatur PID klik <a href='#'class='infolink'>disini</a>.">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 d-inline-flex">
+                                                        <p>Kd :</p>
+                                                        <input type="text" class="form-control ml-auto" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="Konstanta Integral dari algoritma PID, hanya dapat berupa <b>angka positif atau angka negatif</b>, untuk informasi lengkap cara mengatur PID klik <a href='#'class='infolink'>disini</a>.">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 d-inline-flex">
+                                                        <p>Durasi Siklus :</p>
+                                                        <input type="text" class="form-control ml-auto" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="Durasi dari siklus algoritma PID dalam satuan milidetik (1 detik = 1000 milidetik), untuk informasi lengkap cara mengatur PID klik <a href='#'class='infolink'>disini</a>.">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 d-inline-flex">
+                                                        <button class="btn btn-primary">Update</button>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-12 d-inline-flex">
-                                                    <p>Batas Bawah :</p>
-                                                    <input type="text" class="ml-auto form-control">
+                                            <div class="hysteresismenu">
+                                                <div class="row">
+                                                    <div class="col-12 d-inline-flex">
+                                                        <p>Batas Atas :</p>
+                                                        <input type="text" class="form-control ml-auto" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="<u>Batas atas</u> dari setpoint, hanya dapat diisi <b>angka positif</b>. Jika suhu sekarang naik dari <u>setpoint</u> ditambah <u>batas atas</u> maka pendingin akan menyala. Untuk informasi lengkap cara mengatur Hysteresis klik <a href='#'class='infolink'>disini</a>.">
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-12 d-inline-flex">
-                                                    <button class="btn btn-primary">Update</button>
+                                                <div class="row">
+                                                    <div class="col-12 d-inline-flex">
+                                                        <p>Batas Bawah :</p>
+                                                        <input type="text" class="form-control ml-auto" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="<u>Batas bawah</u> dari setpoint, hanya dapat diisi <b>angka positif</b>. Jika suhu sekarang turun dari <u>setpoint</u> dikurang <u>batas bawah</u> maka pendingin akan mati. Untuk informasi lengkap cara mengatur Hysteresis klik <a href='#'class='infolink'>disini</a>.">
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 d-inline-flex">
+                                                        <button class="btn btn-primary">Update</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -409,7 +477,7 @@
         <div class="tab-pane fade" id="menu3" role="tabpanel" aria-labelledby="contact-tab">
             <div class="row">
                 <div class="col-12">
-                    <div class="nexuscond">
+                    <div class="nexuscond" id="condition1">
                         <div class="numbox d-flex align-items-center justify-content-center">
                             <span>Kondisi 1</span>
                         </div>
@@ -440,6 +508,10 @@
                                 <span>Maka</span>
                                 <input type="text" class="form-control">
                             </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center" style="padding-bottom:15px;">
+                            <button class="btn btn-primary" style="margin-right:15px;">Update</button>
+                            <button class="btn btn-primary">Hapus</button>
                         </div>
                     </div>
                 </div>

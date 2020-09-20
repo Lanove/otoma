@@ -12,9 +12,9 @@
   --text-color2: rgb(223, 219, 219);
   --switch-on-color: #f98f45;
   --switch-hover-color:#da8141;
-  --progbar-bg-color: #89cecb;
-  --progbar-bar-color: #0547fd;
-  --progbar-bar-paused-color: #2b7a78;
+  --progbar-bg-color: #71c0c0;
+  --progbar-bar-color:#219aa5;
+  --progbar-bar-paused-color: #18727a;
   --myblack: #16252a;
   --loader-width: 120px;
   --loader-height: 120px;
@@ -320,6 +320,18 @@ body {
   transition: all 0.3s;
 }
 
+#dashboard .infolink{
+  color: var(--primary);
+  text-decoration: none;
+  transition: all 0.3s;
+}
+#dashboard .infolink:hover,
+#dashboard .infolink:focus {
+  color: #035ebe; /* darker primary color*/
+  text-decoration: underline;
+  transition: all 0.3s;
+}
+
 #dashboard .navbar {
   background-color: var(--navbar-color);
   border: none;
@@ -577,7 +589,7 @@ body {
 #dashboard .device-status-box .content {
   padding: 10px;
 }
-#dashboard .device-status-box .content .progBar {
+#dashboard .progBar {
   width: 100%;
   background-color: var(--progbar-bg-color);
   border-radius: 5px;
@@ -585,7 +597,7 @@ body {
   margin-top: 5px;
   margin-bottom: 5px;
 }
-#dashboard .device-status-box .content .progBar div {
+#dashboard .progBar div {
   /* width: 10%; */
   height: 24px;
   border-radius: 5px;
@@ -995,6 +1007,14 @@ font-size: 3rem;
   transition: all 0.1s ease-in-out;
   margin-bottom:0;
 }
+#dashboard .nexustcon .content .childbox .hysteresismenu,.pidmenu{
+  display:none;
+  opacity:0;
+}
+#dashboard .nexustcon .content .childbox .hysteresismenu.active,.pidmenu.active{
+  display:block;
+  opacity:1;
+}
 #dashboard .nexustcon .content .childbox input[type="text"] {
   max-width: 180px;
   background-color: var(--text-color1);
@@ -1047,6 +1067,7 @@ font-size: 3rem;
   color:var(--text-color1);
   font-size:1.1em;
   padding:15px;
+  padding-top:5px;
 }
 #dashboard .numbox{    
   background-color: var(--third-color);
@@ -1072,6 +1093,7 @@ font-size: 3rem;
 }
 #dashboard .nexuscond .item{
   margin-top:10px;
+  margin-right:5px;
 }
 #dashboard #addcond{
   font-size:32px;

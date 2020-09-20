@@ -727,6 +727,27 @@ if (deviceBelonging) {
     }
   } else if (deviceBelonging.hasClass("nexusdevice")) {
     $(document).ready(function () {
+      $('[data-toggle="popover"]').popover({ html: true });
+      $("input[name='cmode']").click(function () {
+        var radioValue = $("input[name='cmode']:checked").val();
+        $("#coolerbox .hysteresismenu").removeClass("active");
+        $("#coolerbox .pidmenu").removeClass("active");
+        if (radioValue === "pid") {
+          $("#coolerbox .pidmenu").addClass("active");
+        } else {
+          $("#coolerbox .hysteresismenu").addClass("active");
+        }
+      });
+      $("input[name='hmode']").click(function () {
+        var radioValue = $("input[name='hmode']:checked").val();
+        $("#heaterbox .hysteresismenu").removeClass("active");
+        $("#heaterbox .pidmenu").removeClass("active");
+        if (radioValue === "pid") {
+          $("#heaterbox .pidmenu").addClass("active");
+        } else {
+          $("#heaterbox .hysteresismenu").addClass("active");
+        }
+      });
       $(".absolute-overlay").addClass("loaded");
     });
     const check = setInterval(function () {
