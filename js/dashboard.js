@@ -90,10 +90,10 @@ if (deviceBelonging) {
     elem.style.width = percentage + "%";
     elem.innerHTML = label;
   }
-  function requestAJAX(jsonobject, callback = function () {}) {
+  function requestAJAX(fileName, jsonobject, callback = function () {}) {
     var xhr = new XMLHttpRequest();
     var json = JSON.stringify(jsonobject);
-    xhr.open("POST", "api/AjaxService.php");
+    xhr.open("POST", "api/" + fileName + ".php");
     xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
     xhr.send(json);
     xhr.onload = function () {
@@ -102,7 +102,6 @@ if (deviceBelonging) {
       }
     };
   }
-
   function getMeta(metaName) {
     const metas = document.getElementsByTagName("meta");
     for (let i = 0; i < metas.length; i++) {
@@ -154,6 +153,8 @@ if (deviceBelonging) {
               label: "Suhu " /*+ date*/,
               backgroundColor: "#002bb8",
               borderColor: "#002bb8",
+              borderWidth: 2,
+              pointRadius: 2,
             },
           ],
         },
@@ -183,11 +184,41 @@ if (deviceBelonging) {
       }
       return labeltable;
     }
+
+    // Anypicker custom trigger onSet
     function spsetOut(oSelectedValues) {
       $("#spvalue").text(String(oSelectedValues.values[0].label) + "°C");
       return oSelectedValues.values[0].label;
     }
+    function setTrigger(sOutput) {
+      return (
+        sOutput.values[0].label +
+        "-" +
+        sOutput.values[1].label +
+        "-" +
+        sOutput.values[2].label
+      );
+    }
+    /////////////////////////////////////////////////
+
+    function loadDeviceInformation(master) {
+      requestAJAX(
+        "NexusService",
+        {
+          requestType: "loadDeviceInformation",
+          master: master,
+          token: getMeta("token"),
+        },
+        function callback(response) {
+          var parseJson = JSON.parse(response);
+          console.log(parseJson);
+        }
+      );
+    }
+
     $(document).ready(function () {
+      // Awal loading page load device yang paling atas.
+      loadDeviceInformation("master");
       createChart(
         nexuschart,
         document.getElementById("tempgraph").getContext("2d"),
@@ -207,109 +238,37 @@ if (deviceBelonging) {
         tempConfig,
         {
           label: getLabel(),
-          data: [
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-            Math.random() * 100,
-          ],
+          data: [],
         }
       );
       // Enable popover
       $('[data-toggle="popover"]').popover({ html: true });
 
+      // Enable anypicker on humid and temp dateselector
+      var today = new Date();
+      var dd = String(today.getDate()).padStart(2, "0");
+      var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+      var yyyy = today.getFullYear();
+
+      today = yyyy + "-" + mm + "-" + dd;
+      $("#humidds").val(today); // set today as default value of datepicker
+      $("#tempds").val(today); // set today as default value of datepicker
+      $("#humidds").unbind().removeData(); // Remove any anypicker instance to make sure it's not duplicating.
+      $("#tempds").unbind().removeData(); // Remove any anypicker instance to make sure it's not duplicating.
+      $("#tempds").AnyPicker({
+        mode: "datetime",
+        dateTimeFormat: "yyyy-MM-dd",
+        lang: "id",
+        formatOutput: setTrigger,
+        // minValue: new Date(),
+      });
+      $("#humidds").AnyPicker({
+        mode: "datetime",
+        dateTimeFormat: "yyyy-MM-dd",
+        lang: "id",
+        formatOutput: setTrigger,
+        // minValue: new Date(),
+      });
       // Enable anypicker on setpoint setting
       var oArrData = [];
       createDataSource(oArrData, [100]);

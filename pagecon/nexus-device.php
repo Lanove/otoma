@@ -184,7 +184,7 @@
                                     <div class="dropdown name">
                                         <p class="text">Grafik Suhu</p>
                                     </div>
-                                    <button class="btn btn-primary ml-auto" id="dateselector">
+                                    <button class="btn btn-primary ml-auto" id="humidds">
                                         <i class="fas fa-calendar-alt"></i>
                                     </button>
                                 </div>
@@ -220,7 +220,7 @@
                                     <div class="dropdown name">
                                         <p class="text">Grafik Humiditas</p>
                                     </div>
-                                    <button class="btn btn-primary ml-auto" id="dateselector">
+                                    <button class="btn btn-primary ml-auto" id="tempds">
                                         <i class="fas fa-calendar-alt"></i>
                                     </button>
                                 </div>
