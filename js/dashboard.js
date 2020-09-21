@@ -201,6 +201,76 @@ if (deviceBelonging) {
     }
     /////////////////////////////////////////////////
 
+    // Function that is triggered when operation
+
+    function modeCallback(mode, docchi) {
+      if (docchi === "cooler") {
+        $("#coolerbox .hysteresismenu").removeClass("active"); // Remove both active class
+        $("#coolerbox .pidmenu").removeClass("active"); // Remove both active class
+        if (mode === "pid") {
+          // Display the pidmenu or hysteresismenu accordingly
+          $("#coolerbox .pidmenu").addClass("active");
+        } else {
+          $("#coolerbox .hysteresismenu").addClass("active");
+        }
+      } else if (docchi === "heater") {
+        $("#heaterbox .hysteresismenu").removeClass("active"); // Remove both active class
+        $("#heaterbox .pidmenu").removeClass("active"); // Remove both active class
+        if (mode === "pid") {
+          // Display the pidmenu or hysteresismenu accordingly
+          $("#heaterbox .pidmenu").addClass("active");
+        } else {
+          $("#heaterbox .hysteresismenu").addClass("active");
+        }
+      } else if (docchi === "thermo") {
+        if ($("input[name='operation']:checked").val() === "auto") {
+          // Only do shit when we are on auto mode
+          $("#heateroverlay").removeClass("active"); // Remove both active overlay class
+          $("#cooleroverlay").removeClass("active"); // Remove both active overlay class
+          $("#heateroverlay p").text(""); // Remove text from overlay
+          $("#cooleroverlay p").text(""); // Remove text from overlay
+          if (mode === "heat") {
+            $("#cooleroverlay").addClass("active"); // Overlay the cooler
+            $("#cooleroverlay p").text(
+              "Hanya tersedia dalam mode Cooling atau Dual"
+            ); // Add text to overlay
+          } else if (mode === "cool") {
+            $("#heateroverlay").addClass("active"); // Overlay the heater
+            $("#heateroverlay p").text(
+              "Hanya tersedia dalam mode Heating atau Dual"
+            ); // Add text to overlay
+          }
+        }
+      } else if (docchi === "operation") {
+        $("#heateroverlay").removeClass("active"); // Remove both active overlay class
+        $("#cooleroverlay").removeClass("active"); // Remove both active overlay class
+        $("#setpointoverlay").removeClass("active"); // Remove both active overlay class
+        $("#heateroverlay p").text(""); // Remove text from overlay
+        $("#cooleroverlay p").text(""); // Remove text from overlay
+        if (mode === "manual") {
+          $("#setpointoverlay").addClass("active"); // Overlay the setpoint setting
+          $("#cooleroverlay").addClass("active"); // Overlay the cooler
+          $("#cooleroverlay p").text("Hanya tersedia dalam mode Auto"); // Add text to overlay
+          $("#heateroverlay").addClass("active"); // Overlay the heater
+          $("#heateroverlay p").text("Hanya tersedia dalam mode Auto"); // Add text to overlay
+        } else {
+          var thermmode = $("input[name='thermmode']:checked").val();
+          // Apply overlay according to thermmode radio
+          if (thermmode === "heat") {
+            $("#cooleroverlay").addClass("active"); // Overlay the cooler
+            $("#cooleroverlay p").text(
+              "Hanya tersedia dalam mode Cooling atau Dual"
+            ); // Add text to overlay
+          } else if (thermmode === "cool") {
+            $("#heateroverlay").addClass("active"); // Overlay the heater
+            $("#heateroverlay p").text(
+              "Hanya tersedia dalam mode Heating atau Dual"
+            ); // Add text to overlay
+          }
+        }
+      }
+    }
+
     function loadDeviceInformation(master) {
       requestAJAX(
         "NexusService",
@@ -211,7 +281,98 @@ if (deviceBelonging) {
         },
         function callback(response) {
           var parseJson = JSON.parse(response);
-          console.log(parseJson);
+
+          // Add device bondKey information to dummy class within main header
+          $("#deviceheader dummy").removeClass();
+          $("#deviceheader dummy").addClass(parseJson["deviceInfo"]["bondKey"]);
+
+          if (parseJson.otherName) {
+            // If user had more than one device
+            // Add text and icon to the title of the main header
+            $("#deviceheader .text").text(
+              parseJson["deviceInfo"]["masterName"]
+            );
+            $("#deviceheader .text").append(
+              "<i class = 'fas fa-caret-down'></i>"
+            );
+            //Add submasters name that user had to dropdown
+            $("#deviceheader .dropdown-menu").html("");
+            for (x in parseJson.otherName) {
+              $("#deviceheader .dropdown-menu").append(
+                '<a href="#" class="dropdown-item ' +
+                  "subMasterName" +
+                  String(x) +
+                  '">' +
+                  parseJson.otherName[x]["masterName"] +
+                  "</a>"
+              );
+            }
+          } else {
+            // If user had just only one device then
+            $("#deviceheader .dropdown").html(""); // remove dropdown menu
+            $("#deviceheader .dropdown").prepend(
+              "<p class='text'>" +
+                parseJson["deviceInfo"]["masterName"] +
+                "</p>"
+            ); // Add name but without caret or dropdown
+          }
+
+          // Self explanation
+          $("#tempnow").text(parseJson.nexusBond.tempNow + "°C");
+          $("#humidnow").text(parseJson.nexusBond.humidNow + "%");
+          $("#spvalue").text(parseJson.nexusBond.sp + "°C");
+          $("#spsetting").val(parseJson.nexusBond.sp);
+          $("#auxname1").text(parseJson.nexusBond.auxName1);
+          $("#auxname2").text(parseJson.nexusBond.auxName2);
+
+          // Adjust the position of switch based on database value
+          $("#aux1Switch").prop(
+            "checked",
+            Boolean(Number(parseJson.nexusBond.auxStatus1))
+          );
+          $("#aux2Switch").prop(
+            "checked",
+            Boolean(Number(parseJson.nexusBond.auxStatus2))
+          );
+
+          // Get each data by splitting/exploding the string
+          parseJson.nexusBond.thercoInfo = parseJson.nexusBond.thercoInfo.split(
+            "%"
+          );
+          parseJson.nexusBond.heaterInfo = parseJson.nexusBond.heaterInfo.split(
+            "%"
+          );
+          parseJson.nexusBond.coolerInfo = parseJson.nexusBond.coolerInfo.split(
+            "%"
+          );
+
+          // Adjust thermocontrols radio checked position based on database value
+          $(
+            "input[name=operation][value='" +
+              parseJson.nexusBond.thercoInfo[0] +
+              "']"
+          ).prop("checked", true);
+          $(
+            "input[name=thermmode][value='" +
+              parseJson.nexusBond.thercoInfo[1] +
+              "']"
+          ).prop("checked", true);
+          $(
+            "input[name=hmode][value='" +
+              parseJson.nexusBond.heaterInfo[0] +
+              "']"
+          ).prop("checked", true);
+          $(
+            "input[name=cmode][value='" +
+              parseJson.nexusBond.coolerInfo[0] +
+              "']"
+          ).prop("checked", true);
+
+          // Adjust overlay and display of thermocontrol based on database value
+          modeCallback($("input[name='operation']:checked").val(), "operation");
+          modeCallback($("input[name='thermmode']:checked").val(), "thermo");
+          modeCallback($("input[name='hmode']:checked").val(), "heater");
+          modeCallback($("input[name='cmode']:checked").val(), "cooler");
         }
       );
     }
@@ -300,98 +461,25 @@ if (deviceBelonging) {
       // Onclick thermocontroller operation select
       $("input[name='operation']").click(function () {
         var radioValue = $("input[name='operation']:checked").val(); // Get the value of checked radio
-        $("#heateroverlay").removeClass("active"); // Remove both active overlay class
-        $("#cooleroverlay").removeClass("active"); // Remove both active overlay class
-        $("#setpointoverlay").removeClass("active"); // Remove both active overlay class
-        $("#heateroverlay p").text(""); // Remove text from overlay
-        $("#cooleroverlay p").text(""); // Remove text from overlay
-
-        if (radioValue === "manual") {
-          $("#setpointoverlay").addClass("active"); // Overlay the setpoint setting
-          $("#cooleroverlay").addClass("active"); // Overlay the cooler
-          $("#cooleroverlay p").text("Hanya tersedia dalam mode Auto"); // Add text to overlay
-          $("#heateroverlay").addClass("active"); // Overlay the heater
-          $("#heateroverlay p").text("Hanya tersedia dalam mode Auto"); // Add text to overlay
-        } else {
-          var thermmode = $("input[name='thermmode']:checked").val();
-          // Apply overlay according to thermmode radio
-          if (thermmode === "heat") {
-            $("#cooleroverlay").addClass("active"); // Overlay the cooler
-            $("#cooleroverlay p").text(
-              "Hanya tersedia dalam mode Cooling atau Dual"
-            ); // Add text to overlay
-          } else if (thermmode === "cool") {
-            $("#heateroverlay").addClass("active"); // Overlay the heater
-            $("#heateroverlay p").text(
-              "Hanya tersedia dalam mode Heating atau Dual"
-            ); // Add text to overlay
-          }
-        }
-        // Do AJAX things here and such
+        modeCallback(radioValue, "operation");
       });
 
       // Onclick thermocontroller mode select
       $("input[name='thermmode']").click(function () {
         var radioValue = $("input[name='thermmode']:checked").val(); // Get the value of checked radio
-        if ($("input[name='operation']:checked").val() == "auto") {
-          // Only do shit when we are on auto mode
-          $("#heateroverlay").removeClass("active"); // Remove both active overlay class
-          $("#cooleroverlay").removeClass("active"); // Remove both active overlay class
-          $("#heateroverlay p").text(""); // Remove text from overlay
-          $("#cooleroverlay p").text(""); // Remove text from overlay
-
-          if (radioValue === "heat") {
-            $("#cooleroverlay").addClass("active"); // Overlay the cooler
-            $("#cooleroverlay p").text(
-              "Hanya tersedia dalam mode Cooling atau Dual"
-            ); // Add text to overlay
-          } else if (radioValue === "cool") {
-            $("#heateroverlay").addClass("active"); // Overlay the heater
-            $("#heateroverlay p").text(
-              "Hanya tersedia dalam mode Heating atau Dual"
-            ); // Add text to overlay
-          }
-          // Do AJAX things here and such
-        }
+        modeCallback(radioValue, "thermo");
       });
 
       // Onclick cooler mode select
       $("input[name='cmode']").click(function () {
         var radioValue = $("input[name='cmode']:checked").val(); // Get the value of checked radio
-        $("#coolerbox .hysteresismenu").removeClass("active"); // Remove both active class
-        $("#coolerbox .pidmenu").removeClass("active"); // Remove both active class
-        if (radioValue === "pid") {
-          // Display the pidmenu or hysteresismenu accordingly
-          $("#coolerbox .pidmenu").addClass("active");
-        } else {
-          $("#coolerbox .hysteresismenu").addClass("active");
-        }
-      });
-
-      // Onclick cooler mode select
-      $("input[name='cmode']").click(function () {
-        var radioValue = $("input[name='cmode']:checked").val(); // Get the value of checked radio
-        $("#coolerbox .hysteresismenu").removeClass("active"); // Remove both active class
-        $("#coolerbox .pidmenu").removeClass("active"); // Remove both active class
-        if (radioValue === "pid") {
-          // Display the pidmenu or hysteresismenu accordingly
-          $("#coolerbox .pidmenu").addClass("active");
-        } else {
-          $("#coolerbox .hysteresismenu").addClass("active");
-        }
+        modeCallback(radioValue, "cooler");
       });
 
       // Onclick heater mode select
       $("input[name='hmode']").click(function () {
         var radioValue = $("input[name='hmode']:checked").val(); // Get the value of checked radio
-        $("#heaterbox .hysteresismenu").removeClass("active"); // Remove both active class
-        $("#heaterbox .pidmenu").removeClass("active"); // Remove both active class
-        if (radioValue === "pid") {
-          // Display the pidmenu or hysteresismenu accordingly
-          $("#heaterbox .pidmenu").addClass("active");
-        } else {
-          $("#heaterbox .hysteresismenu").addClass("active");
-        }
+        modeCallback(radioValue, "heater");
       });
 
       $(".absolute-overlay").addClass("loaded");

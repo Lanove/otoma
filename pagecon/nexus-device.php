@@ -7,7 +7,7 @@
                 <div class="col-12 d-inline-flex align-items-center">
                     <div class="dropdown">
                         <a href="#" data-toggle="dropdown">
-                            <p class="text">aefafefae</p>
+                            <p class="text"></p>
                             <div class="dropdown-menu"></div>
                         </a>
                     </div>
@@ -73,7 +73,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-12 centerme">
-                                    <span>37.5°C</span>
+                                    <span id="tempnow"></span>
                                 </div>
                             </div>
                         </div>
@@ -96,7 +96,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-12 centerme">
-                                    <span>60%</span>
+                                    <span id="humidnow"></span>
                                 </div>
                             </div>
                         </div>
@@ -125,13 +125,12 @@
                             </div>
                             <div class="row">
                                 <div class="col-12 centerme d-inline-flex">
-                                    <span id="spvalue">37°C</span>
+                                    <span id="spvalue"></span>
                                     <div class="btn-group-vertical">
                                         <i class="fas fa-caret-square-up udbutton"></i>
                                         <i class="fas fa-caret-square-down udbutton"></i>
                                     </div>
                                     <a href="#0" class="d-inline-flex" id="spsetting">
-                                        10
                                     </a>
                                 </div>
                             </div>
@@ -144,7 +143,7 @@
                     <div class="row auxheader">
                         <div class="col-12 d-inline-flex align-items-center" style="margin-left:-5px;padding-right:5px;">
                             <i class=" fas fa-plug icon ibcolor"></i>
-                            <span class="text" style="font-size:1.25rem;margin-left:10px;">Aux Output 1</span>
+                            <span class="text" style="font-size:1.25rem;margin-left:10px;" id="auxname1"></span>
                             <div class="material-switch pull-right ml-auto switch" style="position:relative;top:2px;">
                                 <input id="aux1Switch" type="checkbox" />
                                 <label for="aux1Switch" class="label-primary"></label>
@@ -156,7 +155,7 @@
                     <div class="row auxheader">
                         <div class="col-12 d-inline-flex align-items-center" style="margin-left:-5px;padding-right:5px;">
                             <i class=" fas fa-plug icon ibcolor"></i>
-                            <span class="text" style="font-size:1.25rem;margin-left:10px;">Aux Output 2</span>
+                            <span class="text" style="font-size:1.25rem;margin-left:10px;" id="auxname2"></span>
                             <div class="material-switch pull-right ml-auto switch" style="position:relative;top:2px;">
                                 <input id="aux2Switch" type="checkbox" />
                                 <label for="aux2Switch" class="label-primary"></label>
@@ -263,7 +262,7 @@
                                     <p>Operasi : </p>
                                     <div class="ml-auto">
                                         <div class="switch-field">
-                                            <input type="radio" id="manualop" name="operation" value="manual" checked />
+                                            <input type="radio" id="manualop" name="operation" value="manual" />
                                             <label for="manualop">Manual</label>
                                             <input type="radio" id="autoop" name="operation" value="auto" />
                                             <label for="autoop">Auto</label>
@@ -277,7 +276,7 @@
                                     <p>Mode : </p>
                                     <div class="ml-auto">
                                         <div class="switch-field">
-                                            <input type="radio" id="heatingmd" name="thermmode" value="heat" checked />
+                                            <input type="radio" id="heatingmd" name="thermmode" value="heat" />
                                             <label for="heatingmd">Heating</label>
                                             <input type="radio" id="coolingmd" name="thermmode" value="cool" />
                                             <label for="coolingmd">Cooling</label>
@@ -314,7 +313,7 @@
                                                     <p>Mode : </p>
                                                     <div class="ml-auto">
                                                         <div class="switch-field">
-                                                            <input type="radio" id="hpidmd" name="hmode" value="pid" checked />
+                                                            <input type="radio" id="hpidmd" name="hmode" value="pid" />
                                                             <label for="hpidmd">PID</label>
                                                             <input type="radio" id="hhysteresismd" name="hmode" value="hys" />
                                                             <label for="hhysteresismd">Hysteresis</label>
@@ -404,7 +403,7 @@
                                                     <p>Mode : </p>
                                                     <div class="ml-auto">
                                                         <div class="switch-field">
-                                                            <input type="radio" id="cpidmd" name="cmode" value="pid" checked />
+                                                            <input type="radio" id="cpidmd" name="cmode" value="pid" />
                                                             <label for="cpidmd">PID</label>
                                                             <input type="radio" id="chysteresismd" name="cmode" value="hys" />
                                                             <label for="chysteresismd">Hysteresis</label>
