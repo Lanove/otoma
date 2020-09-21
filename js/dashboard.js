@@ -345,7 +345,25 @@ if (deviceBelonging) {
           parseJson.nexusBond.coolerInfo = parseJson.nexusBond.coolerInfo.split(
             "%"
           );
-
+          // Adjust Thermocontrol Input text value based on database
+          if (parseJson.nexusBond.coolerInfo[0] === "pid") {
+            $("#ckp").val(parseJson.nexusBond.coolerInfo[1]);
+            $("#cki").val(parseJson.nexusBond.coolerInfo[2]);
+            $("#ckd").val(parseJson.nexusBond.coolerInfo[3]);
+            $("#cds").val(parseJson.nexusBond.coolerInfo[4]);
+          } else {
+            $("#cba").val(parseJson.nexusBond.coolerInfo[1]);
+            $("#cbb").val(parseJson.nexusBond.coolerInfo[2]);
+          }
+          if (parseJson.nexusBond.heaterInfo[0] === "pid") {
+            $("#hkp").val(parseJson.nexusBond.heaterInfo[1]);
+            $("#hki").val(parseJson.nexusBond.heaterInfo[2]);
+            $("#hkd").val(parseJson.nexusBond.heaterInfo[3]);
+            $("#hds").val(parseJson.nexusBond.heaterInfo[4]);
+          } else {
+            $("#hba").val(parseJson.nexusBond.heaterInfo[1]);
+            $("#hbb").val(parseJson.nexusBond.heaterInfo[2]);
+          }
           // Adjust thermocontrols radio checked position based on database value
           $(
             "input[name=operation][value='" +
