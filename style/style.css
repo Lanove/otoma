@@ -714,13 +714,15 @@ body {
 }
 #dashboard .device-graph-box .content {
   padding: 10px;
+  position:relative;
 }
+
 #dashboard .device-graph-box .totalenergy {
   margin-bottom: -10px;
 }
 #dashboard .device-graph-box .content .chart {
   position: relative;
-  height: 40vh;
+  height: 50vh;
   width: 100%;
 }
 

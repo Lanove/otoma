@@ -44,44 +44,16 @@ if (deviceBelonging) {
   ///////////////////////////////////////////
 
   // Utility function for chart.js
-  function createChart(chartApo, element, config, obj) {
-    Chart.defaults.global.defaultFontColor = "white";
-    Chart.defaults.global.elements.rectangle.borderWidth = 2;
-    chartApo[obj] = new Chart(element, config);
-  }
-
-  function addData(chart, label, data) {
-    chart.data.labels.push(label);
-    chart.data.datasets.forEach((dataset) => {
-      dataset.data.push(data);
-    });
-    chart.update();
-  }
-
-  function removeData(chart) {
-    chart.data.labels.pop();
-    chart.data.datasets.forEach((dataset) => {
-      dataset.data.pop();
-    });
-    chart.update();
-  }
-
-  function updateChart(chart, label, data) {
-    for (c in label) {
-      addData(chart, label[c], data[c]);
+  function drawChart(chartObj, element, config) {
+    if (chartObj != null) {
+      chartObj.destroy();
+      chartObj.config = config;
+      //redraw the chart
+      chartObj.update();
+    } else {
+      // Get the context of the canvas element we want to select
+      chartObj = new Chart(element, config);
     }
-  }
-
-  function refreshChart(
-    chartApo,
-    chartObj,
-    chartElement,
-    chartConfig,
-    apoPlot
-  ) {
-    chartApo[chartObj].destroy();
-    createChart(chartApo, chartElement, chartConfig, chartObj);
-    updateChart(chartApo[chartObj], apoPlot.label, apoPlot.data);
   }
   ////////////////////////////////////////////////////////////////////
 
@@ -89,6 +61,25 @@ if (deviceBelonging) {
     var elem = document.getElementById(id);
     elem.style.width = percentage + "%";
     elem.innerHTML = label;
+  }
+
+  function convertToDateLong(arg) {
+    var buffer = arg.split("-");
+    let month = [
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "Juli",
+      "Agustus",
+      "September",
+      "Oktober",
+      "November",
+      "Desember",
+    ][parseInt(buffer[1]) - 1];
+    return buffer[2] + " " + month + " " + buffer[0];
   }
   function requestAJAX(fileName, jsonobject, callback = function () {}) {
     var xhr = new XMLHttpRequest();
@@ -125,79 +116,101 @@ if (deviceBelonging) {
 
   if (deviceBelonging.hasClass("maindevice")) {
   } else if (deviceBelonging.hasClass("nexusdevice")) {
-    var nexuschart = { temp: null, humid: null },
-      options = {
-        maintainAspectRatio: false,
-        responsive: true,
-        title: {
-          display: true,
-          text: "Grafik Suhu pada tanggal 16 Agustus 2020",
-          fontFamily: "'Poppins',sans-serif",
-          fontStyle: "normal",
-        },
-        tooltips: {
-          mode: "index",
-          intersect: false,
-        },
-        hover: {
-          mode: "nearest",
-          intersect: true,
-        },
-      },
-      tempConfig = {
+    var nexusChart,
+      config = {
         type: "line",
         data: {
           datasets: [
             {
               fill: false,
-              label: "Suhu " /*+ date*/,
+              label: "Suhu",
               backgroundColor: "#002bb8",
               borderColor: "#002bb8",
               borderWidth: 2,
               pointRadius: 2,
             },
-          ],
-        },
-        options: options,
-      },
-      humidConfig = {
-        type: "line",
-        data: {
-          datasets: [
             {
               fill: false,
-              label: "Humiditas pada " /*+ date*/,
-              backgroundColor: "rgba(33, 145, 251, 1)",
-              borderColor: "rgba(33, 145, 251, 1)",
-              borderWidth: 1,
+              label: "Humiditas",
+              backgroundColor: "#b8002b",
+              borderColor: "#b8002b",
+              borderWidth: 2,
+              pointRadius: 2,
             },
           ],
         },
-        options: options,
+        options: {
+          maintainAspectRatio: false,
+          responsive: true,
+          title: {
+            display: true,
+            text: "sample text",
+            fontFamily: "'Poppins',sans-serif",
+            fontStyle: "normal",
+          },
+          tooltips: {
+            mode: "index",
+            intersect: false,
+          },
+          hover: {
+            mode: "nearest",
+            intersect: true,
+          },
+        },
       };
-    function getLabel() {
-      labeltable = [];
-      for (var x = 0; x < 24; x++) {
-        for (var i = 0; i < 2; i++) {
-          labeltable[x * 4 + i] = String(x) + ":" + String(i * 30);
-        }
-      }
-      return labeltable;
-    }
 
+    // Draw chart function that is specific to nexus device
+    function redrawChart(plotData) {
+      if (plotData.available) {
+        $("#goverlay").removeClass("active");
+        $("#goverlay p").text("");
+        var chartData = { humidData: [], tempData: [], label: [] };
+        for (c in plotData.data) {
+          chartData.tempData[c] = parseInt(plotData.data[c].data1);
+          chartData.humidData[c] = parseInt(plotData.data[c].data2);
+          chartData.label[c] = plotData.data[c].timestamp.slice(0, 5);
+        }
+        config.options.title.text =
+          "Grafik pada " + convertToDateLong(plotData.plotDate);
+        config.data.labels = chartData.label;
+        config.data.datasets[0].data = chartData.tempData;
+        config.data.datasets[1].data = chartData.humidData;
+        drawChart(nexusChart, $("#graph"), config);
+      } else {
+        drawChart(nexusChart, $("#graph"), {});
+        $("#goverlay").addClass("active");
+        $("#goverlay p").text(
+          "Grafik pada " +
+            convertToDateLong(plotData.plotDate) +
+            " tidak tersedia. Hal ini disebabkan karena kontroller anda tidak online pada tanggal tersebut, pastikan kontroller anda tetap tersambung ke internet agar kontroller dapat mengirim data grafik ke database"
+        );
+      }
+    }
     // Anypicker custom trigger onSet
     function spsetOut(oSelectedValues) {
       $("#spvalue").text(String(oSelectedValues.values[0].label) + "°C");
       return oSelectedValues.values[0].label;
     }
     function setTrigger(sOutput) {
-      return (
+      const requestedDate =
         sOutput.values[0].label +
         "-" +
         sOutput.values[1].label +
         "-" +
-        sOutput.values[2].label
+        sOutput.values[2].label;
+      requestAJAX(
+        "NexusService",
+        {
+          token: getMeta("token"),
+          bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+          requestType: "loadPlot",
+          date: requestedDate,
+        },
+        function (response) {
+          redrawChart(JSON.parse(response).plot);
+        }
       );
+      return requestedDate;
     }
     /////////////////////////////////////////////////
 
@@ -391,35 +404,37 @@ if (deviceBelonging) {
           modeCallback($("input[name='thermmode']:checked").val(), "thermo");
           modeCallback($("input[name='hmode']:checked").val(), "heater");
           modeCallback($("input[name='cmode']:checked").val(), "cooler");
+
+          // Initialize anypicker with correct date limit based on database
+          var oldest = parseJson.plot.oldest.oldestPlot.split("-");
+          var newest = parseJson.plot.newest.newestPlot.split("-");
+          for (index in newest) {
+            // Convert every string array that is splitted into integer array
+            newest[index] = parseInt(newest[index]);
+            oldest[index] = parseInt(oldest[index]);
+          }
+          oldest[1]--; // Dk what is this, but keep it.
+          $("#dateselector").unbind().removeData(); // Remove any anypicker instance to make sure it's not duplicating.
+          $("#dateselector").AnyPicker({
+            // Create anypicker instance
+            mode: "datetime",
+            dateTimeFormat: "yyyy-MM-dd",
+            lang: "id",
+            formatOutput: setTrigger,
+            minValue: new Date(oldest[0], oldest[1], 01),
+            maxValue: new Date(newest[0], newest[1], 00),
+          });
+
+          redrawChart(parseJson.plot);
         }
       );
     }
 
     $(document).ready(function () {
+      Chart.defaults.global.defaultFontColor = "white";
+      Chart.defaults.global.elements.rectangle.borderWidth = 2;
       // Awal loading page load device yang paling atas.
       loadDeviceInformation("master");
-      createChart(
-        nexuschart,
-        document.getElementById("tempgraph").getContext("2d"),
-        tempConfig,
-        "temp"
-      );
-      createChart(
-        nexuschart,
-        document.getElementById("humidgraph").getContext("2d"),
-        humidConfig,
-        "humid"
-      );
-      refreshChart(
-        nexuschart,
-        "temp",
-        document.getElementById("tempgraph").getContext("2d"),
-        tempConfig,
-        {
-          label: getLabel(),
-          data: [],
-        }
-      );
       // Enable popover
       $('[data-toggle="popover"]').popover({ html: true });
 
@@ -432,22 +447,7 @@ if (deviceBelonging) {
       today = yyyy + "-" + mm + "-" + dd;
       $("#humidds").val(today); // set today as default value of datepicker
       $("#tempds").val(today); // set today as default value of datepicker
-      $("#humidds").unbind().removeData(); // Remove any anypicker instance to make sure it's not duplicating.
-      $("#tempds").unbind().removeData(); // Remove any anypicker instance to make sure it's not duplicating.
-      $("#tempds").AnyPicker({
-        mode: "datetime",
-        dateTimeFormat: "yyyy-MM-dd",
-        lang: "id",
-        formatOutput: setTrigger,
-        // minValue: new Date(),
-      });
-      $("#humidds").AnyPicker({
-        mode: "datetime",
-        dateTimeFormat: "yyyy-MM-dd",
-        lang: "id",
-        formatOutput: setTrigger,
-        // minValue: new Date(),
-      });
+
       // Enable anypicker on setpoint setting
       var oArrData = [];
       createDataSource(oArrData, [100]);

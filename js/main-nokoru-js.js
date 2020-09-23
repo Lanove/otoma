@@ -535,6 +535,7 @@ function loadDeviceInformation(controller) {
       $("#dashboard .device-graph-box .name .dropdown-menu").append(
         "<a href='#' class='dropdown-item totalAmount'>" + "Total" + "</a>"
       );
+
       var oldest = parseJson["plot"]["oldest"]["oldestPlot"].split("-");
       var newest = parseJson["plot"]["newest"]["newestPlot"].split("-");
       for (index in newest) {
@@ -569,4 +570,3 @@ function loadDeviceInformation(controller) {
     }
   );
 }
-

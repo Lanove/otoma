@@ -165,7 +165,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-12">
                     <div class="device-graph-box">
                         <div class="mini-overlay" id="tempgraphoverlay">
                             <div class="mino">
@@ -181,9 +181,9 @@
                                 <div class="col-12 d-inline-flex align-items-center" style="min-height: 55px;">
                                     <i class="fas fa-chart-bar icon ibcolor"></i>
                                     <div class="dropdown name">
-                                        <p class="text">Grafik Suhu</p>
+                                        <p class="text">Grafik</p>
                                     </div>
-                                    <button class="btn btn-primary ml-auto" id="humidds">
+                                    <button class="btn btn-primary ml-auto" id="dateselector">
                                         <i class="fas fa-calendar-alt"></i>
                                     </button>
                                 </div>
@@ -191,46 +191,16 @@
                         </div>
                         <!-- Device status box content -->
                         <div class="content">
+
+                            <div class="mini-overlay" id="goverlay" style="padding:0;">
+                                <div class="mino d-flex align-items-center justify-content-center text-center" style="border-radius: 0px 0px 10px 10px;">
+                                    <p></p>
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-12">
                                     <div class="chart">
-                                        <canvas id="tempgraph"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="device-graph-box">
-                        <div class="mini-overlay" id="humidgraphoverlay">
-                            <div class="mino">
-                                <div class="myLoader">
-                                    <div class="loader quantum-spinner">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Device status box status -->
-                        <div class="header">
-                            <div class="row">
-                                <div class="col-12 d-inline-flex align-items-center" style="min-height: 55px;">
-                                    <i class="fas fa-chart-bar icon ibcolor"></i>
-                                    <div class="dropdown name">
-                                        <p class="text">Grafik Humiditas</p>
-                                    </div>
-                                    <button class="btn btn-primary ml-auto" id="tempds">
-                                        <i class="fas fa-calendar-alt"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Device status box content -->
-                        <div class="content">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="chart">
-                                        <canvas id="humidgraph"></canvas>
+                                        <canvas id="graph"></canvas>
                                     </div>
                                 </div>
                             </div>

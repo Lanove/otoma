@@ -31,8 +31,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
         if (hash_equals($_SESSION['ajaxToken'], $ajaxToken) && $username === $_SESSION["username"]) {
             if ($requestType === "loadDeviceInformation") { // Request is first page load
                 loadDeviceInformation($json);
+            } else if ($requestType === "loadPlot") {
+                loadPlot($json);
             }
         }
+    }
+}
+
+function loadPlot($arg)
+{
+    if (!empty($arg["bondKey"]) && !empty($arg["date"])) {
+        $bondKey = $arg["bondKey"];
+        $date = $arg["date"];
+        $fetchResult["plot"]["available"] = $GLOBALS["dbController"]->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date LIMIT 1;", ["bondkey" => $bondKey, "date" => $date]);
+        $fetchResult["plot"]["plotDate"] = $date; // Refer to availability of plot of current date
+        if ($fetchResult["plot"]["available"]) {
+            $fetchResult["plot"]["available"] = true;
+            $fetchResult["plot"]["data"] = $GLOBALS["dbController"]->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $bondKey, "date" => $date], "ALL"); // Fetch all data from date
+        } else {
+            $fetchResult["plot"]["available"] = false;
+        }
+
+        echo json_encode($fetchResult);
     }
 }
 
@@ -58,11 +78,11 @@ function loadDeviceInformation($arg)
         $fetchResult["plot"]["newest"] = $GLOBALS["dbController"]->runQuery("SELECT MAX(date) AS newestPlot FROM nexusplot WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
         // If the newest record from daily plot data is not current date, then create the frame of the current date.
         // Get current date plot data.
-        $fetchResult["plot"]["available"] = $GLOBALS["dbController"]->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date LIMIT 1;", ["bondkey" => $bondKey, "date" => date("y-m-d")]);
-
+        $fetchResult["plot"]["available"] = $GLOBALS["dbController"]->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date LIMIT 1;", ["bondkey" => $bondKey, "date" => date("Y-m-d")]);
+        $fetchResult["plot"]["plotDate"] = date("Y-m-d"); // Refer to availability of plot of current date
         if ($fetchResult["plot"]["available"]) {
             $fetchResult["plot"]["available"] = true;
-            $fetchResult["plot"]["data"] = $GLOBALS["dbController"]->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $bondKey, "date" => date("y-m-d")], "ALL");
+            $fetchResult["plot"]["data"] = $GLOBALS["dbController"]->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $bondKey, "date" => date("Y-m-d")], "ALL"); // Fetch all data from date
             if ($fetchResult["plot"]["newest"]["newestPlot"] !== date("Y-m-d")) {
                 // Refresh the newest record
                 $fetchResult["plot"]["newest"] = $GLOBALS["dbController"]->runQuery("SELECT MAX(date) AS newestPlot FROM nexusplot WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
