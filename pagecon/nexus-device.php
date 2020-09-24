@@ -167,7 +167,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="device-graph-box">
-                        <div class="mini-overlay" id="tempgraphoverlay">
+                        <div class="mini-overlay" id="graphoverlay">
                             <div class="mino">
                                 <div class="myLoader">
                                     <div class="loader quantum-spinner">
@@ -183,6 +183,7 @@
                                     <div class="dropdown name">
                                         <p class="text">Grafik</p>
                                     </div>
+                                    <input type="hidden" id="datebuffer">
                                     <button class="btn btn-primary ml-auto" id="dateselector">
                                         <i class="fas fa-calendar-alt"></i>
                                     </button>
@@ -191,7 +192,6 @@
                         </div>
                         <!-- Device status box content -->
                         <div class="content">
-
                             <div class="mini-overlay" id="goverlay" style="padding:0;">
                                 <div class="mino d-flex align-items-center justify-content-center text-center" style="border-radius: 0px 0px 10px 10px;">
                                     <p></p>

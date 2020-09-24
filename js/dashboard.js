@@ -286,18 +286,24 @@ if (deviceBelonging) {
         sOutput.values[1].label +
         "-" +
         sOutput.values[2].label;
-      requestAJAX(
-        "NexusService",
-        {
-          token: getMeta("token"),
-          bondKey: $("#dashboard #deviceheader dummy").attr("class"),
-          requestType: "loadPlot",
-          date: requestedDate,
-        },
-        function (response) {
-          redrawChart(JSON.parse(response).plot);
-        }
-      );
+      if (requestedDate !== $("#datebuffer").val()) {
+        // Only load graph when requested graph is different than current showed graph
+        $("#graphoverlay").addClass("active");
+        requestAJAX(
+          "NexusService",
+          {
+            token: getMeta("token"),
+            bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+            requestType: "loadPlot",
+            date: requestedDate,
+          },
+          function (response) {
+            redrawChart(JSON.parse(response).plot);
+            $("#graphoverlay").removeClass("active");
+          }
+        );
+      }
+      $("#datebuffer").val(requestedDate);
       return requestedDate;
     }
     /////////////////////////////////////////////////
@@ -517,7 +523,6 @@ if (deviceBelonging) {
 
           const mobileListener = function (e) {
             if (e.matches) {
-              console.log("mobile!");
               nexusChart.setOption({
                 toolbox: {
                   feature: {
@@ -534,7 +539,6 @@ if (deviceBelonging) {
           };
           const tabletListener = function (e) {
             if (e.matches) {
-              console.log("tablet!");
               nexusChart.setOption({
                 toolbox: {
                   feature: {
@@ -576,8 +580,7 @@ if (deviceBelonging) {
       var yyyy = today.getFullYear();
 
       today = yyyy + "-" + mm + "-" + dd;
-      $("#humidds").val(today); // set today as default value of datepicker
-      $("#tempds").val(today); // set today as default value of datepicker
+      $("#dateselector,#datebuffer").val(today); // set today as default value of datepicker
 
       // Enable anypicker on setpoint setting
       var oArrData = [];

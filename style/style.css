@@ -684,6 +684,12 @@ body {
   word-wrap: break-word;
   width: 100%;
 }
+#dashboard #goverlay{
+  z-index:10;
+}
+#dashboard #graphoverlay{
+  z-index:11;
+}
 #dashboard .sub2 {
   min-height: 100%;
 }
