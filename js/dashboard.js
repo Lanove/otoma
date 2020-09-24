@@ -43,18 +43,6 @@ if (deviceBelonging) {
   }
   ///////////////////////////////////////////
 
-  // Utility function for chart.js
-  function drawChart(chartObj, element, config) {
-    if (chartObj != null) {
-      chartObj.destroy();
-      chartObj.config = config;
-      //redraw the chart
-      chartObj.update();
-    } else {
-      // Get the context of the canvas element we want to select
-      chartObj = new Chart(element, config);
-    }
-  }
   ////////////////////////////////////////////////////////////////////
 
   function updateBar(id, percentage, label) {
@@ -118,49 +106,147 @@ if (deviceBelonging) {
   } else if (deviceBelonging.hasClass("nexusdevice")) {
     var nexusChart,
       config = {
-        type: "line",
-        data: {
-          datasets: [
-            {
-              fill: false,
-              label: "Suhu",
-              backgroundColor: "#002bb8",
-              borderColor: "#002bb8",
-              borderWidth: 2,
-              pointRadius: 2,
-            },
-            {
-              fill: false,
-              label: "Humiditas",
-              backgroundColor: "#b8002b",
-              borderColor: "#b8002b",
-              borderWidth: 2,
-              pointRadius: 2,
-            },
-          ],
-        },
-        options: {
-          maintainAspectRatio: false,
-          responsive: true,
-          title: {
-            display: true,
-            text: "sample text",
-            fontFamily: "'Poppins',sans-serif",
-            fontStyle: "normal",
-          },
-          tooltips: {
-            mode: "index",
-            intersect: false,
-          },
-          hover: {
-            mode: "nearest",
-            intersect: true,
-          },
-        },
-      };
+        color: ["#b8002b", "#002bb8", "#00b82b", "#2b00b8"],
 
+        tooltip: {
+          trigger: "axis",
+          position: function (pt) {
+            return [pt[0], "10%"];
+          },
+          axisPointer: {
+            type: "line",
+            lineStyle: {
+              color: "#fff",
+            },
+          },
+        },
+        grid: {
+          left: 40,
+          top: 50,
+          right: 10,
+          bottom: 25,
+          borderColor: "#ccc",
+        },
+        title: {
+          text: "sampletext",
+          left: "center",
+          textStyle: {
+            color: "#ffffff",
+            fontFamily: '"Poppins", sans-serif',
+            fontWeight: "normal",
+            fontSize: 18,
+          },
+        },
+        textStyle: {
+          color: "#ffffff",
+          fontFamily: '"Poppins", sans-serif',
+          fontSize: 16,
+        },
+
+        toolbox: {
+          orient: "horizontal",
+          right: -5,
+          itemSize: 25,
+          showTitle: false,
+          iconStyle: {
+            color: "#132e32",
+          },
+          textStyle: {
+            color: "#fff",
+          },
+          feature: {
+            dataZoom: {
+              yAxisIndex: "none",
+              icon: {
+                zoom:
+                  "path://M304 192v32c0 6.6-5.4 12-12 12h-56v56c0 6.6-5.4 12-12 12h-32c-6.6 0-12-5.4-12-12v-56h-56c-6.6 0-12-5.4-12-12v-32c0-6.6 5.4-12 12-12h56v-56c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v56h56c6.6 0 12 5.4 12 12zm201 284.7L476.7 505c-9.4 9.4-24.6 9.4-33.9 0L343 405.3c-4.5-4.5-7-10.6-7-17V372c-35.3 27.6-79.7 44-128 44C93.1 416 0 322.9 0 208S93.1 0 208 0s208 93.1 208 208c0 48.3-16.4 92.7-44 128h16.3c6.4 0 12.5 2.5 17 7l99.7 99.7c9.3 9.4 9.3 24.6 0 34zM344 208c0-75.2-60.8-136-136-136S72 132.8 72 208s60.8 136 136 136 136-60.8 136-136z",
+                back:
+                  "path://M304 192v32c0 6.6-5.4 12-12 12H124c-6.6 0-12-5.4-12-12v-32c0-6.6 5.4-12 12-12h168c6.6 0 12 5.4 12 12zm201 284.7L476.7 505c-9.4 9.4-24.6 9.4-33.9 0L343 405.3c-4.5-4.5-7-10.6-7-17V372c-35.3 27.6-79.7 44-128 44C93.1 416 0 322.9 0 208S93.1 0 208 0s208 93.1 208 208c0 48.3-16.4 92.7-44 128h16.3c6.4 0 12.5 2.5 17 7l99.7 99.7c9.3 9.4 9.3 24.6 0 34zM344 208c0-75.2-60.8-136-136-136S72 132.8 72 208s60.8 136 136 136 136-60.8 136-136z",
+              },
+            },
+            restore: {
+              icon:
+                "path://M440.935 12.574l3.966 82.766C399.416 41.904 331.674 8 256 8 134.813 8 33.933 94.924 12.296 209.824 10.908 217.193 16.604 224 24.103 224h49.084c5.57 0 10.377-3.842 11.676-9.259C103.407 137.408 172.931 80 256 80c60.893 0 114.512 30.856 146.104 77.801l-101.53-4.865c-6.845-.328-12.574 5.133-12.574 11.986v47.411c0 6.627 5.373 12 12 12h200.333c6.627 0 12-5.373 12-12V12c0-6.627-5.373-12-12-12h-47.411c-6.853 0-12.315 5.729-11.987 12.574zM256 432c-60.895 0-114.517-30.858-146.109-77.805l101.868 4.871c6.845.327 12.573-5.134 12.573-11.986v-47.412c0-6.627-5.373-12-12-12H12c-6.627 0-12 5.373-12 12V500c0 6.627 5.373 12 12 12h47.385c6.863 0 12.328-5.745 11.985-12.599l-4.129-82.575C112.725 470.166 180.405 504 256 504c121.187 0 222.067-86.924 243.704-201.824 1.388-7.369-4.308-14.176-11.807-14.176h-49.084c-5.57 0-10.377 3.842-11.676 9.259C408.593 374.592 339.069 432 256 432z",
+            },
+            saveAsImage: {
+              icon:
+                "path://M216 0h80c13.3 0 24 10.7 24 24v168h87.7c17.8 0 26.7 21.5 14.1 34.1L269.7 378.3c-7.5 7.5-19.8 7.5-27.3 0L90.1 226.1c-12.6-12.6-3.7-34.1 14.1-34.1H192V24c0-13.3 10.7-24 24-24zm296 376v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h146.7l49 49c20.1 20.1 52.5 20.1 72.6 0l49-49H488c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z",
+            },
+          },
+        },
+        legend: {
+          data: ["Suhu (°C)", "Humiditas (%)"],
+          top: 25,
+          textStyle: {
+            color: "#ffffff",
+            fontFamily: '"Poppins", sans-serif',
+          },
+        },
+        xAxis: {
+          type: "category",
+          axisTick: {
+            alignWithLabel: true,
+          },
+          boundaryGap: false,
+          axisLabel: {
+            fontSize: 14,
+            fontFamily: '"Poppins", sans-serif',
+          },
+          axisLine: {
+            lineStyle: {
+              color: "#ffffff",
+            },
+          },
+          data: ["sampletext"],
+        },
+        yAxis: {
+          type: "value",
+          axisLabel: {
+            fontSize: 14,
+            fontFamily: '"Poppins", sans-serif',
+          },
+          axisLine: {
+            lineStyle: {
+              color: "#e9e9e9",
+            },
+          },
+        },
+        dataZoom: [
+          {
+            type: "inside",
+            start: 0,
+            end: 100,
+          },
+        ],
+        series: [
+          {
+            name: "Suhu (°C)",
+            type: "line",
+            data: [],
+            smooth: true,
+            symbol: "none",
+            sampling: "average",
+          },
+          {
+            name: "Humiditas (%)",
+            type: "line",
+            data: [],
+            smooth: true,
+            symbol: "none",
+            sampling: "average",
+          },
+        ],
+      };
+    $(window).on("resize", function () {
+      if (nexusChart != null && nexusChart != undefined) {
+        nexusChart.resize();
+      }
+    });
     // Draw chart function that is specific to nexus device
     function redrawChart(plotData) {
+      if (nexusChart) {
+        nexusChart.dispose();
+      }
       if (plotData.available) {
         $("#goverlay").removeClass("active");
         $("#goverlay p").text("");
@@ -170,14 +256,16 @@ if (deviceBelonging) {
           chartData.humidData[c] = parseInt(plotData.data[c].data2);
           chartData.label[c] = plotData.data[c].timestamp.slice(0, 5);
         }
-        config.options.title.text =
+
+        config.title.text =
           "Grafik pada " + convertToDateLong(plotData.plotDate);
-        config.data.labels = chartData.label;
-        config.data.datasets[0].data = chartData.tempData;
-        config.data.datasets[1].data = chartData.humidData;
-        drawChart(nexusChart, $("#graph"), config);
+        config.xAxis.data = chartData.label;
+        config.series[0].data = chartData.tempData;
+        config.series[1].data = chartData.humidData;
+
+        nexusChart = echarts.init(document.getElementById("graph"));
+        nexusChart.setOption(config);
       } else {
-        drawChart(nexusChart, $("#graph"), {});
         $("#goverlay").addClass("active");
         $("#goverlay p").text(
           "Grafik pada " +
@@ -426,13 +514,56 @@ if (deviceBelonging) {
           });
 
           redrawChart(parseJson.plot);
+
+          const mobileListener = function (e) {
+            if (e.matches) {
+              console.log("mobile!");
+              nexusChart.setOption({
+                toolbox: {
+                  feature: {
+                    dataZoom: {
+                      show: false,
+                    },
+                    restore: {
+                      show: false,
+                    },
+                  },
+                },
+              });
+            }
+          };
+          const tabletListener = function (e) {
+            if (e.matches) {
+              console.log("tablet!");
+              nexusChart.setOption({
+                toolbox: {
+                  feature: {
+                    dataZoom: {
+                      show: true,
+                    },
+                    restore: {
+                      show: true,
+                    },
+                  },
+                },
+              });
+            }
+          };
+          const checkMobile = window.matchMedia(
+            "screen and (max-width: 611px)"
+          );
+          const checkTablet = window.matchMedia(
+            "screen and (min-width: 612px) and (max-width: 991px)"
+          );
+          mobileListener(checkMobile);
+          tabletListener(checkTablet);
+          checkMobile.addListener(mobileListener);
+          checkTablet.addListener(tabletListener);
         }
       );
     }
 
     $(document).ready(function () {
-      Chart.defaults.global.defaultFontColor = "white";
-      Chart.defaults.global.elements.rectangle.borderWidth = 2;
       // Awal loading page load device yang paling atas.
       loadDeviceInformation("master");
       // Enable popover

@@ -174,8 +174,8 @@ if ($fetchResult) {
   <!-- Font Awesome JS -->
   <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
   <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
-  <!-- Chart.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js" integrity="sha512-G8JE1Xbr0egZE5gNGyUm1fF764iHVfRXshIoUWCTPAbKkkItp/6qal5YAHXrxEu4HNfPTQs6HOu3D5vCGS1j3w==" crossorigin="anonymous"></script>
+  <!-- echarts.js -->
+  <script type="text/javascript" src="js/echarts.min.js"></script>
   <!-- Anypicker -->
   <link rel="stylesheet" type="text/css" href="style/anypicker-font.css?<?php echo date('l jS \of F Y h:i:s A'); ?>" />
   <link rel="stylesheet" type="text/css" href="style/anypicker.css?<?php echo date('l jS \of F Y h:i:s A'); ?>" />

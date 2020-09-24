@@ -199,8 +199,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="chart">
-                                        <canvas id="graph"></canvas>
+                                    <div id="graph">
                                     </div>
                                 </div>
                             </div>
