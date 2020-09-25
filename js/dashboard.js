@@ -110,8 +110,11 @@ if (deviceBelonging) {
 
         tooltip: {
           trigger: "axis",
-          position: function (pt) {
-            return [pt[0], "10%"];
+          position: function (pos, params, dom, rect, size) {
+            if (pos[0] < size.viewSize[0] / 2) {
+              return [pos[0], "-10%"];
+            }
+            return [pos[0] - 130, "-10%"];
           },
           axisPointer: {
             type: "line",
@@ -519,38 +522,44 @@ if (deviceBelonging) {
             maxValue: new Date(newest[0], newest[1], 00),
           });
 
+          // Draw a chart
           redrawChart(parseJson.plot);
 
+          // Add event listener for device size, if it's mobile just show the download image icon.
           const mobileListener = function (e) {
-            if (e.matches) {
-              nexusChart.setOption({
-                toolbox: {
-                  feature: {
-                    dataZoom: {
-                      show: false,
-                    },
-                    restore: {
-                      show: false,
+            if (nexusChart != null && nexusChart != undefined) {
+              if (e.matches) {
+                nexusChart.setOption({
+                  toolbox: {
+                    feature: {
+                      dataZoom: {
+                        show: false,
+                      },
+                      restore: {
+                        show: false,
+                      },
                     },
                   },
-                },
-              });
+                });
+              }
             }
           };
           const tabletListener = function (e) {
-            if (e.matches) {
-              nexusChart.setOption({
-                toolbox: {
-                  feature: {
-                    dataZoom: {
-                      show: true,
-                    },
-                    restore: {
-                      show: true,
+            if (nexusChart != null && nexusChart != undefined) {
+              if (e.matches) {
+                nexusChart.setOption({
+                  toolbox: {
+                    feature: {
+                      dataZoom: {
+                        show: true,
+                      },
+                      restore: {
+                        show: true,
+                      },
                     },
                   },
-                },
-              });
+                });
+              }
             }
           };
           const checkMobile = window.matchMedia(
