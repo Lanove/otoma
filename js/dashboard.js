@@ -102,6 +102,78 @@ if (deviceBelonging) {
     });
   }
 
+  function downloadCSV(csv, filename) {
+    var csvFile;
+    var downloadLink;
+
+    // CSV file
+    csvFile = new Blob([csv], { type: "text/csv" });
+
+    // Download link
+    downloadLink = document.createElement("a");
+
+    // File name
+    downloadLink.download = filename;
+
+    // Create a link to the file
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+
+    // Hide download link
+    downloadLink.style.display = "none";
+
+    // Add the link to DOM
+    document.body.appendChild(downloadLink);
+
+    // Click download link
+    downloadLink.click();
+  }
+  function exportTableToCSV(tableID, filename) {
+    var csv = [];
+    var rows = $("#" + tableID).find("tr");
+    for (var i = 0; i < rows.length; i++) {
+      var row = [],
+        cols = rows[i].querySelectorAll("td, th");
+
+      for (var j = 0; j < cols.length; j++) row.push(cols[j].innerText);
+
+      csv.push(row.join(","));
+    }
+
+    // Download CSV file
+    downloadCSV(csv.join("\n"), filename + ".csv");
+  }
+
+  function exportTableToExcel(tableID, filename = "") {
+    var downloadLink;
+    var dataType = "application/vnd.ms-excel";
+    var tableSelect = document.getElementById(tableID);
+    var tableHTML = tableSelect.outerHTML.replace(/ /g, "%20");
+
+    // Specify file name
+    filename = filename ? filename + ".xls" : "excel_data.xls";
+
+    // Create download link element
+    downloadLink = document.createElement("a");
+
+    document.body.appendChild(downloadLink);
+
+    if (navigator.msSaveOrOpenBlob) {
+      var blob = new Blob(["\ufeff", tableHTML], {
+        type: dataType,
+      });
+      navigator.msSaveOrOpenBlob(blob, filename);
+    } else {
+      // Create a link to the file
+      downloadLink.href = "data:" + dataType + ", " + tableHTML;
+
+      // Setting the file name
+      downloadLink.download = filename;
+
+      //triggering the function
+      downloadLink.click();
+    }
+  }
+
   if (deviceBelonging.hasClass("maindevice")) {
   } else if (deviceBelonging.hasClass("nexusdevice")) {
     var nexusChart,
@@ -168,12 +240,58 @@ if (deviceBelonging) {
               },
             },
             restore: {
-              icon:
-                "path://M440.935 12.574l3.966 82.766C399.416 41.904 331.674 8 256 8 134.813 8 33.933 94.924 12.296 209.824 10.908 217.193 16.604 224 24.103 224h49.084c5.57 0 10.377-3.842 11.676-9.259C103.407 137.408 172.931 80 256 80c60.893 0 114.512 30.856 146.104 77.801l-101.53-4.865c-6.845-.328-12.574 5.133-12.574 11.986v47.411c0 6.627 5.373 12 12 12h200.333c6.627 0 12-5.373 12-12V12c0-6.627-5.373-12-12-12h-47.411c-6.853 0-12.315 5.729-11.987 12.574zM256 432c-60.895 0-114.517-30.858-146.109-77.805l101.868 4.871c6.845.327 12.573-5.134 12.573-11.986v-47.412c0-6.627-5.373-12-12-12H12c-6.627 0-12 5.373-12 12V500c0 6.627 5.373 12 12 12h47.385c6.863 0 12.328-5.745 11.985-12.599l-4.129-82.575C112.725 470.166 180.405 504 256 504c121.187 0 222.067-86.924 243.704-201.824 1.388-7.369-4.308-14.176-11.807-14.176h-49.084c-5.57 0-10.377 3.842-11.676 9.259C408.593 374.592 339.069 432 256 432z",
+              show: false,
             },
-            saveAsImage: {
+            dataView: {
+              lang: ["Data View", "Close", "Refresh"],
+              optionToContent: function (opt) {
+                var axisData = opt.xAxis[0].data;
+                var series = opt.series;
+                const title = opt.title[0].text;
+                var table =
+                  `
+                    <div style="position: absolute;top: 5px;right: 20px;" class="dropdown">
+                      <button  data-toggle="dropdown" type="button" class="btn btn-primary">
+                        Download <i class = 'fas fa-caret-down'></i>
+                      </button>
+                      <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#0" onclick="exportTableToCSV('dataview','${title}');">CSV</a>
+                        <a class="dropdown-item" href="#0" onclick="exportTableToExcel('dataview','${title}');">Excel</a>
+                      </div>
+                    </div>
+                  ` +
+                  '<table id="dataview" style="width:100%;text-align:center"><tbody><tr>' +
+                  "<td></td>" +
+                  "<td>Waktu:</td>" +
+                  "<td>" +
+                  series[0].name +
+                  "</td>" +
+                  "<td>" +
+                  series[1].name +
+                  "</td>" +
+                  "</tr>";
+                for (var i = 0, l = axisData.length; i < l; i++) {
+                  table +=
+                    "<tr>" +
+                    "<td>" +
+                    (i + 1) +
+                    "</td>" +
+                    "<td>" +
+                    axisData[i] +
+                    "</td>" +
+                    "<td>" +
+                    series[0].data[i] +
+                    "</td>" +
+                    "<td>" +
+                    series[1].data[i] +
+                    "</td>" +
+                    "</tr>";
+                }
+                table += "</tbody></table>";
+                return table;
+              },
               icon:
-                "path://M216 0h80c13.3 0 24 10.7 24 24v168h87.7c17.8 0 26.7 21.5 14.1 34.1L269.7 378.3c-7.5 7.5-19.8 7.5-27.3 0L90.1 226.1c-12.6-12.6-3.7-34.1 14.1-34.1H192V24c0-13.3 10.7-24 24-24zm296 376v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h146.7l49 49c20.1 20.1 52.5 20.1 72.6 0l49-49H488c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z",
+                "path://M464 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zM224 416H64v-96h160v96zm0-160H64v-96h160v96zm224 160H288v-96h160v96zm0-160H288v-96h160v96z",
             },
           },
         },
@@ -242,6 +360,12 @@ if (deviceBelonging) {
       };
     $(window).on("resize", function () {
       if (nexusChart != null && nexusChart != undefined) {
+        const checkMobile = window.matchMedia("screen and (max-width: 611px)");
+        const checkTablet = window.matchMedia(
+          "screen and (min-width: 612px) and (max-width: 991px)"
+        );
+        mobileListener(checkMobile);
+        tabletListener(checkTablet);
         nexusChart.resize();
       }
     });
@@ -268,6 +392,12 @@ if (deviceBelonging) {
 
         nexusChart = echarts.init(document.getElementById("graph"));
         nexusChart.setOption(config);
+        const checkMobile = window.matchMedia("screen and (max-width: 611px)");
+        const checkTablet = window.matchMedia(
+          "screen and (min-width: 612px) and (max-width: 991px)"
+        );
+        mobileListener(checkMobile);
+        tabletListener(checkTablet);
       } else {
         $("#goverlay").addClass("active");
         $("#goverlay p").text(
@@ -526,42 +656,6 @@ if (deviceBelonging) {
           redrawChart(parseJson.plot);
 
           // Add event listener for device size, if it's mobile just show the download image icon.
-          const mobileListener = function (e) {
-            if (nexusChart != null && nexusChart != undefined) {
-              if (e.matches) {
-                nexusChart.setOption({
-                  toolbox: {
-                    feature: {
-                      dataZoom: {
-                        show: false,
-                      },
-                      restore: {
-                        show: false,
-                      },
-                    },
-                  },
-                });
-              }
-            }
-          };
-          const tabletListener = function (e) {
-            if (nexusChart != null && nexusChart != undefined) {
-              if (e.matches) {
-                nexusChart.setOption({
-                  toolbox: {
-                    feature: {
-                      dataZoom: {
-                        show: true,
-                      },
-                      restore: {
-                        show: true,
-                      },
-                    },
-                  },
-                });
-              }
-            }
-          };
           const checkMobile = window.matchMedia(
             "screen and (max-width: 611px)"
           );
@@ -575,7 +669,40 @@ if (deviceBelonging) {
         }
       );
     }
-
+    function tabletListener(e) {
+      if (nexusChart != null && nexusChart != undefined) {
+        if (e.matches) {
+          nexusChart.setOption({
+            toolbox: {
+              itemGap: 10,
+              itemSize: 25,
+            },
+            title: {
+              textStyle: {
+                fontSize: 18,
+              },
+            },
+          });
+        }
+      }
+    }
+    function mobileListener(e) {
+      if (nexusChart != null && nexusChart != undefined) {
+        if (e.matches) {
+          nexusChart.setOption({
+            title: {
+              textStyle: {
+                fontSize: 14,
+              },
+            },
+            toolbox: {
+              itemGap: 6,
+              itemSize: 16,
+            },
+          });
+        }
+      }
+    }
     $(document).ready(function () {
       // Awal loading page load device yang paling atas.
       loadDeviceInformation("master");

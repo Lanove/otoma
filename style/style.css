@@ -745,9 +745,33 @@ body {
   background-color: var(--text-color1);
   color: var(--first-color);
 }
-.dropdown-menu a:hover {
+#dashboard .dropdown-menu a:hover {
   background-color: var(--text-color1);
   color: var(--first-color);
+}
+#dashboard .dropdown-item {
+  color: var(--text-color1);
+}
+#dashboard .device-graph-box .dropdown-menu {
+  background-color: #ddd;
+  color:black;
+  border: 1px black solid;
+  margin-top:-10px;
+}
+#dashboard .device-graph-box .dropdown-item{
+  color:black;
+}
+#dashboard .device-graph-box .dropdown-item.active > a {
+  background-color: #ccc;
+  color: black;
+}
+#dashboard .device-graph-box .dropdown-menu a:hover {
+  background-color:#ccc;
+  color: black;
+}
+#dashboard .device-graph-box .dropdown a[aria-expanded="true"]{
+  background:inherit;
+  transition:none;
 }
 #dashboard #maindev-setting {
   background-color: var(--bigdevicebox-color);
