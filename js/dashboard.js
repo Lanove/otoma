@@ -398,6 +398,15 @@ if (deviceBelonging) {
     // Anypicker custom trigger onSet
     function spsetOut(oSelectedValues) {
       $("#spvalue").text(String(oSelectedValues.values[0].label) + "°C");
+      requestAJAX(
+        "NexusService",
+        {
+          token: getMeta("token"),
+          bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+          requestType: "changeSetpoint",
+          data: oSelectedValues.values[0].label,
+        }
+      );
       return oSelectedValues.values[0].label;
     }
     function setTrigger(sOutput) {
@@ -439,8 +448,10 @@ if (deviceBelonging) {
           $("#ckd").val(),
           $("#cds").val(),
         ];
+        modeCallback($("input[name='cmode']:checked").val(), "cmode");
       } else if (id === "submitchys") {
         par = [$("#cba").val(), $("#cbb").val()];
+        modeCallback($("input[name='cmode']:checked").val(), "cmode");
       } else if (id === "submithpid") {
         par = [
           $("#hkp").val(),
@@ -448,8 +459,10 @@ if (deviceBelonging) {
           $("#hkd").val(),
           $("#hds").val(),
         ];
+        modeCallback($("input[name='hmode']:checked").val(), "hmode");
       } else if (id === "submithhys") {
         par = [$("#hba").val(), $("#hbb").val()];
+        modeCallback($("input[name='hmode']:checked").val(), "hmode");
       }
       requestAJAX(
         "NexusService",
@@ -463,11 +476,8 @@ if (deviceBelonging) {
         function (response) {
           var parseJson = JSON.parse(response);
           var spanId = "";
-          if (id === "submitcpid") spanId = "#spancpid";
-          else if (id === "submithpid") spanId = "#spanhpid";
-          else if (id === "submitchys") spanId = "#spanchys";
-          else if (id === "submithhys") spanId = "#spanhhys";
-          if (parseJson[0].failed && spanId !== "") {
+          spanId = id.replace("submit", "#span");
+          if (parseJson.failed && spanId !== "") {
             $(spanId).removeClass();
             $(spanId).addClass("tfailed");
             $(spanId).text(
@@ -490,6 +500,10 @@ if (deviceBelonging) {
             $("#cbb").val(parseJson[0].coolerPar[1][0].toFixed(2));
             $("#cba").val(parseJson[0].coolerPar[1][1].toFixed(2));
           }
+          setTimeout(function () {
+            $(spanId).removeClass();
+            $(spanId).text("");
+          }, 5000);
         }
       );
     }
@@ -509,7 +523,7 @@ if (deviceBelonging) {
         }
       );
     }
-    function modeCallback(mode, docchi) {
+    function modeCallback(mode, docchi, request = true) {
       if (docchi === "cmode") {
         $("#coolerbox .hysteresismenu").removeClass("active"); // Remove both active class
         $("#coolerbox .pidmenu").removeClass("active"); // Remove both active class
@@ -575,17 +589,19 @@ if (deviceBelonging) {
           }
         }
       }
-      requestAJAX(
-        "NexusService",
-        {
-          requestType: "modeSwitch",
-          bondKey: $("#dashboard #deviceheader dummy").attr("class"),
-          mode: mode,
-          docchi: docchi,
-          token: getMeta("token"),
-        },
-        function (response) {}
-      );
+      if (request) {
+        requestAJAX(
+          "NexusService",
+          {
+            requestType: "modeSwitch",
+            bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+            mode: mode,
+            docchi: docchi,
+            token: getMeta("token"),
+          },
+          function (response) {}
+        );
+      }
     }
 
     ///////////////////////////////
@@ -731,10 +747,18 @@ if (deviceBelonging) {
           ).prop("checked", true);
 
           // Adjust overlay and display of thermocontrol based on database value
-          modeCallback($("input[name='operation']:checked").val(), "operation");
-          modeCallback($("input[name='thermmode']:checked").val(), "thermmode");
-          modeCallback($("input[name='hmode']:checked").val(), "hmode");
-          modeCallback($("input[name='cmode']:checked").val(), "cmode");
+          modeCallback(
+            $("input[name='operation']:checked").val(),
+            "operation",
+            false
+          );
+          modeCallback(
+            $("input[name='thermmode']:checked").val(),
+            "thermmode",
+            false
+          );
+          modeCallback($("input[name='hmode']:checked").val(), "hmode", false);
+          modeCallback($("input[name='cmode']:checked").val(), "cmode", false);
 
           // Initialize anypicker with correct date limit based on database
           var oldest = parseJson.plot.oldest.oldestPlot.split("-");
@@ -881,11 +905,16 @@ if (deviceBelonging) {
 
       // Onclick mode select
       $(
-        "input[name='cmode'],input[name='hmode'],input[name='thermmode'],input[name='operation']"
+        "input[name='thermmode'],input[name='operation'],input[name='cmode'],input[name='hmode']"
       ).click(function () {
-        modeCallback(this.value, this.name);
+        modeCallback(
+          this.value,
+          this.name,
+          !(this.name == "cmode" || this.name == "hmode")
+        );
       });
     });
+
     const check = setInterval(function () {
       // Function to check every 0.1s if bondKey is available, then execute reloadStatus() and destroy itself.
       if ($("#dashboard #deviceheader dummy").attr("class") != "") {

@@ -44,10 +44,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                             modeSwitch($json);
                         } else if ($requestType === "submitParameter") {
                             submitParameter($json);
+                        } else if ($requestType === "changeSetpoint") {
+                            changeSetpoint($json);
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+function changeSetpoint($arg)
+{
+    if (!empty($arg["data"])) {
+        $data = $arg["data"];
+        $bondKey = $arg["bondKey"];
+        if (is_numeric($data) && $data >= 0 && $data <= 100) {
+            $GLOBALS["dbController"]->runQuery("UPDATE nexusbond SET sp='{$data}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
         }
     }
 }
