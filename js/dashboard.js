@@ -91,17 +91,6 @@ if (deviceBelonging) {
     return "";
   }
 
-  function switchToggle(id) {
-    var checkBox = document.getElementById(id);
-    requestAJAX({
-      requestType: "changeStatus",
-      masterDevice: $("#dashboard #deviceheader dummy").attr("class"),
-      id: id,
-      status: String(checkBox.checked),
-      token: getMeta("token"),
-    });
-  }
-
   function downloadCSV(csv, filename) {
     var csvFile;
     var downloadLink;
@@ -179,7 +168,6 @@ if (deviceBelonging) {
     var nexusChart,
       config = {
         color: ["#b8002b", "#002bb8", "#00b82b", "#2b00b8"],
-
         tooltip: {
           trigger: "axis",
           position: function (pos, params, dom, rect, size) {
@@ -441,10 +429,88 @@ if (deviceBelonging) {
     }
     /////////////////////////////////////////////////
 
-    // Function that is triggered when operation
-
+    // UI API
+    function submitPar(id) {
+      var par = [];
+      if (id === "submitcpid") {
+        par = [
+          $("#ckp").val(),
+          $("#cki").val(),
+          $("#ckd").val(),
+          $("#cds").val(),
+        ];
+      } else if (id === "submitchys") {
+        par = [$("#cba").val(), $("#cbb").val()];
+      } else if (id === "submithpid") {
+        par = [
+          $("#hkp").val(),
+          $("#hki").val(),
+          $("#hkd").val(),
+          $("#hds").val(),
+        ];
+      } else if (id === "submithhys") {
+        par = [$("#hba").val(), $("#hbb").val()];
+      }
+      requestAJAX(
+        "NexusService",
+        {
+          requestType: "submitParameter",
+          bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+          id: id,
+          par: par,
+          token: getMeta("token"),
+        },
+        function (response) {
+          var parseJson = JSON.parse(response);
+          var spanId = "";
+          if (id === "submitcpid") spanId = "#spancpid";
+          else if (id === "submithpid") spanId = "#spanhpid";
+          else if (id === "submitchys") spanId = "#spanchys";
+          else if (id === "submithhys") spanId = "#spanhhys";
+          if (parseJson[0].failed && spanId !== "") {
+            $(spanId).removeClass();
+            $(spanId).addClass("tfailed");
+            $(spanId).text(
+              "Gagal mengupdate ke database, silahkan coba lagi sesaat kemudian"
+            );
+          } else {
+            $(spanId).removeClass();
+            $(spanId).addClass("tsucceed");
+            $(spanId).text("Sukses mengupdate ke database");
+            $("#hkp").val(parseJson[0].heaterPar[0][0].toFixed(2));
+            $("#hki").val(parseJson[0].heaterPar[0][1].toFixed(2));
+            $("#hkd").val(parseJson[0].heaterPar[0][2].toFixed(2));
+            $("#hds").val(parseJson[0].heaterPar[0][3]);
+            $("#hbb").val(parseJson[0].heaterPar[1][0].toFixed(2));
+            $("#hba").val(parseJson[0].heaterPar[1][1].toFixed(2));
+            $("#ckp").val(parseJson[0].coolerPar[0][0].toFixed(2));
+            $("#cki").val(parseJson[0].coolerPar[0][1].toFixed(2));
+            $("#ckd").val(parseJson[0].coolerPar[0][2].toFixed(2));
+            $("#cds").val(parseJson[0].coolerPar[0][3]);
+            $("#cbb").val(parseJson[0].coolerPar[1][0].toFixed(2));
+            $("#cba").val(parseJson[0].coolerPar[1][1].toFixed(2));
+          }
+        }
+      );
+    }
+    function switchToggle(id) {
+      var checkBox = document.getElementById(id);
+      requestAJAX(
+        "NexusService",
+        {
+          requestType: "toggleSwitch",
+          bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+          id: id,
+          status: String(checkBox.checked),
+          token: getMeta("token"),
+        },
+        function (response) {
+          // DO SOMETHING IF THERE ARE SOME EXCEPTION SUCH AS CONDITIONAL
+        }
+      );
+    }
     function modeCallback(mode, docchi) {
-      if (docchi === "cooler") {
+      if (docchi === "cmode") {
         $("#coolerbox .hysteresismenu").removeClass("active"); // Remove both active class
         $("#coolerbox .pidmenu").removeClass("active"); // Remove both active class
         if (mode === "pid") {
@@ -453,7 +519,7 @@ if (deviceBelonging) {
         } else {
           $("#coolerbox .hysteresismenu").addClass("active");
         }
-      } else if (docchi === "heater") {
+      } else if (docchi === "hmode") {
         $("#heaterbox .hysteresismenu").removeClass("active"); // Remove both active class
         $("#heaterbox .pidmenu").removeClass("active"); // Remove both active class
         if (mode === "pid") {
@@ -462,7 +528,7 @@ if (deviceBelonging) {
         } else {
           $("#heaterbox .hysteresismenu").addClass("active");
         }
-      } else if (docchi === "thermo") {
+      } else if (docchi === "thermmode") {
         if ($("input[name='operation']:checked").val() === "auto") {
           // Only do shit when we are on auto mode
           $("#heateroverlay").removeClass("active"); // Remove both active overlay class
@@ -509,8 +575,20 @@ if (deviceBelonging) {
           }
         }
       }
+      requestAJAX(
+        "NexusService",
+        {
+          requestType: "modeSwitch",
+          bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+          mode: mode,
+          docchi: docchi,
+          token: getMeta("token"),
+        },
+        function (response) {}
+      );
     }
 
+    ///////////////////////////////
     function loadDeviceInformation(master) {
       requestAJAX(
         "NexusService",
@@ -574,36 +652,66 @@ if (deviceBelonging) {
             "checked",
             Boolean(Number(parseJson.nexusBond.auxStatus2))
           );
+          $("#heaterSwitch").prop(
+            "checked",
+            Boolean(Number(parseJson.nexusBond.htStatus))
+          );
+          $("#coolerSwitch").prop(
+            "checked",
+            Boolean(Number(parseJson.nexusBond.clStatus))
+          );
 
           // Get each data by splitting/exploding the string
           parseJson.nexusBond.thercoInfo = parseJson.nexusBond.thercoInfo.split(
             "%"
           );
-          parseJson.nexusBond.heaterInfo = parseJson.nexusBond.heaterInfo.split(
+          parseJson.nexusBond.heaterPar = parseJson.nexusBond.heaterPar.split(
             "%"
           );
-          parseJson.nexusBond.coolerInfo = parseJson.nexusBond.coolerInfo.split(
+          parseJson.nexusBond.coolerPar = parseJson.nexusBond.coolerPar.split(
             "%"
           );
-          // Adjust Thermocontrol Input text value based on database
-          if (parseJson.nexusBond.coolerInfo[0] === "pid") {
-            $("#ckp").val(parseJson.nexusBond.coolerInfo[1]);
-            $("#cki").val(parseJson.nexusBond.coolerInfo[2]);
-            $("#ckd").val(parseJson.nexusBond.coolerInfo[3]);
-            $("#cds").val(parseJson.nexusBond.coolerInfo[4]);
-          } else {
-            $("#cba").val(parseJson.nexusBond.coolerInfo[1]);
-            $("#cbb").val(parseJson.nexusBond.coolerInfo[2]);
+          for (var i = 0; i < 2; i++) {
+            parseJson.nexusBond.heaterPar[i] = parseJson.nexusBond.heaterPar[
+              i
+            ].split("/");
+            parseJson.nexusBond.coolerPar[i] = parseJson.nexusBond.coolerPar[
+              i
+            ].split("/");
           }
-          if (parseJson.nexusBond.heaterInfo[0] === "pid") {
-            $("#hkp").val(parseJson.nexusBond.heaterInfo[1]);
-            $("#hki").val(parseJson.nexusBond.heaterInfo[2]);
-            $("#hkd").val(parseJson.nexusBond.heaterInfo[3]);
-            $("#hds").val(parseJson.nexusBond.heaterInfo[4]);
-          } else {
-            $("#hba").val(parseJson.nexusBond.heaterInfo[1]);
-            $("#hbb").val(parseJson.nexusBond.heaterInfo[2]);
-          }
+          // // Adjust Thermocontrol Input text value based on database
+          $("#ckp").val(
+            parseFloat(parseJson.nexusBond.coolerPar[0][0]).toFixed(2)
+          );
+          $("#cki").val(
+            parseFloat(parseJson.nexusBond.coolerPar[0][1]).toFixed(2)
+          );
+          $("#ckd").val(
+            parseFloat(parseJson.nexusBond.coolerPar[0][2]).toFixed(2)
+          );
+          $("#cds").val(parseJson.nexusBond.coolerPar[0][3]);
+          $("#cba").val(
+            parseFloat(parseJson.nexusBond.coolerPar[1][0]).toFixed(2)
+          );
+          $("#cbb").val(
+            parseFloat(parseJson.nexusBond.coolerPar[1][1]).toFixed(2)
+          );
+          $("#hkp").val(
+            parseFloat(parseJson.nexusBond.heaterPar[0][0]).toFixed(2)
+          );
+          $("#hki").val(
+            parseFloat(parseJson.nexusBond.heaterPar[0][1]).toFixed(2)
+          );
+          $("#hkd").val(
+            parseFloat(parseJson.nexusBond.heaterPar[0][2]).toFixed(2)
+          );
+          $("#hds").val(parseJson.nexusBond.heaterPar[0][3]);
+          $("#hba").val(
+            parseFloat(parseJson.nexusBond.heaterPar[1][0]).toFixed(2)
+          );
+          $("#hbb").val(
+            parseFloat(parseJson.nexusBond.heaterPar[1][1]).toFixed(2)
+          );
           // Adjust thermocontrols radio checked position based on database value
           $(
             "input[name=operation][value='" +
@@ -616,21 +724,17 @@ if (deviceBelonging) {
               "']"
           ).prop("checked", true);
           $(
-            "input[name=hmode][value='" +
-              parseJson.nexusBond.heaterInfo[0] +
-              "']"
+            "input[name=hmode][value='" + parseJson.nexusBond.heaterMode + "']"
           ).prop("checked", true);
           $(
-            "input[name=cmode][value='" +
-              parseJson.nexusBond.coolerInfo[0] +
-              "']"
+            "input[name=cmode][value='" + parseJson.nexusBond.coolerMode + "']"
           ).prop("checked", true);
 
           // Adjust overlay and display of thermocontrol based on database value
           modeCallback($("input[name='operation']:checked").val(), "operation");
-          modeCallback($("input[name='thermmode']:checked").val(), "thermo");
-          modeCallback($("input[name='hmode']:checked").val(), "heater");
-          modeCallback($("input[name='cmode']:checked").val(), "cooler");
+          modeCallback($("input[name='thermmode']:checked").val(), "thermmode");
+          modeCallback($("input[name='hmode']:checked").val(), "hmode");
+          modeCallback($("input[name='cmode']:checked").val(), "cmode");
 
           // Initialize anypicker with correct date limit based on database
           var oldest = parseJson.plot.oldest.oldestPlot.split("-");
@@ -703,12 +807,41 @@ if (deviceBelonging) {
         }
       }
     }
+    var prevInput = {};
     $(document).ready(function () {
       // Awal loading page load device yang paling atas.
       loadDeviceInformation("master");
       // Enable popover
       $('[data-toggle="popover"]').popover({ html: true });
-
+      // Client side filter (that is kinda suck) for parameter of therco
+      $("#ckp, #cki, #ckd, #hkp, #hki, #hkd").on("input", function () {
+        var v = parseFloat(this.value);
+        if (isNaN(v)) {
+          if (this.value.charAt(0) != "-") this.value = "";
+          else this.value = "-";
+        } else {
+          if (v > 100) v = 100;
+          else if (v < -100) v = -100;
+          if (this.value.split(".").length > 1) this.value = v.toFixed(2);
+          else this.value = v.toFixed(0);
+        }
+      });
+      // Client side filter (that is kinda suck) for duration of pid
+      $("#hds, #cds, #cba, #cbb, #hba, #hbb").on("input", function () {
+        var v = parseFloat(this.value);
+        if (isNaN(v)) {
+          this.value = "";
+        } else {
+          if (this.id === "hds" || this.id === "cds") {
+            if (v > 1000000) v = 1000000;
+            else if (v < 0) v = 0;
+          } else {
+            if (v > 30) v = 30;
+            else if (v < 0) v = 0;
+          }
+          this.value = v.toFixed(0);
+        }
+      });
       // Enable anypicker on humid and temp dateselector
       var today = new Date();
       var dd = String(today.getDate()).padStart(2, "0");
@@ -746,38 +879,20 @@ if (deviceBelonging) {
         formatOutput: spsetOut,
       });
 
-      // Onclick thermocontroller operation select
-      $("input[name='operation']").click(function () {
-        var radioValue = $("input[name='operation']:checked").val(); // Get the value of checked radio
-        modeCallback(radioValue, "operation");
+      // Onclick mode select
+      $(
+        "input[name='cmode'],input[name='hmode'],input[name='thermmode'],input[name='operation']"
+      ).click(function () {
+        modeCallback(this.value, this.name);
       });
-
-      // Onclick thermocontroller mode select
-      $("input[name='thermmode']").click(function () {
-        var radioValue = $("input[name='thermmode']:checked").val(); // Get the value of checked radio
-        modeCallback(radioValue, "thermo");
-      });
-
-      // Onclick cooler mode select
-      $("input[name='cmode']").click(function () {
-        var radioValue = $("input[name='cmode']:checked").val(); // Get the value of checked radio
-        modeCallback(radioValue, "cooler");
-      });
-
-      // Onclick heater mode select
-      $("input[name='hmode']").click(function () {
-        var radioValue = $("input[name='hmode']:checked").val(); // Get the value of checked radio
-        modeCallback(radioValue, "heater");
-      });
-
-      $(".absolute-overlay").addClass("loaded");
     });
     const check = setInterval(function () {
       // Function to check every 0.1s if bondKey is available, then execute reloadStatus() and destroy itself.
-      // if ($("#dashboard #deviceheader dummy").attr("class") != "") {
-      //   reloadStatus();
-      //   clearInterval(check); // kill after executed
-      // }
+      if ($("#dashboard #deviceheader dummy").attr("class") != "") {
+        $(".absolute-overlay").addClass("loaded");
+        //   reloadStatus();
+        clearInterval(check); // kill after executed
+      }
     }, 100);
   }
 }

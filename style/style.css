@@ -25,6 +25,9 @@
   --loader-initial-scale: 0.1;
   --childbox-tcon:#488186;
   --base-icon-color:#132E32;
+
+  --text-succeed:#24ce57;
+  --text-failed:#c72535;
   /* #A288E3 
     2191FB
     02182B
@@ -57,6 +60,12 @@
 }
 .twhite3{
   color:var(--text-color3);
+}
+.tsucceed{
+  color:var(--text-succeed);
+}
+.tfailed{
+  color:var(--text-failed);
 }
 
 /*

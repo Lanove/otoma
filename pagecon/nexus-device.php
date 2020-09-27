@@ -145,7 +145,7 @@
                             <i class=" fas fa-plug icon ibcolor"></i>
                             <span class="text" style="font-size:1.25rem;margin-left:10px;" id="auxname1"></span>
                             <div class="material-switch pull-right ml-auto switch" style="position:relative;top:2px;">
-                                <input id="aux1Switch" type="checkbox" />
+                                <input id="aux1Switch" type="checkbox" onClick="switchToggle(this.id)" />
                                 <label for="aux1Switch" class="label-primary"></label>
                             </div>
                         </div>
@@ -157,7 +157,7 @@
                             <i class=" fas fa-plug icon ibcolor"></i>
                             <span class="text" style="font-size:1.25rem;margin-left:10px;" id="auxname2"></span>
                             <div class="material-switch pull-right ml-auto switch" style="position:relative;top:2px;">
-                                <input id="aux2Switch" type="checkbox" />
+                                <input id="aux2Switch" type="checkbox" onClick="switchToggle(this.id)" />
                                 <label for="aux2Switch" class="label-primary"></label>
                             </div>
                         </div>
@@ -266,7 +266,7 @@
                                                 <i class="fas fa-fire icon ibcolor"></i>
                                                 <span class="text">Pemanas</span>
                                                 <div class="material-switch pull-right ml-auto switch">
-                                                    <input id="heaterSwitch" type="checkbox" />
+                                                    <input id="heaterSwitch" type="checkbox" onClick="switchToggle(this.id)" />
                                                     <label for="heaterSwitch" class="label-primary"></label>
                                                 </div>
                                             </div>
@@ -319,9 +319,15 @@
                                                         <input id="hds" type="text" class="form-control ml-auto" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="Durasi dari siklus algoritma PID dalam satuan milidetik (1 detik = 1000 milidetik), untuk informasi lengkap cara mengatur PID klik <a href='#0'class='infolink'>disini</a>.">
                                                     </div>
                                                 </div>
+
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span class="" id="spanhpid"></span>
+                                                    </div>
+                                                </div>
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
-                                                        <button class="btn btn-primary">Update</button>
+                                                        <button class="btn btn-primary" id="submithpid" onclick='submitPar(this.id)'>Update</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -339,8 +345,13 @@
                                                     </div>
                                                 </div>
                                                 <div class="row">
+                                                    <div class="col-12">
+                                                        <span class="" id="spanhhys"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
                                                     <div class="col-12 d-inline-flex">
-                                                        <button class="btn btn-primary">Update</button>
+                                                        <button class="btn btn-primary" id="submithhys" onclick='submitPar(this.id)'>Update</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -354,7 +365,7 @@
                                                 <i class="fas fa-snowflake icon ibcolor"></i>
                                                 <span class="text">Pendingin</span>
                                                 <div class="material-switch pull-right ml-auto switch">
-                                                    <input id="coolerSwitch" type="checkbox" />
+                                                    <input id="coolerSwitch" type="checkbox" onClick="switchToggle(this.id)" />
                                                     <label for="coolerSwitch" class="label-primary"></label>
                                                 </div>
                                             </div>
@@ -410,8 +421,13 @@
                                                     </div>
                                                 </div>
                                                 <div class="row">
+                                                    <div class="col-12">
+                                                        <span class="" id="spancpid"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
                                                     <div class="col-12 d-inline-flex">
-                                                        <button class="btn btn-primary">Update</button>
+                                                        <button class="btn btn-primary" id="submitcpid" onclick='submitPar(this.id)'>Update</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -428,9 +444,15 @@
                                                         <input id="cbb" type="text" class="form-control ml-auto" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="<u>Batas bawah</u> dari setpoint, hanya dapat diisi <b>angka positif</b>. Jika suhu sekarang turun dari <u>setpoint</u> dikurang <u>batas bawah</u> maka pendingin akan mati. Untuk informasi lengkap cara mengatur Hysteresis klik <a href='#0'class='infolink'>disini</a>.">
                                                     </div>
                                                 </div>
+
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span class="" id="spanchys"></span>
+                                                    </div>
+                                                </div>
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
-                                                        <button class="btn btn-primary">Update</button>
+                                                        <button class="btn btn-primary" id="submitchys" onclick='submitPar(this.id)'>Update</button>
                                                     </div>
                                                 </div>
                                             </div>
