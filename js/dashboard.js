@@ -396,17 +396,24 @@ if (deviceBelonging) {
       }
     }
     // Anypicker custom trigger onSet
+    function ifCdCallback(sOutput) {
+      var val = sOutput.values[0].val;
+      var id = this.elem.id;
+      if (val == "Timer") {
+      } else if (val == "Nilai Suhu") {
+      } else if (val == "Nilai Humiditas") {
+      } else if (val == "Jadwal") {
+      }
+      return val;
+    }
     function spsetOut(oSelectedValues) {
       $("#spvalue").text(String(oSelectedValues.values[0].label) + "°C");
-      requestAJAX(
-        "NexusService",
-        {
-          token: getMeta("token"),
-          bondKey: $("#dashboard #deviceheader dummy").attr("class"),
-          requestType: "changeSetpoint",
-          data: oSelectedValues.values[0].label,
-        }
-      );
+      requestAJAX("NexusService", {
+        token: getMeta("token"),
+        bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+        requestType: "changeSetpoint",
+        data: oSelectedValues.values[0].label,
+      });
       return oSelectedValues.values[0].label;
     }
     function setTrigger(sOutput) {
@@ -871,10 +878,8 @@ if (deviceBelonging) {
       var dd = String(today.getDate()).padStart(2, "0");
       var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
       var yyyy = today.getFullYear();
-
       today = yyyy + "-" + mm + "-" + dd;
       $("#dateselector,#datebuffer").val(today); // set today as default value of datepicker
-
       // Enable anypicker on setpoint setting
       var oArrData = [];
       createDataSource(oArrData, [100]);
@@ -893,7 +898,6 @@ if (deviceBelonging) {
             data: oArrData[0],
           },
         ];
-      $("#spsetting").text("37"); // test
       $("#spsetting").AnyPicker({
         mode: "select",
         lang: "id",
@@ -901,6 +905,93 @@ if (deviceBelonging) {
         components: oArrComponents,
         dataSource: oArrDataSource,
         formatOutput: spsetOut,
+      });
+
+      // Onclick add condition button
+      $("#addCond").click(function () {
+        var space = true;
+        var spaceNum;
+        for (var i = 1; i <= 30; i++) {
+          if ($("#condition" + i).length == 0) {
+            spaceNum = i;
+            break;
+          }
+          if (i == 30) {
+            space = false;
+          }
+        }
+        if (space) {
+          $("#conditional").append(`
+        <div class="row">
+            <div class="col-12">
+                <div class="nexuscond" id="condition${spaceNum}">
+                    <div class="numbox d-flex align-items-center justify-content-center">
+                        <span>Kondisi ${spaceNum}</span>
+                    </div>
+                    <div class="d-flex content justify-content-center">
+                        <div class="item">
+                            <span>Jika</span>
+                            <input type="text" class="form-control" id="ifCd${spaceNum}" style="max-width:150px;text-align:center;" readonly>
+                        </div>
+                        <div class="item">
+                            <span>Maka</span>
+                            <input type="text" class="form-control" id="thenCd${spaceNum}">
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-center" style="padding-bottom:15px;">
+                        <button class="btn btn-primary" style="margin-right:15px;" id="submitCd${spaceNum}">Update</button>
+                        <button class="btn btn-primary" class="deleteCd${spaceNum}">Hapus</button>
+                    </div>
+                </div>
+            </div>
+        </div>`);
+          var getIfsList = function () {
+            var data = [];
+            var content = ["Nilai Suhu", "Nilai Humiditas", "Jadwal", "Timer"];
+            for (
+              var iTempIndex = 0;
+              iTempIndex < content.length;
+              iTempIndex++
+            ) {
+              data.push({
+                val: content[iTempIndex],
+                label: content[iTempIndex],
+              });
+            }
+            return data;
+          };
+          $("#ifCd" + spaceNum).AnyPicker({
+            // Create anypicker instance
+            mode: "select",
+            lang: "id",
+            formatOutput: ifCdCallback,
+            components: [
+              {
+                component: 0,
+                name: "jika",
+                label: "Jika",
+              },
+            ],
+            dataSource: [
+              {
+                component: 0,
+                data: getIfsList(),
+              },
+            ],
+          });
+        } else {
+          bootbox.alert({
+            size: "large",
+            title: "Tidak dapat menambah kondisi",
+            message: "Jumlah maksimum kondisi yang dapat ditambahkan adalah 30",
+            closeButton: false,
+            buttons: {
+              ok: {
+                label: "Tutup",
+              },
+            },
+          });
+        }
       });
 
       // Onclick mode select

@@ -466,50 +466,10 @@
             </div>
         </div>
         <div class="tab-pane fade" id="menu3" role="tabpanel" aria-labelledby="contact-tab">
-            <div class="row">
-                <div class="col-12">
-                    <div class="nexuscond" id="condition1">
-                        <div class="numbox d-flex align-items-center justify-content-center">
-                            <span>Kondisi 1</span>
-                        </div>
-                        <div class="d-flex content justify-content-center">
-                            <div class="item">
-                                <span>Maka</span>
-                                <input type="text" class="form-control">
-                            </div>
-                            <div class="item">
-                                <span>Maka</span>
-                                <input type="text" class="form-control" style="width:150px;">
-                                <button class="btn btn-primary">Start</button>
-                                <button class="btn btn-primary">Reset</button>
-                            </div>
-                            <div class="item">
-                                <span>Maka</span>
-                                <input type="text" class="form-control">
-                            </div>
-                            <div class="item">
-                                <span>Maka</span>
-                                <input type="text" class="form-control">
-                            </div>
-                            <div class="item">
-                                <span>Maka</span>
-                                <input type="text" class="form-control">
-                            </div>
-                            <div class="item">
-                                <span>Maka</span>
-                                <input type="text" class="form-control">
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-center" style="padding-bottom:15px;">
-                            <button class="btn btn-primary" style="margin-right:15px;">Update</button>
-                            <button class="btn btn-primary">Hapus</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div id="conditional"></div>
             <div class="row">
                 <div class="col-12 d-inline-flex align-items-center justify-content-center">
-                    <button class="btn btn-primary" id="addcond"><i class="fas fa-plus"></i></button>
+                    <button class="btn btn-primary" id="addCond"><i class="fas fa-plus"></i></button>
                 </div>
             </div>
         </div>
