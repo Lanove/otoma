@@ -27,6 +27,7 @@
   --base-icon-color:#132E32;
 
   --text-succeed:#24ce57;
+  --text-succeed2:#0aaf18;
   --text-failed:#c72535;
   /* #A288E3 
     2191FB
@@ -63,6 +64,9 @@
 }
 .tsucceed{
   color:var(--text-succeed);
+}
+.tsucceed2{
+  color:var(--text-succeed2);
 }
 .tfailed{
   color:var(--text-failed);

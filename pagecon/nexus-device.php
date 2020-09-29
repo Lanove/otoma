@@ -145,7 +145,7 @@
                             <i class=" fas fa-plug icon ibcolor"></i>
                             <span class="text" style="font-size:1.25rem;margin-left:10px;" id="auxname1"></span>
                             <div class="material-switch pull-right ml-auto switch" style="position:relative;top:2px;">
-                                <input id="aux1Switch" type="checkbox" onClick="switchToggle(this.id)" />
+                                <input id="aux1Switch" type="checkbox" />
                                 <label for="aux1Switch" class="label-primary"></label>
                             </div>
                         </div>
@@ -157,7 +157,7 @@
                             <i class=" fas fa-plug icon ibcolor"></i>
                             <span class="text" style="font-size:1.25rem;margin-left:10px;" id="auxname2"></span>
                             <div class="material-switch pull-right ml-auto switch" style="position:relative;top:2px;">
-                                <input id="aux2Switch" type="checkbox" onClick="switchToggle(this.id)" />
+                                <input id="aux2Switch" type="checkbox" />
                                 <label for="aux2Switch" class="label-primary"></label>
                             </div>
                         </div>
@@ -266,7 +266,7 @@
                                                 <i class="fas fa-fire icon ibcolor"></i>
                                                 <span class="text">Pemanas</span>
                                                 <div class="material-switch pull-right ml-auto switch">
-                                                    <input id="heaterSwitch" type="checkbox" onClick="switchToggle(this.id)" />
+                                                    <input id="heaterSwitch" type="checkbox" />
                                                     <label for="heaterSwitch" class="label-primary"></label>
                                                 </div>
                                             </div>
@@ -365,7 +365,7 @@
                                                 <i class="fas fa-snowflake icon ibcolor"></i>
                                                 <span class="text">Pendingin</span>
                                                 <div class="material-switch pull-right ml-auto switch">
-                                                    <input id="coolerSwitch" type="checkbox" onClick="switchToggle(this.id)" />
+                                                    <input id="coolerSwitch" type="checkbox" />
                                                     <label for="coolerSwitch" class="label-primary"></label>
                                                 </div>
                                             </div>

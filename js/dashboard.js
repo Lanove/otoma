@@ -358,6 +358,12 @@ if (deviceBelonging) {
         nexusChart.resize();
       }
     });
+    jQuery.fn.sortDivs = function sortDivs() {
+      $("> div", this[0]).sort(dec_sort).appendTo(this[0]);
+      function dec_sort(a, b) {
+        return $(b).data("sort") < $(a).data("sort") ? 1 : -1;
+      }
+    };
     // Draw chart function that is specific to nexus device
     function redrawChart(plotData) {
       if (nexusChart) {
@@ -784,22 +790,6 @@ if (deviceBelonging) {
         }
       );
     }
-    function switchToggle(id) {
-      var checkBox = document.getElementById(id);
-      requestAJAX(
-        "NexusService",
-        {
-          requestType: "toggleSwitch",
-          bondKey: $("#dashboard #deviceheader dummy").attr("class"),
-          id: id,
-          status: String(checkBox.checked),
-          token: getMeta("token"),
-        },
-        function (response) {
-          // DO SOMETHING IF THERE ARE SOME EXCEPTION SUCH AS CONDITIONAL
-        }
-      );
-    }
     function modeCallback(mode, docchi, request = true) {
       if (docchi === "cmode") {
         $("#coolerbox .hysteresismenu").removeClass("active"); // Remove both active class
@@ -1176,6 +1166,48 @@ if (deviceBelonging) {
         formatOutput: spsetOut,
       });
 
+      // Onclick switches
+      $("#coolerSwitch, #heaterSwitch, #aux1Switch, #aux2Switch").click(
+        function () {
+          const switchToggle = function (arg) {
+            requestAJAX(
+              "NexusService",
+              {
+                requestType: "toggleSwitch",
+                bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+                id: arg.id,
+                status: String(arg.checked),
+                token: getMeta("token"),
+              },
+              function (response) {
+                // DO SOMETHING IF THERE ARE SOME EXCEPTION SUCH AS CONDITIONAL
+              }
+            );
+          };
+          if (this.id == "coolerSwitch" || this.id == "heaterSwitch") {
+            var check = $(this).prop("checked");
+            if ($("input[name='operation']:checked").val() === "auto") {
+              $(this).prop("checked", !check);
+              bootbox.alert({
+                size: "large",
+                title: "Aksi tidak dapat dilakukan",
+                message: `Mengubah keadaan pemanas atau pendingin dengan saklar hanya dapat dilakukan saat mode manual`,
+                closeButton: false,
+                buttons: {
+                  ok: {
+                    label: "Tutup",
+                  },
+                },
+              });
+            } else {
+              switchToggle(this);
+            }
+          } else {
+            switchToggle(this);
+          }
+        }
+      );
+
       // Onclick add condition button
       $("#addCond").click(function () {
         var space = true;
@@ -1191,7 +1223,7 @@ if (deviceBelonging) {
         }
         if (space) {
           $("#conditional").append(`
-        <div class="row">
+          <div class="row" data-sort="${spaceNum}">
             <div class="col-12">
                 <div class="nexuscond" id="condition${spaceNum}">
                     <div class="numbox d-flex align-items-center justify-content-center">
@@ -1203,14 +1235,108 @@ if (deviceBelonging) {
                             <input type="text" class="form-control" id="ifCd${spaceNum}" style="max-width:150px;text-align:center;" readonly>
                         </div>
                     </div>
+                    <span id="nSpan${spaceNum}" style="text-align:center;"></span>
                     <div class="d-flex align-items-center justify-content-center" style="padding-bottom:15px;">
                         <button class="btn btn-primary" style="margin-right:15px;" id="submitCd${spaceNum}">Update</button>
-                        <button class="btn btn-primary" class="deleteCd${spaceNum}">Hapus</button>
+                        <button class="btn btn-primary" id="deleteCd${spaceNum}">Hapus</button>
                     </div>
-                </div>
-            </div>
-        </div>`);
-          $("#ifCd" + spaceNum).AnyPicker({
+                  </div>
+              </div>
+          </div>`);
+          $("#conditional").sortDivs();
+          $(`#submitCd${spaceNum}, #deleteCd${spaceNum}`).click(function () {
+            if (this.id.match(/\D+/g) == "submitCd") {
+              const ifVal = $(`#ifCd${spaceNum}`).val();
+              var span = $(`#nSpan${spaceNum}`);
+              var success = true;
+              var passedData = {};
+              span.html("");
+              if (ifVal == "Nilai Suhu" || ifVal == "Nilai Humiditas") {
+                passedData.nscmpCd = $(`#nscmpCd${spaceNum}`).val();
+                passedData.nsvalCd = $(`#nsvalCd${spaceNum}`).val();
+                passedData.acCd = $(`#acCd${spaceNum}`).val();
+                if ($(`#nscmpCd${spaceNum}`).val() == "") {
+                  span.append(
+                    `<span class="tfailed" style="display:block;">Komparator tidak boleh kosong<span>`
+                  );
+                  success = false;
+                }
+                if ($(`#nsvalCd${spaceNum}`).val() == "") {
+                  span.append(
+                    ifVal == "Nilai Suhu"
+                      ? `<span class="tfailed" style="display:block;">Nilai Suhu tidak boleh kosong<span>`
+                      : `<span class="tfailed" style="display:block;">Nilai Humiditas tidak boleh kosong<span>`
+                  );
+                  success = false;
+                }
+                if ($(`#acCd${spaceNum}`).val() == "") {
+                  span.append(
+                    `<span class="tfailed" style="display:block;">Aksi tidak boleh kosong<span>`
+                  );
+                  success = false;
+                }
+              } else if (ifVal == "Jadwal") {
+                passedData.faCd = $(`#faCd${spaceNum}`).val();
+                passedData.feCd = $(`#feCd${spaceNum}`).val();
+                passedData.acCd = $(`#acCd${spaceNum}`).val();
+                if ($(`#faCd${spaceNum}`).val() == "") {
+                  span.append(
+                    `<span class="tfailed" style="display:block;">Input Jam (Dari) tidak boleh kosong<span>`
+                  );
+                  success = false;
+                }
+                if ($(`#feCd${spaceNum}`).val() == "") {
+                  span.append(
+                    `<span class="tfailed" style="display:block;">Input Jam (Hingga) tidak boleh kosong<span>`
+                  );
+                  success = false;
+                }
+                if ($(`#acCd${spaceNum}`).val() == "") {
+                  span.append(
+                    `<span class="tfailed" style="display:block;">Aksi tidak boleh kosong<span>`
+                  );
+                  success = false;
+                }
+              } else if (ifVal == "Timer") {
+                passedData.timerCd = $(`#timerCd${spaceNum}`).val();
+                passedData.acCd = $(`#acCd${spaceNum}`).val();
+                if ($(`#timerCd${spaceNum}`).val() == "") {
+                  span.append(
+                    `<span class="tfailed" style="display:block;">Durasi timer tidak boleh kosong<span>`
+                  );
+                  success = false;
+                }
+                if ($(`#acCd${spaceNum}`).val() == "") {
+                  span.append(
+                    `<span class="tfailed" style="display:block;">Aksi tidak boleh kosong<span>`
+                  );
+                  success = false;
+                }
+              } else {
+                success = false;
+                span.append(
+                  `<span class="tfailed" style="display:block;">Pemicu tidak boleh kosong<span>`
+                );
+              }
+
+              if (success) {
+                span.append(
+                  `<span style="display:block;">Mengupdate program ke database...<span>`
+                );
+                passedData.trCd = ifVal;
+                requestAJAX("NexusService", {
+                  token: getMeta("token"),
+                  bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+                  requestType: "updateProgram",
+                  passedData,
+                });
+              } else {
+              }
+            } else {
+              $(`#condition${spaceNum}`).remove();
+            }
+          });
+          $(`#ifCd${spaceNum}`).AnyPicker({
             // Create anypicker instance
             showComponentLabel: true,
             mode: "select",

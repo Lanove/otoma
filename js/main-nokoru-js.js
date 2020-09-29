@@ -116,8 +116,8 @@ $(document).ready(function () {
       // Add event listener to status toggle
       var matches = this.id.match(/\d+/g);
       var elem = this.id;
-      var check = $("#" + this.id).prop("checked");
-      $("#" + elem).prop("checked", !check);
+      var check = $(`#${this.id}`).prop("checked");
+      $(`#${elem}`).prop("checked", !check);
       if (timerData["t" + matches]["status"] === "started") {
         if (check == false) {
           bootbox.confirm({
