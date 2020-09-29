@@ -31,7 +31,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="#menu3">
-                                Kondisional
+                                Otomasi
                             </a>
                         </li>
                     </ul>
@@ -467,9 +467,10 @@
         </div>
         <div class="tab-pane fade" id="menu3" role="tabpanel" aria-labelledby="contact-tab">
             <div id="conditional"></div>
-            <div class="row">
-                <div class="col-12 d-inline-flex align-items-center justify-content-center">
+            <div class="row" style="margin-top:10px;">
+                <div class="col-12 d-inline-flex">
                     <button class="btn btn-primary" id="addCond"><i class="fas fa-plus"></i></button>
+                    <a href="#0" class="ml-auto btn btn-primary helpBtn">Bantuan<i style="position:relative;top:3px;" class="fas fa-info-circle infocon"></i></a>
                 </div>
             </div>
         </div>

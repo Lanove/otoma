@@ -136,7 +136,8 @@ if (deviceBelonging) {
     var downloadLink;
     var dataType = "application/vnd.ms-excel";
     var tableSelect = document.getElementById(tableID);
-    var tableHTML = tableSelect.outerHTML.replace(/ /g, "%20");
+    const newLocal = / /g;
+    var tableHTML = tableSelect.outerHTML.replace(newLocal, "%20");
 
     // Specify file name
     filename = filename ? filename + ".xls" : "excel_data.xls";
@@ -396,17 +397,286 @@ if (deviceBelonging) {
       }
     }
     // Anypicker custom trigger onSet
-    function ifCdCallback(sOutput) {
+
+    function formatTimerInput(sElemValue) {
+      var matches = sElemValue.match(/\d+/g);
+      for (i in matches) {
+        if (
+          matches[i] === null ||
+          matches[i] === undefined ||
+          matches[i] === "" ||
+          matches[i] === "0"
+        )
+          matches[i] = "0";
+      }
+      return matches;
+    }
+
+    function formatTimerOutput(oSelectedValues) {
+      var stringBuffer = "",
+        numberPal = ["h ", "j ", "m"];
+      for (i in oSelectedValues.values) {
+        if (
+          oSelectedValues.values[i].val === null ||
+          oSelectedValues.values[i].val === undefined ||
+          oSelectedValues.values[i].val === "" ||
+          oSelectedValues.values[i].val === "0"
+        )
+          stringBuffer += "0" + numberPal[i];
+        else stringBuffer += oSelectedValues.values[i].val + numberPal[i];
+      }
+      // requestAJAX({
+      //   requestType: "updateTimerVal",
+      //   bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+      //   token: getMeta("token"),
+      //   value: stringBuffer,
+      //   id: this.elem.id,
+      // });
+      return stringBuffer;
+    }
+
+    function createTextDataSource(content) {
+      var data = [];
+      for (var iTempIndex = 0; iTempIndex < content.length; iTempIndex++) {
+        data.push({
+          val: content[iTempIndex],
+          label: content[iTempIndex],
+        });
+      }
+      return data;
+    }
+
+    var oAP1 = [],
+      oAP2 = [];
+    function pgacCdCallback(sOutput) {
       var val = sOutput.values[0].val;
       var id = this.elem.id;
-      if (val == "Timer") {
-      } else if (val == "Nilai Suhu") {
-      } else if (val == "Nilai Humiditas") {
-      } else if (val == "Jadwal") {
+      var spaceNum = id.match(/\d+/g);
+
+      if (id.substring(0, 4) === "ifCd") {
+        var acContent = [];
+        $(`#condition${spaceNum} .ctCd`).remove();
+        if (val == "Timer") {
+          $(`#condition${spaceNum} .content`).append(`
+          <div class="item ctCd">
+            <span>Durasi</span>
+            <input style="max-width:125px;" type="text" class="form-control" id="timerCd${spaceNum}" value="0h 0j 0m" readonly>
+          </div>          
+          <div class="item ctCd">
+            <button class="btn btn-primary" style="margin-right:7.5px;" id="tstartCd${spaceNum}">Start</button>
+            <button class="btn btn-primary" class="tstopCd${spaceNum}">Reset</button>
+          </div>
+          <div class="item ctCd">
+              <span>Aksi</span>
+              <input style="font-size:16px;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+          </div>`);
+
+          // Create anypicker object for timer selector
+          var oArrData = [];
+          createDataSource(oArrData, [30, 23, 59]); // Maximum duration is 30 day 23 hour 59 minute
+          $(`#timerCd${spaceNum}`).AnyPicker({
+            // Add anypicker to every timer
+            mode: "select",
+            lang: "id",
+            showComponentLabel: true,
+            components: [
+              {
+                component: 0,
+                name: "h",
+                label: "Hari",
+                width: "40%",
+                textAlign: "center",
+              },
+              {
+                component: 1,
+                name: "j",
+                label: "Jam",
+                width: "30%",
+                textAlign: "center",
+              },
+              {
+                component: 2,
+                name: "m",
+                label: "Menit",
+                width: "30%",
+                textAlign: "center",
+              },
+            ],
+            dataSource: [
+              {
+                component: 0,
+                data: oArrData[0],
+              },
+              {
+                component: 1,
+                data: oArrData[1],
+              },
+              {
+                component: 2,
+                data: oArrData[2],
+              },
+            ],
+            parseInput: formatTimerInput,
+            formatOutput: formatTimerOutput,
+          });
+          acContent = [
+            "Nyalakan Output 1",
+            "Nyalakan Output 2",
+            "Nyalakan Pemanas",
+            "Nyalakan Pendingin",
+            "Matikan Pemanas",
+            "Matikan Pendingin",
+            "Nyalakan Sistem",
+          ];
+        } else if (val == "Nilai Suhu" || val == "Nilai Humiditas") {
+          $(`#condition${spaceNum} .content`).append(`
+          <div class="item ctCd">
+            <input style="max-width:50px;" type="text" class="form-control" id="nscmpCd${spaceNum}" value=">" readonly>
+          </div>    
+          <div class="item ctCd">
+            <input style="max-width:60px;" type="text" class="form-control" id="nsvalCd${spaceNum}" value="0" readonly>
+          </div>
+          <div class="item ctCd">
+              <span>Aksi</span>
+              <input style="font-size:16px;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+          </div>`);
+          $("#nscmpCd" + spaceNum).AnyPicker({
+            // Create anypicker instance
+            showComponentLabel: true,
+            mode: "select",
+            lang: "id",
+            components: [
+              {
+                component: 0,
+                name: "comparator",
+                label: "Comparator",
+                width: "50%",
+                textAlign: "center",
+              },
+            ],
+            dataSource: [
+              {
+                component: 0,
+                data: createTextDataSource(["<", ">", "<=", ">=", "!=", "=="]),
+              },
+            ],
+          });
+          var oArrData = [];
+          createDataSource(oArrData, [100]);
+          $(`#nsvalCd${spaceNum}`).AnyPicker({
+            // Add anypicker to every timer
+            showComponentLabel: true,
+            mode: "select",
+            lang: "id",
+            components: [
+              {
+                component: 0,
+                name: "c",
+                label: val == "Nilai Suhu" ? "Suhu (°C)" : "Humiditas (%)",
+                width: "50%",
+                textAlign: "center",
+              },
+            ],
+            dataSource: [
+              {
+                component: 0,
+                data: oArrData[0],
+              },
+            ],
+          });
+          acContent = [
+            "Nyalakan Output 1",
+            "Nyalakan Output 2",
+            "Nyalakan Pemanas",
+            "Nyalakan Pendingin",
+            "Matikan Pemanas",
+            "Matikan Pendingin",
+            "Nyalakan Sistem",
+          ];
+        } else if (val == "Jadwal") {
+          $(`#condition${spaceNum} .content`).append(`
+          <div class="item ctCd">
+            <span>Dari</span>
+            <input style="max-width:100px;" type="text" class="form-control" id="faCd${spaceNum}" readonly>
+          </div>    
+          <div class="item ctCd">
+            <span>Hingga</span>
+            <input style="max-width:100px;" type="text" class="form-control" id="feCd${spaceNum}" readonly>
+          </div>
+          <div class="item ctCd">
+              <span>Aksi</span>
+              <input style="font-size:16px;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+          </div>`);
+          $(`#faCd${spaceNum}`).AnyPicker({
+            mode: "datetime",
+            lang: "id",
+            inputDateTimeFormat: "HH:mm:ss",
+            dateTimeFormat: "HH:mm:ss",
+            showComponentLabel: true,
+            onInit: function () {
+              oAP1[spaceNum] = this;
+            },
+            onSetOutput: function (sOutput, oSelectedValues) {
+              sStartD = sOutput;
+              if ($(`#feCd${spaceNum}`).val() == "")
+                $(`#feCd${spaceNum}`).val(sStartD);
+              oAP2[spaceNum].setMinimumDate(sStartD);
+            },
+          });
+          $(`#feCd${spaceNum}`).AnyPicker({
+            mode: "datetime",
+            lang: "id",
+            inputDateTimeFormat: "HH:mm:ss",
+            dateTimeFormat: "HH:mm:ss",
+            showComponentLabel: true,
+            onInit: function () {
+              oAP2[spaceNum] = this;
+            },
+            onSetOutput: function (sOutput, oSelectedValues) {
+              sEndD = sOutput;
+              if ($(`#faCd${spaceNum}`).val() == "")
+                $(`#faCd${spaceNum}`).val(sEndD);
+              oAP1[spaceNum].setMaximumDate(sEndD);
+            },
+          });
+          acContent = [
+            "Nyalakan Output 1",
+            "Nyalakan Output 2",
+            "Nyalakan Pemanas",
+            "Nyalakan Pendingin",
+            "Matikan Pemanas",
+            "Matikan Pendingin",
+            "Nyalakan Sistem",
+          ];
+        }
+        $("#acCd" + spaceNum).AnyPicker({
+          // Create anypicker instance
+          showComponentLabel: true,
+          mode: "select",
+          lang: "id",
+          components: [
+            {
+              component: 0,
+              name: "aksi",
+              label: "Aksi",
+              width: "50%",
+              textAlign: "center",
+            },
+          ],
+          dataSource: [
+            {
+              component: 0,
+              data: createTextDataSource(acContent),
+            },
+          ],
+        });
+      } else if (id.substring(0, 4) === "acCd") {
       }
+
       return val;
     }
     function spsetOut(oSelectedValues) {
+      console.log(this);
       $("#spvalue").text(String(oSelectedValues.values[0].label) + "°C");
       requestAJAX("NexusService", {
         token: getMeta("token"),
@@ -779,6 +1049,7 @@ if (deviceBelonging) {
           $("#dateselector").unbind().removeData(); // Remove any anypicker instance to make sure it's not duplicating.
           $("#dateselector").AnyPicker({
             // Create anypicker instance
+            showComponentLabel: true,
             mode: "datetime",
             dateTimeFormat: "yyyy-MM-dd",
             lang: "id",
@@ -883,27 +1154,25 @@ if (deviceBelonging) {
       // Enable anypicker on setpoint setting
       var oArrData = [];
       createDataSource(oArrData, [100]);
-      var oArrComponents = [
-          {
-            component: 0,
-            name: "c",
-            label: "Suhu",
-            width: "50%",
-            textAlign: "center",
-          },
-        ],
-        oArrDataSource = [
-          {
-            component: 0,
-            data: oArrData[0],
-          },
-        ];
       $("#spsetting").AnyPicker({
         mode: "select",
         lang: "id",
         showComponentLabel: true,
-        components: oArrComponents,
-        dataSource: oArrDataSource,
+        components: [
+          {
+            component: 0,
+            name: "c",
+            label: "Suhu (°C)",
+            width: "50%",
+            textAlign: "center",
+          },
+        ],
+        dataSource: [
+          {
+            component: 0,
+            data: oArrData[0],
+          },
+        ],
         formatOutput: spsetOut,
       });
 
@@ -926,16 +1195,12 @@ if (deviceBelonging) {
             <div class="col-12">
                 <div class="nexuscond" id="condition${spaceNum}">
                     <div class="numbox d-flex align-items-center justify-content-center">
-                        <span>Kondisi ${spaceNum}</span>
+                        <span>Program ${spaceNum}</span>
                     </div>
                     <div class="d-flex content justify-content-center">
-                        <div class="item">
-                            <span>Jika</span>
+                        <div class="item pgCd">
+                            <span>Pemicu</span>
                             <input type="text" class="form-control" id="ifCd${spaceNum}" style="max-width:150px;text-align:center;" readonly>
-                        </div>
-                        <div class="item">
-                            <span>Maka</span>
-                            <input type="text" class="form-control" id="thenCd${spaceNum}">
                         </div>
                     </div>
                     <div class="d-flex align-items-center justify-content-center" style="padding-bottom:15px;">
@@ -945,45 +1210,38 @@ if (deviceBelonging) {
                 </div>
             </div>
         </div>`);
-          var getIfsList = function () {
-            var data = [];
-            var content = ["Nilai Suhu", "Nilai Humiditas", "Jadwal", "Timer"];
-            for (
-              var iTempIndex = 0;
-              iTempIndex < content.length;
-              iTempIndex++
-            ) {
-              data.push({
-                val: content[iTempIndex],
-                label: content[iTempIndex],
-              });
-            }
-            return data;
-          };
           $("#ifCd" + spaceNum).AnyPicker({
             // Create anypicker instance
+            showComponentLabel: true,
             mode: "select",
             lang: "id",
-            formatOutput: ifCdCallback,
+            formatOutput: pgacCdCallback,
             components: [
               {
                 component: 0,
-                name: "jika",
-                label: "Jika",
+                name: "pemicu",
+                label: "Pemicu",
+                width: "50%",
+                textAlign: "center",
               },
             ],
             dataSource: [
               {
                 component: 0,
-                data: getIfsList(),
+                data: createTextDataSource([
+                  "Nilai Suhu",
+                  "Nilai Humiditas",
+                  "Jadwal",
+                  "Timer",
+                ]),
               },
             ],
           });
         } else {
           bootbox.alert({
             size: "large",
-            title: "Tidak dapat menambah kondisi",
-            message: "Jumlah maksimum kondisi yang dapat ditambahkan adalah 30",
+            title: "Tidak dapat menambah program",
+            message: "Jumlah maksimum program yang dapat ditambahkan adalah 30",
             closeButton: false,
             buttons: {
               ok: {

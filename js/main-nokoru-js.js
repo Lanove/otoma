@@ -80,13 +80,13 @@ function formatTimerOutput(oSelectedValues) {
       stringBuffer += "0" + numberPal[i];
     else stringBuffer += oSelectedValues.values[i].val + numberPal[i];
   }
-  requestAJAX({
-    requestType: "updateTimerVal",
-    bondKey: $("#dashboard #deviceheader dummy").attr("class"),
-    token: getMeta("token"),
-    value: stringBuffer,
-    id: this.elem.id,
-  });
+  // requestAJAX({
+  //   requestType: "updateTimerVal",
+  //   bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+  //   token: getMeta("token"),
+  //   value: stringBuffer,
+  //   id: this.elem.id,
+  // });
   return stringBuffer;
 }
 

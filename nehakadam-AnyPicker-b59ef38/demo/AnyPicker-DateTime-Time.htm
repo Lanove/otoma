@@ -1,153 +1,127 @@
 <!DOCTYPE html>
 
 <html>
+  <head>
+    <title>Time - AnyPicker</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <meta name="msapplication-tap-highlight" content="no" />
 
-	<head>
-	
-		<title>Time - AnyPicker</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-		<meta name="msapplication-tap-highlight" content="no" />
+    <style type="text/css">
+      body {
+        margin: 0px;
+      }
 
-		<style type="text/css">
+      .input-cont {
+        width: 300px;
+        padding: 20px;
+      }
 
-			body
-			{
-				margin: 0px;
-			}
+      input {
+        width: 200px;
+        height: 30px;
+        padding: 3px 10px;
 
-			.input-cont
-            {
-                width: 300px;
-                padding: 20px;
-            }
+        margin-bottom: 16px;
+      }
+    </style>
 
-            input
-            {
-            	width: 200px;
-            	height: 30px;
-            	padding: 3px 10px;
+    <link rel="stylesheet" type="text/css" href="../src/anypicker-font.css" />
+    <link rel="stylesheet" type="text/css" href="../src/anypicker.css" />
 
-            	margin-bottom: 16px;
-            }
+    <link rel="stylesheet" type="text/css" href="../src/anypicker-ios.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="../src/anypicker-android.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="../src/anypicker-windows.css"
+    />
 
-		</style>
+    <script type="text/javascript" src="vendors/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="../src/anypicker.js"></script>
 
-		<link rel="stylesheet" type="text/css" href="../src/anypicker-font.css" />
-		<link rel="stylesheet" type="text/css" href="../src/anypicker.css" />
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $("#ip-de").AnyPicker({
+          mode: "datetime",
 
-		<link rel="stylesheet" type="text/css" href="../src/anypicker-ios.css" />
-		<link rel="stylesheet" type="text/css" href="../src/anypicker-android.css" />
-		<link rel="stylesheet" type="text/css" href="../src/anypicker-windows.css" />
+          dateTimeFormat: "H:mm:ss",
+        });
 
-		<script type="text/javascript" src="vendors/jquery-1.11.1.min.js"></script>
-		<script type="text/javascript" src="../src/anypicker.js"></script>
+        $("#ip-ios").AnyPicker({
+          mode: "datetime",
 
-		<script type="text/javascript">
-			
-			$(document).ready(function()
-			{
-				$("#ip-de").AnyPicker(
-				{
-					mode: "datetime",
-				
-					dateTimeFormat: "hh:mm aa"
-				});
+          dateTimeFormat: "hh:mm aa",
 
-				$("#ip-ios").AnyPicker(
-				{
-					mode: "datetime",
-				
-					dateTimeFormat: "hh:mm aa",
+          theme: "iOS", // "Default", "iOS", "Android", "Windows"
+        });
 
-					theme: "iOS" // "Default", "iOS", "Android", "Windows"
-				});
+        $("#ip-android").AnyPicker({
+          mode: "datetime",
 
-				$("#ip-android").AnyPicker(
-				{
-					mode: "datetime",
-				
-					dateTimeFormat: "hh:mm aa",
+          dateTimeFormat: "hh:mm aa",
 
-					theme: "Android" // "Default", "iOS", "Android", "Windows"
-				});
+          theme: "Android", // "Default", "iOS", "Android", "Windows"
+        });
 
-				$("#ip-wp").AnyPicker(
-				{
-					mode: "datetime",
-				
-					dateTimeFormat: "hh:mm aa",
+        $("#ip-wp").AnyPicker({
+          mode: "datetime",
 
-					theme: "Windows" // "Default", "iOS", "Android", "Windows"
-				});
+          dateTimeFormat: "hh:mm aa",
 
-			});
+          theme: "Windows", // "Default", "iOS", "Android", "Windows"
+        });
+      });
+    </script>
+  </head>
 
-		</script>
+  <body>
+    <table class="input-cont">
+      <tr>
+        <td>Time : (Default)</td>
+      </tr>
 
-	</head>
+      <tr>
+        <td>
+          <input type="text" id="ip-de" readonly />
+        </td>
+      </tr>
 
-	<body>
+      <tr>
+        <td>Time : (iOS)</td>
+      </tr>
 
-		<table class="input-cont">
-        
-        	<tr>
+      <tr>
+        <td>
+          <input type="text" id="ip-ios" readonly />
+        </td>
+      </tr>
 
-        		<td>Time : (Default)</td>
+      <tr>
+        <td>Time : (Android)</td>
+      </tr>
 
-        	</tr>
+      <tr>
+        <td>
+          <input type="text" id="ip-android" readonly />
+        </td>
+      </tr>
 
-        	<tr>
+      <tr>
+        <td>Time : (Windows)</td>
+      </tr>
 
-            	<td>
-            		<input type="text" id="ip-de" readonly>
-            	</td>
-        
-        	</tr>
-
-        	<tr>
-
-        		<td>Time : (iOS)</td>
-
-        	</tr>
-
-        	<tr>
-
-            	<td>
-            		<input type="text" id="ip-ios" readonly>
-            	</td>
-        
-        	</tr>
-
-        	<tr>
-
-        		<td>Time : (Android)</td>
-
-        	</tr>
-
-        	<tr>
-
-            	<td>
-            		<input type="text" id="ip-android" readonly>
-            	</td>
-        
-        	</tr>
-
-        	<tr>
-
-        		<td>Time : (Windows)</td>
-
-        	</tr>
-
-        	<tr>
-
-            	<td>
-            		<input type="text" id="ip-wp" readonly>
-            	</td>
-        
-        	</tr>
-
-        </table>
-	
-	</body>
-
+      <tr>
+        <td>
+          <input type="text" id="ip-wp" readonly />
+        </td>
+      </tr>
+    </table>
+  </body>
 </html>
