@@ -595,9 +595,12 @@ if (deviceBelonging) {
             "Nyalakan Output 2",
             "Nyalakan Pemanas",
             "Nyalakan Pendingin",
+            "Nyalakan Sistem",
+            "Matikan Output 1",
+            "Matikan Output 2",
             "Matikan Pemanas",
             "Matikan Pendingin",
-            "Nyalakan Sistem",
+            "Matikan Sistem",
           ];
         } else if (val == "Jadwal") {
           $(`#condition${spaceNum} .content`).append(`
@@ -650,9 +653,12 @@ if (deviceBelonging) {
             "Nyalakan Output 2",
             "Nyalakan Pemanas",
             "Nyalakan Pendingin",
+            "Nyalakan Sistem",
+            "Matikan Output 1",
+            "Matikan Output 2",
             "Matikan Pemanas",
             "Matikan Pendingin",
-            "Nyalakan Sistem",
+            "Matikan Sistem",
           ];
         }
         $("#acCd" + spaceNum).AnyPicker({
@@ -866,7 +872,12 @@ if (deviceBelonging) {
             docchi: docchi,
             token: getMeta("token"),
           },
-          function (response) {}
+          (response) => {
+            if (mode === "auto" && docchi === "operation") {
+              $("#heaterSwitch").prop("checked", false);
+              $("#coolerSwitch").prop("checked", false);
+            }
+          }
         );
       }
     }
@@ -1245,11 +1256,11 @@ if (deviceBelonging) {
           </div>`);
           $("#conditional").sortDivs();
           $(`#submitCd${spaceNum}, #deleteCd${spaceNum}`).click(function () {
+            var passedData = {};
             if (this.id.match(/\D+/g) == "submitCd") {
               const ifVal = $(`#ifCd${spaceNum}`).val();
               var span = $(`#nSpan${spaceNum}`);
               var success = true;
-              var passedData = {};
               span.html("");
               if (ifVal == "Nilai Suhu" || ifVal == "Nilai Humiditas") {
                 passedData.nscmpCd = $(`#nscmpCd${spaceNum}`).val();
@@ -1324,6 +1335,7 @@ if (deviceBelonging) {
                   `<span style="display:block;">Mengupdate program ke database...<span>`
                 );
                 passedData.trCd = ifVal;
+                passedData.progNum = spaceNum;
                 requestAJAX("NexusService", {
                   token: getMeta("token"),
                   bondKey: $("#dashboard #deviceheader dummy").attr("class"),
@@ -1333,7 +1345,19 @@ if (deviceBelonging) {
               } else {
               }
             } else {
-              $(`#condition${spaceNum}`).remove();
+              passedData.progNum = spaceNum;
+              requestAJAX(
+                "NexusService",
+                {
+                  token: getMeta("token"),
+                  bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+                  requestType: "deleteProgram",
+                  passedData,
+                },
+                function (response) {
+                  $(`#condition${spaceNum}`).remove();
+                }
+              );
             }
           });
           $(`#ifCd${spaceNum}`).AnyPicker({

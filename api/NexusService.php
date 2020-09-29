@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
     }
     session_start();
     $json = json_decode(file_get_contents('php://input'), true); // Get JSON Input from AJAX and decode it to PHP Array
-    if (!empty($json["token"]) && !empty($json["requestType"])) {
+    if (isset($json["token"]) &&  isset($json["requestType"])) {
         require "CryptographyFunction.php";
         // Decrypt token passed by AJAX
         $decryptedMsg = decryptAes($aesKey, $json['token']);
@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
             if ($requestType === "loadDeviceInformation") { // Request is first page load
                 loadDeviceInformation($json);
             } else { // bondKey related request is taken with privilege check.
-                if (!empty($json["bondKey"])) {
+                if (isset($json["bondKey"])) {
                     // Check if user actually had a bond with bondKey holder
                     $privilegeCheck = $GLOBALS["dbController"]->runQuery("SELECT username FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $json["bondKey"]]);
                     if ($privilegeCheck["username"] === $json["username"]) {
@@ -46,6 +46,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                             submitParameter($json);
                         } else if ($requestType === "changeSetpoint") {
                             changeSetpoint($json);
+                        } else if ($requestType === "updateProgram") {
+                            updateProgram($json);
                         }
                     }
                 }
@@ -54,9 +56,65 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
     }
 }
 
+function updateProgram($arg)
+{
+    if (isset($arg["passedData"]["trCd"]) &&  isset($arg["passedData"]["acCd"]) &&  isset($arg["passedData"]["progNum"])) {
+        $bondKey = $arg["bondKey"];
+        $trigger = $arg["passedData"]["trCd"];
+        $action = $arg["passedData"]["acCd"];
+        $progNum = (int)$arg["passedData"]["progNum"];
+        $validAction = array(
+            "Nyalakan Output 1",
+            "Nyalakan Output 2",
+            "Nyalakan Pemanas",
+            "Nyalakan Pendingin",
+            "Nyalakan Sistem",
+            "Matikan Output 1",
+            "Matikan Output 2",
+            "Matikan Pemanas",
+            "Matikan Pendingin",
+            "Matikan Sistem"
+        );
+        $validFlag = false;
+        foreach ($validAction as $k) {
+            if ($k == $action && $progNum >= 1 && $progNum <= 30) $validFlag = true;
+        }
+
+        $isCreated = $GLOBALS["dbController"]->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondkey LIMIT 1;", ["bondkey" => $bondKey]);
+        if (!$isCreated) {
+            $stringBuffer = "";
+            for ($i = 1; $i < 31; $i++) {
+                $stringBuffer .= "('" . $bondKey . "','" . $i . "','nexus')";
+                if ($i != 30) $stringBuffer .= ",";
+            }
+            $GLOBALS["dbController"]->runQuery("INSERT INTO nexusautomation (bondKey,progNumber,deviceType)
+            VALUES ${stringBuffer};", []);
+        }
+        if ($validFlag) {
+            if ($trigger == "Nilai Suhu" || $trigger == "Nilai Humiditas") {
+                if (isset($arg["passedData"]["nscmpCd"]) &&  isset($arg["passedData"]["nsvalCd"])) {
+
+                    $validComparator = array("<", ">", "<=", ">=", "!=", "==");
+                    $nscmp = $arg["passedData"]["nscmpCd"];
+                    $nsval = (int)$arg["passedData"]["nsvalCd"];
+                    $validFlag = false;
+                    foreach ($validComparator as $k) {
+                        if ($k == $nscmp) $validFlag = true;
+                    }
+                    if ($nsval >= 0 && $nsval <= 100 && $validFlag) {
+                        $GLOBALS["dbController"]->runQuery("UPDATE nexusautomation SET exist='1',   progData1=:trigger, progData2=:action, progData3=:nscmp, progData4=:nsval WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "nscmp" => $nscmp, "nsval" => $nsval, "bondKey" => $bondKey, "progNum" => $progNum,]);
+                    }
+                }
+            } else if ($trigger == "Jadwal") {
+            } else if ($trigger == "Timer") {
+            }
+        }
+    }
+}
+
 function changeSetpoint($arg)
 {
-    if (!empty($arg["data"])) {
+    if (isset($arg["data"])) {
         $data = $arg["data"];
         $bondKey = $arg["bondKey"];
         if (is_numeric($data) && $data >= 0 && $data <= 100) {
@@ -67,7 +125,7 @@ function changeSetpoint($arg)
 
 function submitParameter($arg)
 {
-    if (!empty($arg["id"] && !empty($arg["par"]))) {
+    if (isset($arg["id"]) && isset($arg["par"])) {
         $id = $arg["id"];
         $parameter = $arg["par"];
         $bondKey = $arg["bondKey"];
@@ -75,7 +133,7 @@ function submitParameter($arg)
         $columnName = "";
         $failed = true;
         $fetchResult = $GLOBALS["dbController"]->runQuery("SELECT heaterPar,coolerPar FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
-        if (($id === "submitcpid" || $id === "submithpid") && !empty($parameter[0]) && !empty($parameter[1]) && !empty($parameter[2]) && !empty($parameter[3]) && is_numeric($parameter[0]) && is_numeric($parameter[1]) && is_numeric($parameter[2]) && is_numeric($parameter[3])) { // Submit PID parameter requires 4 parameter of array to be passed, so check whether 4 array is empty and is numeric before proceeding the task.
+        if (($id === "submitcpid" || $id === "submithpid") &&  isset($parameter[0]) &&  isset($parameter[1]) &&  isset($parameter[2]) &&  isset($parameter[3]) && is_numeric($parameter[0]) && is_numeric($parameter[1]) && is_numeric($parameter[2]) && is_numeric($parameter[3])) { // Submit PID parameter requires 4 parameter of array to be passed, so check whether 4 array is empty and is numeric before proceeding the task.
             for ($k = 0; $k < 3; $k++) {
                 if ($parameter[$k] > 100) $parameter[$k] = 100;
                 else if ($parameter[$k] < -100) $parameter[$k] = -100;
@@ -94,7 +152,7 @@ function submitParameter($arg)
             }
             $stringBuffer = $parameter[0] . "/" . $parameter[1] . "/" . $parameter[2] . "/" . $parameter[3] . "%" . $split[1];
             $failed = false;
-        } else if (($id === "submitchys" || $id === "submithhys") && !empty($parameter[0]) && !empty($parameter[1]) && is_numeric($parameter[0]) && is_numeric($parameter[1])) { // Submit Hysteresis parameter only requires 2 array of value or par, so just check the first 2 index only
+        } else if (($id === "submitchys" || $id === "submithhys") &&  isset($parameter[0]) &&  isset($parameter[1]) && is_numeric($parameter[0]) && is_numeric($parameter[1])) { // Submit Hysteresis parameter only requires 2 array of value or par, so just check the first 2 index only
             for ($k = 0; $k < 2; $k++) {
                 if ($parameter[$k] > 30) $parameter[$k] = 30;
                 else if ($parameter[$k] < 0) $parameter[$k] = 0;
@@ -140,7 +198,7 @@ function submitParameter($arg)
 
 function modeSwitch($arg)
 {
-    if (!empty($arg["mode"]) && !empty($arg["docchi"])) {
+    if (isset($arg["mode"]) &&  isset($arg["docchi"])) {
         $mode = $arg["mode"];
         $docchi = $arg["docchi"];
         $bondKey = $arg["bondKey"];
@@ -148,6 +206,9 @@ function modeSwitch($arg)
         $stringBuffer = "";
         $columnName = "";
         if ($docchi === "operation" && ($mode === "auto" || $mode === "manual")) {
+            if ($mode === "auto") {
+                $GLOBALS["dbController"]->runQuery("UPDATE nexusbond SET htStatus='0',clStatus='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+            }
             $fetchResult["thercoInfo"] = explode("%", $fetchResult["thercoInfo"]);
             $stringBuffer = $mode . "%" . $fetchResult["thercoInfo"][1];
             $columnName = "thercoInfo";
@@ -170,7 +231,7 @@ function modeSwitch($arg)
 
 function toggleSwitch($arg)
 {
-    if (!empty($arg["id"]) && !empty($arg["status"])) {
+    if (isset($arg["id"]) &&  isset($arg["status"])) {
         $bondKey = $arg["bondKey"];
         $id = $arg["id"];
         $status = $arg["status"];
@@ -188,12 +249,12 @@ function toggleSwitch($arg)
 }
 function loadPlot($arg)
 {
-    if (!empty($arg["date"])) {
+    if (isset($arg["date"])) {
         $bondKey = $arg["bondKey"];
         $date = $arg["date"];
         $dateCheck = explode("-", $date);
         // A long ass if statement to check if the date is correctly formatted
-        if (!empty($dateCheck[0]) && !empty($dateCheck[1]) && !empty($dateCheck[2]) && is_numeric($dateCheck[0]) && is_numeric($dateCheck[1]) && is_numeric($dateCheck[2]) && $dateCheck[0] > 1970 && $dateCheck[0] < 2100 && $dateCheck[1] > 0 && $dateCheck[1] < 13 && $dateCheck[2] > 0 && $dateCheck[2] < 33) {
+        if (isset($dateCheck[0]) &&  isset($dateCheck[1]) &&  isset($dateCheck[2]) && is_numeric($dateCheck[0]) && is_numeric($dateCheck[1]) && is_numeric($dateCheck[2]) && $dateCheck[0] > 1970 && $dateCheck[0] < 2100 && $dateCheck[1] > 0 && $dateCheck[1] < 13 && $dateCheck[2] > 0 && $dateCheck[2] < 33) {
             $fetchResult["plot"]["available"] = $GLOBALS["dbController"]->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date LIMIT 1;", ["bondkey" => $bondKey, "date" => $date]);
             $fetchResult["plot"]["plotDate"] = $date; // Refer to availability of plot of current date
             if ($fetchResult["plot"]["available"]) {
@@ -209,7 +270,7 @@ function loadPlot($arg)
 
 function loadDeviceInformation($arg)
 {
-    if (!empty($arg["master"])) {
+    if (isset($arg["master"])) {
         $master = $arg["master"];
         $username = $arg["username"];
         if ($master === "master") {

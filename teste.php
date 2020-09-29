@@ -1,4 +1,10 @@
 <?php
+$stringBuffer = "";
+for ($i = 1; $i < 31; $i++) {
+    $stringBuffer .= "('" . "a" . "','" . $i . "','nexus')";
+    if ($i != 30) $stringBuffer .= ",";
+}
+echo $stringBuffer;
 // $date = "2020-12-31";
 // $date = explode("-", $date);
 // if (!empty($date[0]) && !empty($date[1]) && !empty($date[2]) && is_numeric($date[0]) && is_numeric($date[1]) && is_numeric($date[2]) && $date[0] > 1970 && $date[0] < 2100 && $date[1] > 0 && $date[1] < 13 && $date[2] > 0 && $date[2] < 33) {
@@ -6,12 +12,12 @@
 // } else {
 //   echo "invalid date";
 // }
-require "api/DatabaseController.php";
-$dbHandler = new DatabaseController;
+// require "api/DatabaseController.php";
+// $dbHandler = new DatabaseController;
 
-$fetchResult = $dbHandler->runQuery("SELECT thercoInfo,heaterInfo,coolerInfo FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => "6f278959a8"]);
-$fetchResult["thercoInfo"] = explode("%", $fetchResult["thercoInfo"]);
-print_r($fetchResult["thercoInfo"]);
+// $fetchResult = $dbHandler->runQuery("SELECT thercoInfo,heaterInfo,coolerInfo FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => "6f278959a8"]);
+// $fetchResult["thercoInfo"] = explode("%", $fetchResult["thercoInfo"]);
+// print_r($fetchResult["thercoInfo"]);
 // $o = 0;
 // $fetchResult = $dbHandler->runQuery("SELECT table_name AS 'Table',
 // ROUND(((data_length + index_length) / 1024), 2) AS 'Size (KB)'
