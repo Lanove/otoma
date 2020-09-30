@@ -445,79 +445,486 @@ if (deviceBelonging) {
       return data;
     }
 
+    function buildTempOrHum(spaceNum, val) {
+      $(`#condition${spaceNum} .content`).append(`
+      <div class="item ctCd">
+        <input style="max-width:50px;text-align:center;" type="text" class="form-control" id="nscmpCd${spaceNum}" value=">" readonly>
+      </div>    
+      <div class="item ctCd">
+        <input style="max-width:60px;text-align:center;" type="text" class="form-control" id="nsvalCd${spaceNum}" value="0" readonly>
+      </div>
+      <div class="item ctCd">
+          <span>Aksi</span>
+          <input style="max-width:200px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+      </div>`);
+      $("#nscmpCd" + spaceNum).AnyPicker({
+        // Create anypicker instance
+        showComponentLabel: true,
+        mode: "select",
+        lang: "id",
+        components: [
+          {
+            component: 0,
+            name: "comparator",
+            label: "Comparator",
+            width: "50%",
+            textAlign: "center",
+          },
+        ],
+        dataSource: [
+          {
+            component: 0,
+            data: createTextDataSource(["<", ">", "<=", ">=", "!=", "=="]),
+          },
+        ],
+      });
+      var oArrData = [];
+      createDataSource(oArrData, [100]);
+      $(`#nsvalCd${spaceNum}`).AnyPicker({
+        // Add anypicker to every timer
+        showComponentLabel: true,
+        mode: "select",
+        lang: "id",
+        components: [
+          {
+            component: 0,
+            name: "c",
+            label: val == "Nilai Suhu" ? "Suhu (°C)" : "Humiditas (%)",
+            width: "50%",
+            textAlign: "center",
+          },
+        ],
+        dataSource: [
+          {
+            component: 0,
+            data: oArrData[0],
+          },
+        ],
+      });
+    }
+
+    function buildTimer(spaceNum) {
+      $(`#condition${spaceNum} .content`).append(`
+      <div class="item ctCd">
+        <span>Durasi</span>
+        <input style="max-width:125px;text-align:center;" type="text" class="form-control" id="timerCd${spaceNum}" value="0h 0j 0m" readonly>
+      </div>          
+      <div class="item ctCd">
+        <button class="btn btn-primary" style="margin-right:7.5px;" id="tstartCd${spaceNum}">Start</button>
+        <button class="btn btn-primary" class="tstopCd${spaceNum}">Reset</button>
+      </div>
+      <div class="item ctCd">
+          <span>Aksi</span>
+          <input style="max-width:200px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+      </div>`);
+      // Create anypicker object for timer selector
+      var oArrData = [];
+      createDataSource(oArrData, [30, 23, 59]); // Maximum duration is 30 day 23 hour 59 minute
+      $(`#timerCd${spaceNum}`).AnyPicker({
+        // Add anypicker to every timer
+        mode: "select",
+        lang: "id",
+        showComponentLabel: true,
+        components: [
+          {
+            component: 0,
+            name: "h",
+            label: "Hari",
+            width: "40%",
+            textAlign: "center",
+          },
+          {
+            component: 1,
+            name: "j",
+            label: "Jam",
+            width: "30%",
+            textAlign: "center",
+          },
+          {
+            component: 2,
+            name: "m",
+            label: "Menit",
+            width: "30%",
+            textAlign: "center",
+          },
+        ],
+        dataSource: [
+          {
+            component: 0,
+            data: oArrData[0],
+          },
+          {
+            component: 1,
+            data: oArrData[1],
+          },
+          {
+            component: 2,
+            data: oArrData[2],
+          },
+        ],
+        parseInput: formatTimerInput,
+        formatOutput: formatTimerOutput,
+      });
+    }
     var oAP1 = [],
       oAP2 = [];
+    function buildDailyPicker(spaceNum) {
+      $(`#condition${spaceNum} .content`).append(`
+      <div class="item ctCd">
+        <span>Dari</span>
+        <input style="max-width:100px;text-align:center;" type="text" class="form-control" id="faCd${spaceNum}" readonly>
+      </div>    
+      <div class="item ctCd">
+        <span>Hingga</span>
+        <input style="max-width:100px;text-align:center;" type="text" class="form-control" id="feCd${spaceNum}" readonly>
+      </div>
+      <div class="item ctCd">
+          <span>Aksi</span>
+          <input style="max-width:200px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+      </div>`);
+      $(`#faCd${spaceNum}`).AnyPicker({
+        mode: "datetime",
+        lang: "id",
+        inputDateTimeFormat: "HH:mm:ss",
+        dateTimeFormat: "HH:mm:ss",
+        showComponentLabel: true,
+        onInit: function () {
+          oAP1[spaceNum] = this;
+        },
+        onSetOutput: function (sOutput, oSelectedValues) {
+          sStartD = sOutput;
+          if ($(`#feCd${spaceNum}`).val() == "")
+            $(`#feCd${spaceNum}`).val(sStartD);
+          oAP2[spaceNum].setMinimumDate(sStartD);
+        },
+      });
+      $(`#feCd${spaceNum}`).AnyPicker({
+        mode: "datetime",
+        lang: "id",
+        inputDateTimeFormat: "HH:mm:ss",
+        dateTimeFormat: "HH:mm:ss",
+        showComponentLabel: true,
+        onInit: function () {
+          oAP2[spaceNum] = this;
+        },
+        onSetOutput: function (sOutput, oSelectedValues) {
+          sEndD = sOutput;
+          if ($(`#faCd${spaceNum}`).val() == "")
+            $(`#faCd${spaceNum}`).val(sEndD);
+          oAP1[spaceNum].setMaximumDate(sEndD);
+        },
+      });
+    }
+
+    function buildDateTimePicker(spaceNum) {
+      $(`#condition${spaceNum} .content`).append(`
+      <div class="item ctCd">
+        <span>Dari</span>
+        <input style="max-width:200px;text-align:center;" type="text" class="form-control" id="dfaCd${spaceNum}" readonly>
+      </div>    
+      <div class="item ctCd">
+        <span>Hingga</span>
+        <input style="max-width:200px;text-align:center;" type="text" class="form-control" id="dfeCd${spaceNum}" readonly>
+      </div>
+      <div class="item ctCd">
+          <span>Aksi</span>
+          <input style="max-width:200px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+      </div>`);
+      $(`#dfaCd${spaceNum}`).AnyPicker({
+        mode: "datetime",
+        lang: "id",
+        dateTimeFormat: "yyyy-MM-dd HH:mm",
+        showComponentLabel: true,
+        minValue: new Date(2020, 00, 01),
+        maxValue: new Date(2025, 12, 31),
+      });
+      $(`#dfeCd${spaceNum}`).AnyPicker({
+        mode: "datetime",
+        lang: "id",
+        dateTimeFormat: "yyyy-MM-dd HH:mm",
+        showComponentLabel: true,
+        minValue: new Date(2020, 00, 01),
+        maxValue: new Date(2025, 12, 31),
+      });
+    }
+
+    function buildActionPicker(spaceNum, acContent) {
+      $("#acCd" + spaceNum).AnyPicker({
+        // Create anypicker instance
+        showComponentLabel: true,
+        mode: "select",
+        lang: "id",
+        components: [
+          {
+            component: 0,
+            name: "aksi",
+            label: "Aksi",
+            width: "50%",
+            textAlign: "center",
+          },
+        ],
+        dataSource: [
+          {
+            component: 0,
+            data: createTextDataSource(acContent),
+          },
+        ],
+      });
+    }
+
+    function appendConditionalChild(spaceNum, ifContent) {
+      $("#conditional").append(`
+      <div class="row" data-sort="${spaceNum}">
+        <div class="col-12">
+            <div class="nexuscond" id="condition${spaceNum}">
+                <div class="numbox d-flex align-items-center justify-content-center">
+                    <span>Program ${spaceNum}</span>
+                </div>
+                <div class="d-flex content justify-content-center">
+                    <div class="item pgCd">
+                        <span>Pemicu</span>
+                        <input type="text" class="form-control" id="ifCd${spaceNum}" style="max-width:150px;text-align:center;" readonly>
+                    </div>
+                </div>
+                <span id="nSpan${spaceNum}" style="text-align:center;"></span>
+                <div class="d-flex align-items-center justify-content-center" style="padding-bottom:15px;">
+                    <button class="btn btn-primary" style="margin-right:15px;" id="submitCd${spaceNum}">Update</button>
+                    <button class="btn btn-primary" id="deleteCd${spaceNum}">Hapus</button>
+                </div>
+              </div>
+          </div>
+      </div>`);
+      $("#conditional").sortDivs();
+      $(`#ifCd${spaceNum}`).AnyPicker({
+        // Create anypicker instance
+        showComponentLabel: true,
+        mode: "select",
+        lang: "id",
+        formatOutput: pgacCdCallback,
+        components: [
+          {
+            component: 0,
+            name: "pemicu",
+            label: "Pemicu",
+            width: "50%",
+            textAlign: "center",
+          },
+        ],
+        dataSource: [
+          {
+            component: 0,
+            data: createTextDataSource(ifContent),
+          },
+        ],
+      });
+
+      $(`#submitCd${spaceNum}, #deleteCd${spaceNum}`).click(function () {
+        var passedData = {};
+        var span = $(`#nSpan${spaceNum}`);
+        span.html("");
+        if (this.id.match(/\D+/g) == "submitCd") {
+          const ifVal = $(`#ifCd${spaceNum}`).val();
+          var success = true;
+          if (ifVal == "Nilai Suhu" || ifVal == "Nilai Humiditas") {
+            passedData.nscmpCd = $(`#nscmpCd${spaceNum}`).val();
+            passedData.nsvalCd = $(`#nsvalCd${spaceNum}`).val();
+            passedData.acCd = $(`#acCd${spaceNum}`).val();
+            if ($(`#nscmpCd${spaceNum}`).val() == "") {
+              span.append(
+                `<span class="tfailed" style="display:block;">Komparator tidak boleh kosong<span>`
+              );
+              success = false;
+            }
+            if ($(`#nsvalCd${spaceNum}`).val() == "") {
+              span.append(
+                ifVal == "Nilai Suhu"
+                  ? `<span class="tfailed" style="display:block;">Nilai Suhu tidak boleh kosong<span>`
+                  : `<span class="tfailed" style="display:block;">Nilai Humiditas tidak boleh kosong<span>`
+              );
+              success = false;
+            }
+            if ($(`#acCd${spaceNum}`).val() == "") {
+              span.append(
+                `<span class="tfailed" style="display:block;">Aksi tidak boleh kosong<span>`
+              );
+              success = false;
+            }
+          } else if (ifVal == "Jadwal Harian") {
+            passedData.faCd = $(`#faCd${spaceNum}`).val();
+            passedData.feCd = $(`#feCd${spaceNum}`).val();
+            passedData.acCd = $(`#acCd${spaceNum}`).val();
+            if ($(`#faCd${spaceNum}`).val() == "") {
+              span.append(
+                `<span class="tfailed" style="display:block;">Input Jam (Dari) tidak boleh kosong<span>`
+              );
+              success = false;
+            }
+            if ($(`#feCd${spaceNum}`).val() == "") {
+              span.append(
+                `<span class="tfailed" style="display:block;">Input Jam (Hingga) tidak boleh kosong<span>`
+              );
+              success = false;
+            }
+            if ($(`#acCd${spaceNum}`).val() == "") {
+              span.append(
+                `<span class="tfailed" style="display:block;">Aksi tidak boleh kosong<span>`
+              );
+              success = false;
+            }
+          } else if (ifVal == "Tanggal Waktu") {
+            passedData.dfaCd = $(`#dfaCd${spaceNum}`).val();
+            passedData.dfeCd = $(`#dfeCd${spaceNum}`).val();
+            passedData.acCd = $(`#acCd${spaceNum}`).val();
+
+            if ($(`#dfaCd${spaceNum}`).val() == "") {
+              span.append(
+                `<span class="tfailed" style="display:block;">Input Tanggal Waktu (Dari) tidak boleh kosong<span>`
+              );
+              success = false;
+            }
+            if ($(`#dfeCd${spaceNum}`).val() == "") {
+              span.append(
+                `<span class="tfailed" style="display:block;">Input Tanggal Waktu (Hingga) tidak boleh kosong<span>`
+              );
+              success = false;
+            }
+            if (
+              $(`#dfeCd${spaceNum}`).val() != "" &&
+              $(`#dfaCd${spaceNum}`).val() != ""
+            ) {
+              var dateFrom = $(`#dfaCd${spaceNum}`).val().split(" ");
+              var dateTo = $(`#dfeCd${spaceNum}`).val().split(" ");
+              dateFrom[0] = dateFrom[0].split("-");
+              dateTo[0] = dateTo[0].split("-");
+              dateFrom[1] = dateFrom[1].split(":");
+              dateTo[1] = dateTo[1].split(":");
+              const dDateFrom = new Date(
+                dateFrom[0][0],
+                dateFrom[0][1] - 1,
+                dateFrom[0][2],
+                dateFrom[1][0],
+                dateFrom[0][1]
+              );
+              const dDateTo = new Date(
+                dateTo[0][0],
+                dateTo[0][1] - 1,
+                dateTo[0][2],
+                dateTo[1][0],
+                dateTo[0][1]
+              );
+              const dateNow = new Date();
+              // 0 is tanggal, 1 is month str, 2 year, 3 jam:menit
+              if (dDateFrom.getTime() > dDateTo.getTime()) {
+                span.append(
+                  `<span class="tfailed" style="display:block;">Tanggal Waktu(Dari) tidak boleh melebihi Tanggal Waktu(Hingga)<span>`
+                );
+                success = false;
+              }
+              if (dDateTo.getTime() < dateNow.getTime()) {
+                span.append(
+                  `<span class="tfailed" style="display:block;">Tidak dapat memilih Tanggal Waktu(Hingga) yang telah berlalu dari waktu sekarang<span>`
+                );
+                success = false;
+              }
+            }
+            if ($(`#acCd${spaceNum}`).val() == "") {
+              span.append(
+                `<span class="tfailed" style="display:block;">Aksi tidak boleh kosong<span>`
+              );
+              success = false;
+            }
+          } else if (ifVal == "Timer") {
+            passedData.timerCd = $(`#timerCd${spaceNum}`).val();
+            passedData.acCd = $(`#acCd${spaceNum}`).val();
+            if ($(`#timerCd${spaceNum}`).val() == "") {
+              span.append(
+                `<span class="tfailed" style="display:block;">Durasi timer tidak boleh kosong<span>`
+              );
+              success = false;
+            }
+            if ($(`#acCd${spaceNum}`).val() == "") {
+              span.append(
+                `<span class="tfailed" style="display:block;">Aksi tidak boleh kosong<span>`
+              );
+              success = false;
+            }
+          } else {
+            success = false;
+            span.append(
+              `<span class="tfailed" style="display:block;">Pemicu tidak boleh kosong<span>`
+            );
+          }
+
+          if (success) {
+            span.append(
+              `<span style="display:block;">Mengupdate program ke database...<span>`
+            );
+            passedData.trCd = ifVal;
+            passedData.progNum = spaceNum;
+            requestAJAX(
+              "NexusService",
+              {
+                token: getMeta("token"),
+                bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+                requestType: "updateProgram",
+                passedData,
+              },
+              function (response) {
+                span.html("");
+                if (!JSON.parse(response).success)
+                  span.append(
+                    `<span style="display:block;" class="tfailed">Gagal mengupdate program ke database, silahkan coba lagi setelah beberapa saat<span>`
+                  );
+                else
+                  span.append(
+                    `<span style="display:block;" class="tsucceed2">Program berhasil terupdate ke database<span>`
+                  );
+                setTimeout(function () {
+                  span.html("");
+                }, 30000);
+              }
+            );
+          }
+        } else {
+          span.append(
+            `<span style="display:block;">Menghapus program dari database...<span>`
+          );
+          passedData.progNum = spaceNum;
+          requestAJAX(
+            "NexusService",
+            {
+              token: getMeta("token"),
+              bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+              requestType: "deleteProgram",
+              passedData,
+            },
+            function (response) {
+              span.html("");
+              if (JSON.parse(response).success)
+                $(`#condition${spaceNum}`).remove();
+              else
+                span.append(
+                  `<span style="display:block;" class="tfailed">Gagal menghapus, silahkan coba lagi setelah beberapa saat<span>`
+                );
+
+              setTimeout(function () {
+                span.html("");
+              }, 30000);
+            }
+          );
+        }
+      });
+    }
+
     function pgacCdCallback(sOutput) {
       var val = sOutput.values[0].val;
       var id = this.elem.id;
       var spaceNum = id.match(/\d+/g);
-
       if (id.substring(0, 4) === "ifCd") {
         var acContent = [];
         $(`#condition${spaceNum} .ctCd`).remove();
         if (val == "Timer") {
-          $(`#condition${spaceNum} .content`).append(`
-          <div class="item ctCd">
-            <span>Durasi</span>
-            <input style="max-width:125px;" type="text" class="form-control" id="timerCd${spaceNum}" value="0h 0j 0m" readonly>
-          </div>          
-          <div class="item ctCd">
-            <button class="btn btn-primary" style="margin-right:7.5px;" id="tstartCd${spaceNum}">Start</button>
-            <button class="btn btn-primary" class="tstopCd${spaceNum}">Reset</button>
-          </div>
-          <div class="item ctCd">
-              <span>Aksi</span>
-              <input style="max-width:200px;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
-          </div>`);
-
-          // Create anypicker object for timer selector
-          var oArrData = [];
-          createDataSource(oArrData, [30, 23, 59]); // Maximum duration is 30 day 23 hour 59 minute
-          $(`#timerCd${spaceNum}`).AnyPicker({
-            // Add anypicker to every timer
-            mode: "select",
-            lang: "id",
-            showComponentLabel: true,
-            components: [
-              {
-                component: 0,
-                name: "h",
-                label: "Hari",
-                width: "40%",
-                textAlign: "center",
-              },
-              {
-                component: 1,
-                name: "j",
-                label: "Jam",
-                width: "30%",
-                textAlign: "center",
-              },
-              {
-                component: 2,
-                name: "m",
-                label: "Menit",
-                width: "30%",
-                textAlign: "center",
-              },
-            ],
-            dataSource: [
-              {
-                component: 0,
-                data: oArrData[0],
-              },
-              {
-                component: 1,
-                data: oArrData[1],
-              },
-              {
-                component: 2,
-                data: oArrData[2],
-              },
-            ],
-            parseInput: formatTimerInput,
-            formatOutput: formatTimerOutput,
-          });
+          buildTimer(spaceNum);
           acContent = [
             "Nyalakan Output 1",
             "Nyalakan Output 2",
@@ -528,61 +935,7 @@ if (deviceBelonging) {
             "Nyalakan Sistem",
           ];
         } else if (val == "Nilai Suhu" || val == "Nilai Humiditas") {
-          $(`#condition${spaceNum} .content`).append(`
-          <div class="item ctCd">
-            <input style="max-width:50px;" type="text" class="form-control" id="nscmpCd${spaceNum}" value=">" readonly>
-          </div>    
-          <div class="item ctCd">
-            <input style="max-width:60px;" type="text" class="form-control" id="nsvalCd${spaceNum}" value="0" readonly>
-          </div>
-          <div class="item ctCd">
-              <span>Aksi</span>
-              <input style="max-width:200px;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
-          </div>`);
-          $("#nscmpCd" + spaceNum).AnyPicker({
-            // Create anypicker instance
-            showComponentLabel: true,
-            mode: "select",
-            lang: "id",
-            components: [
-              {
-                component: 0,
-                name: "comparator",
-                label: "Comparator",
-                width: "50%",
-                textAlign: "center",
-              },
-            ],
-            dataSource: [
-              {
-                component: 0,
-                data: createTextDataSource(["<", ">", "<=", ">=", "!=", "=="]),
-              },
-            ],
-          });
-          var oArrData = [];
-          createDataSource(oArrData, [100]);
-          $(`#nsvalCd${spaceNum}`).AnyPicker({
-            // Add anypicker to every timer
-            showComponentLabel: true,
-            mode: "select",
-            lang: "id",
-            components: [
-              {
-                component: 0,
-                name: "c",
-                label: val == "Nilai Suhu" ? "Suhu (°C)" : "Humiditas (%)",
-                width: "50%",
-                textAlign: "center",
-              },
-            ],
-            dataSource: [
-              {
-                component: 0,
-                data: oArrData[0],
-              },
-            ],
-          });
+          buildTempOrHum(spaceNum, val);
           acContent = [
             "Nyalakan Output 1",
             "Nyalakan Output 2",
@@ -596,51 +949,7 @@ if (deviceBelonging) {
             "Matikan Sistem",
           ];
         } else if (val == "Jadwal Harian") {
-          $(`#condition${spaceNum} .content`).append(`
-          <div class="item ctCd">
-            <span>Dari</span>
-            <input style="max-width:100px;" type="text" class="form-control" id="faCd${spaceNum}" readonly>
-          </div>    
-          <div class="item ctCd">
-            <span>Hingga</span>
-            <input style="max-width:100px;" type="text" class="form-control" id="feCd${spaceNum}" readonly>
-          </div>
-          <div class="item ctCd">
-              <span>Aksi</span>
-              <input style="max-width:200px;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
-          </div>`);
-          $(`#faCd${spaceNum}`).AnyPicker({
-            mode: "datetime",
-            lang: "id",
-            inputDateTimeFormat: "HH:mm:ss",
-            dateTimeFormat: "HH:mm:ss",
-            showComponentLabel: true,
-            onInit: function () {
-              oAP1[spaceNum] = this;
-            },
-            onSetOutput: function (sOutput, oSelectedValues) {
-              sStartD = sOutput;
-              if ($(`#feCd${spaceNum}`).val() == "")
-                $(`#feCd${spaceNum}`).val(sStartD);
-              oAP2[spaceNum].setMinimumDate(sStartD);
-            },
-          });
-          $(`#feCd${spaceNum}`).AnyPicker({
-            mode: "datetime",
-            lang: "id",
-            inputDateTimeFormat: "HH:mm:ss",
-            dateTimeFormat: "HH:mm:ss",
-            showComponentLabel: true,
-            onInit: function () {
-              oAP2[spaceNum] = this;
-            },
-            onSetOutput: function (sOutput, oSelectedValues) {
-              sEndD = sOutput;
-              if ($(`#faCd${spaceNum}`).val() == "")
-                $(`#faCd${spaceNum}`).val(sEndD);
-              oAP1[spaceNum].setMaximumDate(sEndD);
-            },
-          });
+          buildDailyPicker(spaceNum);
           acContent = [
             "Nyalakan Output 1",
             "Nyalakan Output 2",
@@ -654,35 +963,7 @@ if (deviceBelonging) {
             "Matikan Sistem",
           ];
         } else if (val == "Tanggal Waktu") {
-          $(`#condition${spaceNum} .content`).append(`
-          <div class="item ctCd">
-            <span>Dari</span>
-            <input style="max-width:200px;" type="text" class="form-control" id="dfaCd${spaceNum}" readonly>
-          </div>    
-          <div class="item ctCd">
-            <span>Hingga</span>
-            <input style="max-width:200px;" type="text" class="form-control" id="dfeCd${spaceNum}" readonly>
-          </div>
-          <div class="item ctCd">
-              <span>Aksi</span>
-              <input style="max-width:200px;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
-          </div>`);
-          $(`#dfaCd${spaceNum}`).AnyPicker({
-            mode: "datetime",
-            lang: "id",
-            dateTimeFormat: "yyyy-MM-dd HH:mm",
-            showComponentLabel: true,
-            minValue: new Date(2020, 00, 01),
-            maxValue: new Date(2025, 12, 31),
-          });
-          $(`#dfeCd${spaceNum}`).AnyPicker({
-            mode: "datetime",
-            lang: "id",
-            dateTimeFormat: "yyyy-MM-dd HH:mm",
-            showComponentLabel: true,
-            minValue: new Date(2020, 00, 01),
-            maxValue: new Date(2025, 12, 31),
-          });
+          buildDateTimePicker(spaceNum);
           acContent = [
             "Nyalakan Output 1",
             "Nyalakan Output 2",
@@ -696,34 +977,12 @@ if (deviceBelonging) {
             "Matikan Sistem",
           ];
         }
-        $("#acCd" + spaceNum).AnyPicker({
-          // Create anypicker instance
-          showComponentLabel: true,
-          mode: "select",
-          lang: "id",
-          components: [
-            {
-              component: 0,
-              name: "aksi",
-              label: "Aksi",
-              width: "50%",
-              textAlign: "center",
-            },
-          ],
-          dataSource: [
-            {
-              component: 0,
-              data: createTextDataSource(acContent),
-            },
-          ],
-        });
-      } else if (id.substring(0, 4) === "acCd") {
+        buildActionPicker(spaceNum, acContent);
       }
 
       return val;
     }
     function spsetOut(oSelectedValues) {
-      console.log(this);
       $("#spvalue").text(String(oSelectedValues.values[0].label) + "°C");
       requestAJAX("NexusService", {
         token: getMeta("token"),
@@ -1108,6 +1367,63 @@ if (deviceBelonging) {
           tabletListener(checkTablet);
           checkMobile.addListener(mobileListener);
           checkTablet.addListener(tabletListener);
+          for (index in parseJson.programs) {
+            const progNum = parseJson.programs[index].progNumber;
+            const trigger = parseJson.programs[index].progData1;
+            const action = parseJson.programs[index].progData2;
+            appendConditionalChild(progNum, [
+              "Nilai Suhu",
+              "Nilai Humiditas",
+              "Jadwal Harian",
+              "Tanggal Waktu",
+              "Timer",
+            ]);
+            // buildTempOrHum(spaceNum), buildTimer(spaceNum), buildDailyPicker(spaceNum), buildDateTimePicker(spaceNum), buildActionPicker(spaceNum, acContent)
+            $(`#ifCd${progNum}`).val(trigger);
+            if (trigger == "Nilai Suhu" || trigger == "Nilai Humiditas") {
+              buildTempOrHum(progNum, trigger);
+              $(`#nscmpCd${progNum}`).val(parseJson.programs[index].progData3);
+              $(`#nsvalCd${progNum}`).val(parseJson.programs[index].progData4);
+            } else if (trigger == "Jadwal Harian") {
+              buildDailyPicker(progNum);
+              $(`#faCd${progNum}`).val(parseJson.programs[index].progData3);
+              $(`#feCd${progNum}`).val(parseJson.programs[index].progData4);
+            } else if (trigger == "Tanggal Waktu") {
+              buildDateTimePicker(progNum);
+              $(`#dfaCd${progNum}`).val(parseJson.programs[index].progData3);
+              $(`#dfeCd${progNum}`).val(parseJson.programs[index].progData4);
+            } else if (trigger == "Timer") {
+              buildTimer(progNum);
+              $(`#timerCd${progNum}`).val(parseJson.programs[index].progData3);
+            }
+            var acContent = [];
+            if (trigger != "timer") {
+              acContent = [
+                "Nyalakan Output 1",
+                "Nyalakan Output 2",
+                "Nyalakan Pemanas",
+                "Nyalakan Pendingin",
+                "Nyalakan Sistem",
+                "Matikan Output 1",
+                "Matikan Output 2",
+                "Matikan Pemanas",
+                "Matikan Pendingin",
+                "Matikan Sistem",
+              ];
+            } else {
+              acContent = [
+                "Nyalakan Output 1",
+                "Nyalakan Output 2",
+                "Nyalakan Pemanas",
+                "Nyalakan Pendingin",
+                "Matikan Pemanas",
+                "Matikan Pendingin",
+                "Nyalakan Sistem",
+              ];
+            }
+            buildActionPicker(progNum, acContent);
+            $(`#acCd${progNum}`).val(action);
+          }
         }
       );
     }
@@ -1268,225 +1584,13 @@ if (deviceBelonging) {
           }
         }
         if (space) {
-          $("#conditional").append(`
-          <div class="row" data-sort="${spaceNum}">
-            <div class="col-12">
-                <div class="nexuscond" id="condition${spaceNum}">
-                    <div class="numbox d-flex align-items-center justify-content-center">
-                        <span>Program ${spaceNum}</span>
-                    </div>
-                    <div class="d-flex content justify-content-center">
-                        <div class="item pgCd">
-                            <span>Pemicu</span>
-                            <input type="text" class="form-control" id="ifCd${spaceNum}" style="max-width:150px;text-align:center;" readonly>
-                        </div>
-                    </div>
-                    <span id="nSpan${spaceNum}" style="text-align:center;"></span>
-                    <div class="d-flex align-items-center justify-content-center" style="padding-bottom:15px;">
-                        <button class="btn btn-primary" style="margin-right:15px;" id="submitCd${spaceNum}">Update</button>
-                        <button class="btn btn-primary" id="deleteCd${spaceNum}">Hapus</button>
-                    </div>
-                  </div>
-              </div>
-          </div>`);
-          $("#conditional").sortDivs();
-          $(`#submitCd${spaceNum}, #deleteCd${spaceNum}`).click(function () {
-            var passedData = {};
-            if (this.id.match(/\D+/g) == "submitCd") {
-              const ifVal = $(`#ifCd${spaceNum}`).val();
-              var span = $(`#nSpan${spaceNum}`);
-              var success = true;
-              span.html("");
-              if (ifVal == "Nilai Suhu" || ifVal == "Nilai Humiditas") {
-                passedData.nscmpCd = $(`#nscmpCd${spaceNum}`).val();
-                passedData.nsvalCd = $(`#nsvalCd${spaceNum}`).val();
-                passedData.acCd = $(`#acCd${spaceNum}`).val();
-                if ($(`#nscmpCd${spaceNum}`).val() == "") {
-                  span.append(
-                    `<span class="tfailed" style="display:block;">Komparator tidak boleh kosong<span>`
-                  );
-                  success = false;
-                }
-                if ($(`#nsvalCd${spaceNum}`).val() == "") {
-                  span.append(
-                    ifVal == "Nilai Suhu"
-                      ? `<span class="tfailed" style="display:block;">Nilai Suhu tidak boleh kosong<span>`
-                      : `<span class="tfailed" style="display:block;">Nilai Humiditas tidak boleh kosong<span>`
-                  );
-                  success = false;
-                }
-                if ($(`#acCd${spaceNum}`).val() == "") {
-                  span.append(
-                    `<span class="tfailed" style="display:block;">Aksi tidak boleh kosong<span>`
-                  );
-                  success = false;
-                }
-              } else if (ifVal == "Jadwal Harian") {
-                passedData.faCd = $(`#faCd${spaceNum}`).val();
-                passedData.feCd = $(`#feCd${spaceNum}`).val();
-                passedData.acCd = $(`#acCd${spaceNum}`).val();
-                if ($(`#faCd${spaceNum}`).val() == "") {
-                  span.append(
-                    `<span class="tfailed" style="display:block;">Input Jam (Dari) tidak boleh kosong<span>`
-                  );
-                  success = false;
-                }
-                if ($(`#feCd${spaceNum}`).val() == "") {
-                  span.append(
-                    `<span class="tfailed" style="display:block;">Input Jam (Hingga) tidak boleh kosong<span>`
-                  );
-                  success = false;
-                }
-                if ($(`#acCd${spaceNum}`).val() == "") {
-                  span.append(
-                    `<span class="tfailed" style="display:block;">Aksi tidak boleh kosong<span>`
-                  );
-                  success = false;
-                }
-              } else if (ifVal == "Tanggal Waktu") {
-                passedData.dfaCd = $(`#dfaCd${spaceNum}`).val();
-                passedData.dfeCd = $(`#dfeCd${spaceNum}`).val();
-                passedData.acCd = $(`#acCd${spaceNum}`).val();
-
-                if ($(`#dfaCd${spaceNum}`).val() == "") {
-                  span.append(
-                    `<span class="tfailed" style="display:block;">Input Tanggal Waktu (Dari) tidak boleh kosong<span>`
-                  );
-                  success = false;
-                }
-                if ($(`#dfeCd${spaceNum}`).val() == "") {
-                  span.append(
-                    `<span class="tfailed" style="display:block;">Input Tanggal Waktu (Hingga) tidak boleh kosong<span>`
-                  );
-                  success = false;
-                }
-                if (
-                  $(`#dfeCd${spaceNum}`).val() != "" &&
-                  $(`#dfaCd${spaceNum}`).val() != ""
-                ) {
-                  var dateFrom = $(`#dfaCd${spaceNum}`).val().split(" ");
-                  var dateTo = $(`#dfeCd${spaceNum}`).val().split(" ");
-                  dateFrom[0] = dateFrom[0].split("-");
-                  dateTo[0] = dateTo[0].split("-");
-                  dateFrom[1] = dateFrom[1].split(":");
-                  dateTo[1] = dateTo[1].split(":");
-                  console.log(dateFrom);
-                  console.log(dateTo);
-                  const dDateFrom = new Date(
-                    dateFrom[0][0],
-                    dateFrom[0][1] - 1,
-                    dateFrom[0][2],
-                    dateFrom[1][0],
-                    dateFrom[0][1]
-                  );
-                  const dDateTo = new Date(
-                    dateTo[0][0],
-                    dateTo[0][1] - 1,
-                    dateTo[0][2],
-                    dateTo[1][0],
-                    dateTo[0][1]
-                  );
-                  const dateNow = new Date();
-                  // 0 is tanggal, 1 is month str, 2 year, 3 jam:menit
-                  if (dDateFrom.getTime() > dDateTo.getTime()) {
-                    span.append(
-                      `<span class="tfailed" style="display:block;">Tanggal Waktu(Dari) tidak boleh melebihi Tanggal Waktu(Hingga)<span>`
-                    );
-                    success = false;
-                  }
-                  if (dDateTo.getTime() < dateNow.getTime()) {
-                    span.append(
-                      `<span class="tfailed" style="display:block;">Tidak dapat memilih Tanggal Waktu(Hingga) yang telah berlalu dari waktu sekarang<span>`
-                    );
-                    success = false;
-                  }
-                }
-                if ($(`#acCd${spaceNum}`).val() == "") {
-                  span.append(
-                    `<span class="tfailed" style="display:block;">Aksi tidak boleh kosong<span>`
-                  );
-                  success = false;
-                }
-              } else if (ifVal == "Timer") {
-                passedData.timerCd = $(`#timerCd${spaceNum}`).val();
-                passedData.acCd = $(`#acCd${spaceNum}`).val();
-                if ($(`#timerCd${spaceNum}`).val() == "") {
-                  span.append(
-                    `<span class="tfailed" style="display:block;">Durasi timer tidak boleh kosong<span>`
-                  );
-                  success = false;
-                }
-                if ($(`#acCd${spaceNum}`).val() == "") {
-                  span.append(
-                    `<span class="tfailed" style="display:block;">Aksi tidak boleh kosong<span>`
-                  );
-                  success = false;
-                }
-              } else {
-                success = false;
-                span.append(
-                  `<span class="tfailed" style="display:block;">Pemicu tidak boleh kosong<span>`
-                );
-              }
-
-              if (success) {
-                span.append(
-                  `<span style="display:block;">Mengupdate program ke database...<span>`
-                );
-                passedData.trCd = ifVal;
-                passedData.progNum = spaceNum;
-                requestAJAX("NexusService", {
-                  token: getMeta("token"),
-                  bondKey: $("#dashboard #deviceheader dummy").attr("class"),
-                  requestType: "updateProgram",
-                  passedData,
-                });
-              } else {
-              }
-            } else {
-              passedData.progNum = spaceNum;
-              requestAJAX(
-                "NexusService",
-                {
-                  token: getMeta("token"),
-                  bondKey: $("#dashboard #deviceheader dummy").attr("class"),
-                  requestType: "deleteProgram",
-                  passedData,
-                },
-                function (response) {
-                  $(`#condition${spaceNum}`).remove();
-                }
-              );
-            }
-          });
-          $(`#ifCd${spaceNum}`).AnyPicker({
-            // Create anypicker instance
-            showComponentLabel: true,
-            mode: "select",
-            lang: "id",
-            formatOutput: pgacCdCallback,
-            components: [
-              {
-                component: 0,
-                name: "pemicu",
-                label: "Pemicu",
-                width: "50%",
-                textAlign: "center",
-              },
-            ],
-            dataSource: [
-              {
-                component: 0,
-                data: createTextDataSource([
-                  "Nilai Suhu",
-                  "Nilai Humiditas",
-                  "Jadwal Harian",
-                  "Tanggal Waktu",
-                  "Timer",
-                ]),
-              },
-            ],
-          });
+          appendConditionalChild(spaceNum, [
+            "Nilai Suhu",
+            "Nilai Humiditas",
+            "Jadwal Harian",
+            "Tanggal Waktu",
+            "Timer",
+          ]);
         } else {
           bootbox.alert({
             size: "large",

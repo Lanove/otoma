@@ -48,6 +48,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                             changeSetpoint($json, $dbController);
                         } else if ($requestType === "updateProgram") {
                             updateProgram($json, $dbController);
+                        } else if ($requestType === "deleteProgram") {
+                            deleteProgram($json, $dbController);
                         }
                     }
                 }
@@ -59,14 +61,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
     $dbController = null;
 }
 
-function updateProgram($arg, $dbC) // Be careful within this function there are eye-burning-ifs-conditions
+function deleteProgram($arg, $dbC)
 {
+    $response = array("success" => false);
+    if (isset($arg["passedData"]["progNum"])) {
+        $progNum = $arg["passedData"]["progNum"];
+        $bondKey = $arg["bondKey"];
+        $isCreated = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondkey LIMIT 1;", ["bondkey" => $bondKey]);
+        if (!$isCreated) {
+            $stringBuffer = "";
+            for ($i = 1; $i < 31; $i++) {
+                $stringBuffer .= "('" . $bondKey . "','" . $i . "','nexus')";
+                if ($i != 30) $stringBuffer .= ",";
+            }
+            $dbC->runQuery("INSERT INTO nexusautomation (bondKey,progNumber,deviceType)
+            VALUES ${stringBuffer};", []);
+            $response["success"] = true;
+        } else {
+            if ($progNum > 0 && $progNum < 31) {
+                $dbC->runQuery("UPDATE nexusautomation SET exist='0', progData1='', progData2='', progData3='', progData4='', progData5='', progData6='', progData7='', progData8='' WHERE bondKey = :bondKey AND progNumber = :progNum;", ["bondKey" => $bondKey, "progNum" => $progNum]);
+                $doubleCheck = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondKey AND progNumber = :progNumber;", ["bondKey" => $bondKey, "progNumber" => $progNum]);
+                if (
+                    $doubleCheck["progData1"] == '' &&
+                    $doubleCheck["progData2"] == '' &&
+                    $doubleCheck["progData3"] == '' &&
+                    $doubleCheck["progData4"] == '' &&
+                    $doubleCheck["progData5"] == '' &&
+                    $doubleCheck["progData6"] == '' &&
+                    $doubleCheck["progData7"] == '' &&
+                    $doubleCheck["progData8"] == '' &&
+                    $doubleCheck["progData9"] == '' &&
+                    $doubleCheck["progData10"] == '' &&
+                    $doubleCheck["exist"] == '0'
+                )
+                    $response["success"] = true;
+            }
+        }
+    }
+    echo json_encode($response);
+}
+
+function updateProgram($arg, $dbC) // Be careful, within this function there are eye-burning-ifs-conditions
+{
+    $response = array("success" => false);
     if (
         isset($arg["passedData"]["trCd"]) &&
         isset($arg["passedData"]["acCd"]) &&
         isset($arg["passedData"]["progNum"])
     ) {
-        $response = array("success" => false);
         $bondKey = $arg["bondKey"];
         $trigger = $arg["passedData"]["trCd"];
         $action = $arg["passedData"]["acCd"];
@@ -470,6 +512,8 @@ function loadDeviceInformation($arg, $dbC)
         } else {
             $fetchResult["plot"]["available"] = false;
         }
+        // Fetch automations program that exist
+        $fetchResult["programs"] = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondkey AND exist = '1';", ["bondkey" => $bondKey], "ALL");
         echo json_encode($fetchResult);
     }
 }
