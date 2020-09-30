@@ -431,13 +431,6 @@ if (deviceBelonging) {
           stringBuffer += "0" + numberPal[i];
         else stringBuffer += oSelectedValues.values[i].val + numberPal[i];
       }
-      // requestAJAX({
-      //   requestType: "updateTimerVal",
-      //   bondKey: $("#dashboard #deviceheader dummy").attr("class"),
-      //   token: getMeta("token"),
-      //   value: stringBuffer,
-      //   id: this.elem.id,
-      // });
       return stringBuffer;
     }
 
@@ -474,7 +467,7 @@ if (deviceBelonging) {
           </div>
           <div class="item ctCd">
               <span>Aksi</span>
-              <input style="font-size:16px;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+              <input style="max-width:200px;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
           </div>`);
 
           // Create anypicker object for timer selector
@@ -544,7 +537,7 @@ if (deviceBelonging) {
           </div>
           <div class="item ctCd">
               <span>Aksi</span>
-              <input style="font-size:16px;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+              <input style="max-width:200px;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
           </div>`);
           $("#nscmpCd" + spaceNum).AnyPicker({
             // Create anypicker instance
@@ -602,7 +595,7 @@ if (deviceBelonging) {
             "Matikan Pendingin",
             "Matikan Sistem",
           ];
-        } else if (val == "Jadwal") {
+        } else if (val == "Jadwal Harian") {
           $(`#condition${spaceNum} .content`).append(`
           <div class="item ctCd">
             <span>Dari</span>
@@ -614,7 +607,7 @@ if (deviceBelonging) {
           </div>
           <div class="item ctCd">
               <span>Aksi</span>
-              <input style="font-size:16px;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+              <input style="max-width:200px;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
           </div>`);
           $(`#faCd${spaceNum}`).AnyPicker({
             mode: "datetime",
@@ -647,6 +640,48 @@ if (deviceBelonging) {
                 $(`#faCd${spaceNum}`).val(sEndD);
               oAP1[spaceNum].setMaximumDate(sEndD);
             },
+          });
+          acContent = [
+            "Nyalakan Output 1",
+            "Nyalakan Output 2",
+            "Nyalakan Pemanas",
+            "Nyalakan Pendingin",
+            "Nyalakan Sistem",
+            "Matikan Output 1",
+            "Matikan Output 2",
+            "Matikan Pemanas",
+            "Matikan Pendingin",
+            "Matikan Sistem",
+          ];
+        } else if (val == "Tanggal Waktu") {
+          $(`#condition${spaceNum} .content`).append(`
+          <div class="item ctCd">
+            <span>Dari</span>
+            <input style="max-width:200px;" type="text" class="form-control" id="dfaCd${spaceNum}" readonly>
+          </div>    
+          <div class="item ctCd">
+            <span>Hingga</span>
+            <input style="max-width:200px;" type="text" class="form-control" id="dfeCd${spaceNum}" readonly>
+          </div>
+          <div class="item ctCd">
+              <span>Aksi</span>
+              <input style="max-width:200px;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+          </div>`);
+          $(`#dfaCd${spaceNum}`).AnyPicker({
+            mode: "datetime",
+            lang: "id",
+            dateTimeFormat: "yyyy-MM-dd HH:mm",
+            showComponentLabel: true,
+            minValue: new Date(2020, 00, 01),
+            maxValue: new Date(2025, 12, 31),
+          });
+          $(`#dfeCd${spaceNum}`).AnyPicker({
+            mode: "datetime",
+            lang: "id",
+            dateTimeFormat: "yyyy-MM-dd HH:mm",
+            showComponentLabel: true,
+            minValue: new Date(2020, 00, 01),
+            maxValue: new Date(2025, 12, 31),
           });
           acContent = [
             "Nyalakan Output 1",
@@ -1286,7 +1321,7 @@ if (deviceBelonging) {
                   );
                   success = false;
                 }
-              } else if (ifVal == "Jadwal") {
+              } else if (ifVal == "Jadwal Harian") {
                 passedData.faCd = $(`#faCd${spaceNum}`).val();
                 passedData.feCd = $(`#feCd${spaceNum}`).val();
                 passedData.acCd = $(`#acCd${spaceNum}`).val();
@@ -1301,6 +1336,70 @@ if (deviceBelonging) {
                     `<span class="tfailed" style="display:block;">Input Jam (Hingga) tidak boleh kosong<span>`
                   );
                   success = false;
+                }
+                if ($(`#acCd${spaceNum}`).val() == "") {
+                  span.append(
+                    `<span class="tfailed" style="display:block;">Aksi tidak boleh kosong<span>`
+                  );
+                  success = false;
+                }
+              } else if (ifVal == "Tanggal Waktu") {
+                passedData.dfaCd = $(`#dfaCd${spaceNum}`).val();
+                passedData.dfeCd = $(`#dfeCd${spaceNum}`).val();
+                passedData.acCd = $(`#acCd${spaceNum}`).val();
+
+                if ($(`#dfaCd${spaceNum}`).val() == "") {
+                  span.append(
+                    `<span class="tfailed" style="display:block;">Input Tanggal Waktu (Dari) tidak boleh kosong<span>`
+                  );
+                  success = false;
+                }
+                if ($(`#dfeCd${spaceNum}`).val() == "") {
+                  span.append(
+                    `<span class="tfailed" style="display:block;">Input Tanggal Waktu (Hingga) tidak boleh kosong<span>`
+                  );
+                  success = false;
+                }
+                if (
+                  $(`#dfeCd${spaceNum}`).val() != "" &&
+                  $(`#dfaCd${spaceNum}`).val() != ""
+                ) {
+                  var dateFrom = $(`#dfaCd${spaceNum}`).val().split(" ");
+                  var dateTo = $(`#dfeCd${spaceNum}`).val().split(" ");
+                  dateFrom[0] = dateFrom[0].split("-");
+                  dateTo[0] = dateTo[0].split("-");
+                  dateFrom[1] = dateFrom[1].split(":");
+                  dateTo[1] = dateTo[1].split(":");
+                  console.log(dateFrom);
+                  console.log(dateTo);
+                  const dDateFrom = new Date(
+                    dateFrom[0][0],
+                    dateFrom[0][1] - 1,
+                    dateFrom[0][2],
+                    dateFrom[1][0],
+                    dateFrom[0][1]
+                  );
+                  const dDateTo = new Date(
+                    dateTo[0][0],
+                    dateTo[0][1] - 1,
+                    dateTo[0][2],
+                    dateTo[1][0],
+                    dateTo[0][1]
+                  );
+                  const dateNow = new Date();
+                  // 0 is tanggal, 1 is month str, 2 year, 3 jam:menit
+                  if (dDateFrom.getTime() > dDateTo.getTime()) {
+                    span.append(
+                      `<span class="tfailed" style="display:block;">Tanggal Waktu(Dari) tidak boleh melebihi Tanggal Waktu(Hingga)<span>`
+                    );
+                    success = false;
+                  }
+                  if (dDateTo.getTime() < dateNow.getTime()) {
+                    span.append(
+                      `<span class="tfailed" style="display:block;">Tidak dapat memilih Tanggal Waktu(Hingga) yang telah berlalu dari waktu sekarang<span>`
+                    );
+                    success = false;
+                  }
                 }
                 if ($(`#acCd${spaceNum}`).val() == "") {
                   span.append(
@@ -1381,7 +1480,8 @@ if (deviceBelonging) {
                 data: createTextDataSource([
                   "Nilai Suhu",
                   "Nilai Humiditas",
-                  "Jadwal",
+                  "Jadwal Harian",
+                  "Tanggal Waktu",
                   "Timer",
                 ]),
               },

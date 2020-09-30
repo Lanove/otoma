@@ -1,8 +1,5 @@
 <?php
 require "originandreferer.php";
-
-require "DatabaseController.php";
-$GLOBALS["dbController"] = new DatabaseController();
 if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is POST
     if (isset($_SERVER['HTTP_ORIGIN'])) { // Check if HTTP Origin is set.
         $address = 'http://' . $origin;
@@ -14,6 +11,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
             exit();
         }
     }
+    require "DatabaseController.php";
+    $dbController = new DatabaseController();
+
     session_start();
     $json = json_decode(file_get_contents('php://input'), true); // Get JSON Input from AJAX and decode it to PHP Array
     if (isset($json["token"]) &&  isset($json["requestType"])) {
@@ -30,35 +30,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
         ///////////////////////////////////////////////////////////////////////
         if (hash_equals($_SESSION['ajaxToken'], $ajaxToken) && $username === $_SESSION["username"]) {
             if ($requestType === "loadDeviceInformation") { // Request is first page load
-                loadDeviceInformation($json);
+                loadDeviceInformation($json, $dbController);
             } else { // bondKey related request is taken with privilege check.
                 if (isset($json["bondKey"])) {
                     // Check if user actually had a bond with bondKey holder
-                    $privilegeCheck = $GLOBALS["dbController"]->runQuery("SELECT username FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $json["bondKey"]]);
+                    $privilegeCheck = $dbController->runQuery("SELECT username FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $json["bondKey"]]);
                     if ($privilegeCheck["username"] === $json["username"]) {
                         if (($requestType === "loadPlot")) {
-                            loadPlot($json);
+                            loadPlot($json, $dbController);
                         } else if ($requestType === "toggleSwitch") {
-                            toggleSwitch($json);
+                            toggleSwitch($json, $dbController);
                         } else if ($requestType === "modeSwitch") {
-                            modeSwitch($json);
+                            modeSwitch($json, $dbController);
                         } else if ($requestType === "submitParameter") {
-                            submitParameter($json);
+                            submitParameter($json, $dbController);
                         } else if ($requestType === "changeSetpoint") {
-                            changeSetpoint($json);
+                            changeSetpoint($json, $dbController);
                         } else if ($requestType === "updateProgram") {
-                            updateProgram($json);
+                            updateProgram($json, $dbController);
                         }
                     }
                 }
             }
         }
     }
+
+    $dbController->close();
+    $dbController = null;
 }
 
-function updateProgram($arg)
+function updateProgram($arg, $dbC) // Be careful within this function there are eye-burning-ifs-conditions
 {
-    if (isset($arg["passedData"]["trCd"]) &&  isset($arg["passedData"]["acCd"]) &&  isset($arg["passedData"]["progNum"])) {
+    if (
+        isset($arg["passedData"]["trCd"]) &&
+        isset($arg["passedData"]["acCd"]) &&
+        isset($arg["passedData"]["progNum"])
+    ) {
+        $response = array("success" => false);
         $bondKey = $arg["bondKey"];
         $trigger = $arg["passedData"]["trCd"];
         $action = $arg["passedData"]["acCd"];
@@ -77,23 +85,30 @@ function updateProgram($arg)
         );
         $validFlag = false;
         foreach ($validAction as $k) {
-            if ($k == $action && $progNum >= 1 && $progNum <= 30) $validFlag = true;
+            if (
+                $k == $action && $progNum >= 1 &&
+                $progNum <= 30
+            ) $validFlag = true;
         }
-
-        $isCreated = $GLOBALS["dbController"]->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondkey LIMIT 1;", ["bondkey" => $bondKey]);
+        $isCreated = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondkey LIMIT 1;", ["bondkey" => $bondKey]);
         if (!$isCreated) {
             $stringBuffer = "";
             for ($i = 1; $i < 31; $i++) {
                 $stringBuffer .= "('" . $bondKey . "','" . $i . "','nexus')";
                 if ($i != 30) $stringBuffer .= ",";
             }
-            $GLOBALS["dbController"]->runQuery("INSERT INTO nexusautomation (bondKey,progNumber,deviceType)
+            $dbC->runQuery("INSERT INTO nexusautomation (bondKey,progNumber,deviceType)
             VALUES ${stringBuffer};", []);
         }
         if ($validFlag) {
-            if ($trigger == "Nilai Suhu" || $trigger == "Nilai Humiditas") {
-                if (isset($arg["passedData"]["nscmpCd"]) &&  isset($arg["passedData"]["nsvalCd"])) {
-
+            if (
+                $trigger == "Nilai Suhu" ||
+                $trigger == "Nilai Humiditas"
+            ) {
+                if (
+                    isset($arg["passedData"]["nscmpCd"]) &&
+                    isset($arg["passedData"]["nsvalCd"])
+                ) {
                     $validComparator = array("<", ">", "<=", ">=", "!=", "==");
                     $nscmp = $arg["passedData"]["nscmpCd"];
                     $nsval = (int)$arg["passedData"]["nsvalCd"];
@@ -102,28 +117,128 @@ function updateProgram($arg)
                         if ($k == $nscmp) $validFlag = true;
                     }
                     if ($nsval >= 0 && $nsval <= 100 && $validFlag) {
-                        $GLOBALS["dbController"]->runQuery("UPDATE nexusautomation SET exist='1',   progData1=:trigger, progData2=:action, progData3=:nscmp, progData4=:nsval WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "nscmp" => $nscmp, "nsval" => $nsval, "bondKey" => $bondKey, "progNum" => $progNum,]);
+                        $dbC->runQuery("UPDATE nexusautomation SET exist='1',   progData1=:trigger, progData2=:action, progData3=:nscmp, progData4=:nsval, progData5='', progData6='', progData7='', progData8='' WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "nscmp" => $nscmp, "nsval" => $nsval, "bondKey" => $bondKey, "progNum" => $progNum]);
+                        $doubleCheck = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondKey AND progNumber = :progNumber;", ["bondKey" => $bondKey, "progNumber" => $progNum]);
+                        if (
+                            $doubleCheck["progData1"] == $trigger &&
+                            $doubleCheck["progData2"] == $action &&
+                            $doubleCheck["progData3"] == $nscmp &&
+                            $doubleCheck["progData4"] == $nsval &&
+                            $doubleCheck["exist"] == '1'
+                        )
+                            $response["success"] = true;
                     }
                 }
-            } else if ($trigger == "Jadwal") {
+            } else if ($trigger == "Jadwal Harian") {
+                if (
+                    isset($arg["passedData"]["faCd"]) &&
+                    isset($arg["passedData"]["feCd"])
+                ) {
+                    $timeFrom = $arg["passedData"]["faCd"];
+                    $timeTo = $arg["passedData"]["feCd"];
+                    $sTimeFrom = explode(":", $timeFrom);
+                    $sTimeTo = explode(":", $timeTo);
+                    if (
+                        isset($sTimeFrom[0]) &&
+                        isset($sTimeFrom[1]) &&
+                        isset($sTimeFrom[2]) &&
+                        isset($sTimeTo[0]) &&
+                        isset($sTimeTo[1]) &&
+                        isset($sTimeTo[2])
+                    ) {
+                        $tTimeFrom = ($sTimeFrom[0] * 3600) + ($sTimeFrom[1] * 60) + $sTimeFrom[2];
+                        $tTimeTo = ($sTimeTo[0] * 3600) + ($sTimeTo[1] * 60) + $sTimeTo[2];
+                        if (
+                            $sTimeFrom[0] >= 0 && $sTimeFrom[0] <= 23 &&
+                            $sTimeFrom[1] >= 0 && $sTimeFrom[1] <= 59 &&
+                            $sTimeFrom[2] >= 0 && $sTimeFrom[2] <= 59 &&
+                            $sTimeTo[0] >= 0 && $sTimeTo[0] <= 23 &&
+                            $sTimeTo[1] >= 0 && $sTimeTo[1] <= 59 &&
+                            $sTimeTo[2] >= 0 && $sTimeTo[2] <= 59 &&
+                            $tTimeFrom < $tTimeTo
+                        ) {
+                            $dbC->runQuery("UPDATE nexusautomation SET exist='1',   progData1=:trigger, progData2=:action, progData3=:timeFrom, progData4=:timeTo, progData5='', progData6='', progData7='', progData8='' WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "timeFrom" => $timeFrom, "timeTo" => $timeTo, "bondKey" => $bondKey, "progNum" => $progNum]);
+
+                            $doubleCheck = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondKey AND progNumber = :progNumber;", ["bondKey" => $bondKey, "progNumber" => $progNum]);
+
+                            if (
+                                $doubleCheck["progData1"] == $trigger &&
+                                $doubleCheck["progData2"] == $action &&
+                                $doubleCheck["progData3"] == $timeFrom &&
+                                $doubleCheck["progData4"] == $timeTo &&
+                                $doubleCheck["exist"] == '1'
+                            )
+                                $response["success"] = true;
+                        }
+                    }
+                }
+            } else if ($trigger == "Tanggal Waktu") {
+                if (
+                    isset($arg["passedData"]["dfaCd"]) &&
+                    isset($arg["passedData"]["dfeCd"])
+                ) {
+                    $dateFrom = $arg["passedData"]["dfaCd"];
+                    $dateTo = $arg["passedData"]["dfeCd"];
+                    date_default_timezone_set('Asia/Jakarta');
+                    $nDateFrom = DateTime::createFromFormat('Y-m-d H:i', $dateFrom)->getTimestamp();
+                    $nDateTo = DateTime::createFromFormat('Y-m-d H:i', $dateTo)->getTimestamp();
+                    $now = new DateTime();
+                    if (
+                        $nDateFrom < $nDateTo &&
+                        $nDateTo > $now->getTimestamp() &&
+                        $nDateFrom >= 1577811600 && $nDateTo >= 1577811600 &&
+                        $nDateFrom <= 1767200340 && $nDateTo <= 1767200340
+                    ) {
+                        $dbC->runQuery("UPDATE nexusautomation SET exist='1',   progData1=:trigger, progData2=:action, progData3=:dateFrom, progData4=:dateTo, progData5='', progData6='', progData7='', progData8='' WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "dateFrom" => $dateFrom, "dateTo" => $dateTo, "bondKey" => $bondKey, "progNum" => $progNum]);
+
+                        $doubleCheck = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondKey AND progNumber = :progNumber;", ["bondKey" => $bondKey, "progNumber" => $progNum]);
+
+                        if ($doubleCheck["progData1"] == $trigger && $doubleCheck["progData2"] == $action && $doubleCheck["progData3"] == $dateFrom && $doubleCheck["progData4"] == $dateTo && $doubleCheck["exist"] == '1')
+                            $response["success"] = true;
+                    }
+                }
             } else if ($trigger == "Timer") {
+                if (isset($arg["passedData"]["timerCd"])) {
+                    $timerCd = $arg["passedData"]["timerCd"];
+                    $sTimerCd = null;
+                    preg_match_all("/\d+/", $timerCd, $sTimerCd);
+                    if (
+                        isset($sTimerCd[0][0]) &&
+                        isset($sTimerCd[0][1]) &&
+                        isset($sTimerCd[0][2])
+                    ) {
+                        if (
+                            $sTimerCd[0][0] <= 30 && $sTimerCd[0][0] >= 0 &&
+                            $sTimerCd[0][1] <= 23 && $sTimerCd[0][1] >= 0 &&
+                            $sTimerCd[0][2] <= 59 && $sTimerCd[0][2] >= 0
+                        ) {
+                            $dbC->runQuery("UPDATE nexusautomation SET exist='1',   progData1=:trigger, progData2=:action, progData3=:timerCd, progData4='', progData5='', progData6='', progData7='', progData8='' WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "timerCd" => $timerCd, "bondKey" => $bondKey, "progNum" => $progNum]);
+
+                            $doubleCheck = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondKey AND progNumber = :progNumber;", ["bondKey" => $bondKey, "progNumber" => $progNum]);
+
+                            if ($doubleCheck["progData1"] == $trigger && $doubleCheck["progData2"] == $action && $doubleCheck["progData3"] == $timerCd && $doubleCheck["exist"] == '1')
+                                $response["success"] = true;
+                        }
+                    }
+                }
             }
         }
     }
+    echo json_encode($response);
 }
 
-function changeSetpoint($arg)
+function changeSetpoint($arg, $dbC)
 {
     if (isset($arg["data"])) {
         $data = $arg["data"];
         $bondKey = $arg["bondKey"];
         if (is_numeric($data) && $data >= 0 && $data <= 100) {
-            $GLOBALS["dbController"]->runQuery("UPDATE nexusbond SET sp='{$data}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+            $dbC->runQuery("UPDATE nexusbond SET sp='{$data}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
         }
     }
 }
 
-function submitParameter($arg)
+function submitParameter($arg, $dbC)
 {
     if (isset($arg["id"]) && isset($arg["par"])) {
         $id = $arg["id"];
@@ -132,49 +247,74 @@ function submitParameter($arg)
         $stringBuffer = "";
         $columnName = "";
         $failed = true;
-        $fetchResult = $GLOBALS["dbController"]->runQuery("SELECT heaterPar,coolerPar FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
-        if (($id === "submitcpid" || $id === "submithpid") &&  isset($parameter[0]) &&  isset($parameter[1]) &&  isset($parameter[2]) &&  isset($parameter[3]) && is_numeric($parameter[0]) && is_numeric($parameter[1]) && is_numeric($parameter[2]) && is_numeric($parameter[3])) { // Submit PID parameter requires 4 parameter of array to be passed, so check whether 4 array is empty and is numeric before proceeding the task.
-            for ($k = 0; $k < 3; $k++) {
-                if ($parameter[$k] > 100) $parameter[$k] = 100;
-                else if ($parameter[$k] < -100) $parameter[$k] = -100;
-                $parameter[$k] = round($parameter[$k], 2);
+        $fetchResult = $dbC->runQuery("SELECT heaterPar,coolerPar FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+        if (($id === "submitcpid" || $id === "submithpid") &&
+            isset($parameter[0]) &&
+            isset($parameter[1]) &&
+            isset($parameter[2]) &&
+            isset($parameter[3])
+        ) { // Submit PID parameter requires 4 parameter of array to be passed, so check whether 4 array is empty and is numeric before proceeding the task.
+            if (
+                is_numeric($parameter[0]) &&
+                is_numeric($parameter[1]) &&
+                is_numeric($parameter[2]) &&
+                is_numeric($parameter[3])
+            ) {
+                for ($k = 0; $k < 3; $k++) {
+                    if ($parameter[$k] > 100) $parameter[$k] = 100;
+                    else if ($parameter[$k] < -100) $parameter[$k] = -100;
+                    $parameter[$k] = round($parameter[$k], 2);
+                }
+                if ($parameter[3] > 1000000) $parameter[3] = 1000000;
+                else if ($parameter[3] < 100) $parameter[3] = 100;
+                $parameter[3] = round($parameter[3], 0);
+                $split = "";
+                if ($id === "submitcpid") {
+                    $split = explode("%", $fetchResult["coolerPar"]);
+                    $columnName = "coolerPar";
+                } else {
+                    $split = explode("%", $fetchResult["heaterPar"]);
+                    $columnName = "heaterPar";
+                }
+                $stringBuffer = $parameter[0] . "/" . $parameter[1] . "/" . $parameter[2] . "/" . $parameter[3] . "%" . $split[1];
+                $failed = false;
             }
-            if ($parameter[3] > 1000000) $parameter[3] = 1000000;
-            else if ($parameter[3] < 100) $parameter[3] = 100;
-            $parameter[3] = round($parameter[3], 0);
-            $split = "";
-            if ($id === "submitcpid") {
-                $split = explode("%", $fetchResult["coolerPar"]);
-                $columnName = "coolerPar";
-            } else {
-                $split = explode("%", $fetchResult["heaterPar"]);
-                $columnName = "heaterPar";
+        } else if (($id === "submitchys" || $id === "submithhys") &&
+            isset($parameter[0]) &&
+            isset($parameter[1])
+        ) { // Submit Hysteresis parameter only requires 2 array of value or par, so just check the first 2 index only
+            if (
+                is_numeric($parameter[0]) &&
+                is_numeric($parameter[1])
+            ) {
+
+                for ($k = 0; $k < 2; $k++) {
+                    if ($parameter[$k] > 30) $parameter[$k] = 30;
+                    else if ($parameter[$k] < 0) $parameter[$k] = 0;
+                    $parameter[$k] = round($parameter[$k], 2);
+                }
+                $split = "";
+                if ($id === "submitchys") {
+                    $split = explode("%", $fetchResult["coolerPar"]);
+                    $columnName = "coolerPar";
+                } else {
+                    $split = explode("%", $fetchResult["heaterPar"]);
+                    $columnName = "heaterPar";
+                }
+                $stringBuffer = $split[0] . "%" . $parameter[0] . "/" . $parameter[1];
+                $failed = false;
             }
-            $stringBuffer = $parameter[0] . "/" . $parameter[1] . "/" . $parameter[2] . "/" . $parameter[3] . "%" . $split[1];
-            $failed = false;
-        } else if (($id === "submitchys" || $id === "submithhys") &&  isset($parameter[0]) &&  isset($parameter[1]) && is_numeric($parameter[0]) && is_numeric($parameter[1])) { // Submit Hysteresis parameter only requires 2 array of value or par, so just check the first 2 index only
-            for ($k = 0; $k < 2; $k++) {
-                if ($parameter[$k] > 30) $parameter[$k] = 30;
-                else if ($parameter[$k] < 0) $parameter[$k] = 0;
-                $parameter[$k] = round($parameter[$k], 2);
-            }
-            $split = "";
-            if ($id === "submitchys") {
-                $split = explode("%", $fetchResult["coolerPar"]);
-                $columnName = "coolerPar";
-            } else {
-                $split = explode("%", $fetchResult["heaterPar"]);
-                $columnName = "heaterPar";
-            }
-            $stringBuffer = $split[0] . "%" . $parameter[0] . "/" . $parameter[1];
-            $failed = false;
         }
         if (strlen($stringBuffer) > 50) {
             $stringBuffer = "0/0/0/0%0/0";
         }
-        if ($stringBuffer !== "" && $columnName !== "" && !$failed) {
-            $GLOBALS["dbController"]->runQuery("UPDATE nexusbond SET {$columnName}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
-            $callback = $GLOBALS["dbController"]->runQuery("SELECT heaterPar,coolerPar FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+        if (
+            $stringBuffer !== "" &&
+            $columnName !== "" &&
+            !$failed
+        ) {
+            $dbC->runQuery("UPDATE nexusbond SET {$columnName}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+            $callback = $dbC->runQuery("SELECT heaterPar,coolerPar FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
             $callback["heaterPar"] = explode("%", $callback["heaterPar"]);
             for ($m = 0; $m < 2; $m++) {
                 $callback["heaterPar"][$m] = explode("/", $callback["heaterPar"][$m]);
@@ -196,40 +336,55 @@ function submitParameter($arg)
     }
 }
 
-function modeSwitch($arg)
+function modeSwitch($arg, $dbC)
 {
     if (isset($arg["mode"]) &&  isset($arg["docchi"])) {
         $mode = $arg["mode"];
         $docchi = $arg["docchi"];
         $bondKey = $arg["bondKey"];
-        $fetchResult = $GLOBALS["dbController"]->runQuery("SELECT thercoInfo FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+        $fetchResult = $dbC->runQuery("SELECT thercoInfo FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
         $stringBuffer = "";
         $columnName = "";
-        if ($docchi === "operation" && ($mode === "auto" || $mode === "manual")) {
+        if (
+            $docchi === "operation" &&
+            ($mode === "auto" || $mode === "manual")
+        ) {
             if ($mode === "auto") {
-                $GLOBALS["dbController"]->runQuery("UPDATE nexusbond SET htStatus='0',clStatus='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                $dbC->runQuery("UPDATE nexusbond SET htStatus='0',clStatus='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
             }
             $fetchResult["thercoInfo"] = explode("%", $fetchResult["thercoInfo"]);
             $stringBuffer = $mode . "%" . $fetchResult["thercoInfo"][1];
             $columnName = "thercoInfo";
-        } else if ($docchi === "thermmode" && ($mode === "cool" || $mode === "heat" || $mode === "dual")) {
+        } else if (
+            $docchi === "thermmode" &&
+            ($mode === "cool" || $mode === "heat" || $mode === "dual")
+        ) {
             $fetchResult["thercoInfo"] = explode("%", $fetchResult["thercoInfo"]);
             $stringBuffer = $fetchResult["thercoInfo"][0] . "%" . $mode;
             $columnName = "thercoInfo";
-        } else if ($docchi === "hmode"  && ($mode === "hys" || $mode === "pid")) {
+        } else if (
+            $docchi === "hmode"  &&
+            ($mode === "hys" || $mode === "pid")
+        ) {
             $stringBuffer = $mode;
             $columnName = "heaterMode";
-        } else if ($docchi === "cmode"  && ($mode === "hys" || $mode === "pid")) {
+        } else if (
+            $docchi === "cmode"  &&
+            ($mode === "hys" || $mode === "pid")
+        ) {
             $stringBuffer = $mode;
             $columnName = "coolerMode";
         }
-        if ($stringBuffer !== "" && $columnName !== "") {
-            $GLOBALS["dbController"]->runQuery("UPDATE nexusbond SET {$columnName}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+        if (
+            $stringBuffer !== "" &&
+            $columnName !== ""
+        ) {
+            $dbC->runQuery("UPDATE nexusbond SET {$columnName}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
         }
     }
 }
 
-function toggleSwitch($arg)
+function toggleSwitch($arg, $dbC)
 {
     if (isset($arg["id"]) &&  isset($arg["status"])) {
         $bondKey = $arg["bondKey"];
@@ -244,59 +399,73 @@ function toggleSwitch($arg)
             $columnData = "htStatus";
         else if ($id === "coolerSwitch")
             $columnData = "clStatus";
-        $GLOBALS["dbController"]->runQuery("UPDATE nexusbond SET {$columnData}='{$status}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+        $dbC->runQuery("UPDATE nexusbond SET {$columnData}='{$status}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
     }
 }
-function loadPlot($arg)
+function loadPlot($arg, $dbC)
 {
     if (isset($arg["date"])) {
         $bondKey = $arg["bondKey"];
         $date = $arg["date"];
         $dateCheck = explode("-", $date);
         // A long ass if statement to check if the date is correctly formatted
-        if (isset($dateCheck[0]) &&  isset($dateCheck[1]) &&  isset($dateCheck[2]) && is_numeric($dateCheck[0]) && is_numeric($dateCheck[1]) && is_numeric($dateCheck[2]) && $dateCheck[0] > 1970 && $dateCheck[0] < 2100 && $dateCheck[1] > 0 && $dateCheck[1] < 13 && $dateCheck[2] > 0 && $dateCheck[2] < 33) {
-            $fetchResult["plot"]["available"] = $GLOBALS["dbController"]->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date LIMIT 1;", ["bondkey" => $bondKey, "date" => $date]);
-            $fetchResult["plot"]["plotDate"] = $date; // Refer to availability of plot of current date
-            if ($fetchResult["plot"]["available"]) {
-                $fetchResult["plot"]["available"] = true;
-                $fetchResult["plot"]["data"] = $GLOBALS["dbController"]->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $bondKey, "date" => $date], "ALL"); // Fetch all data from date
-            } else {
-                $fetchResult["plot"]["available"] = false;
+        if (
+            isset($dateCheck[0]) &&
+            isset($dateCheck[1]) &&
+            isset($dateCheck[2])
+        ) {
+            if (
+                is_numeric($dateCheck[0]) &&
+                is_numeric($dateCheck[1]) &&
+                is_numeric($dateCheck[2]) &&
+                $dateCheck[0] > 1970 && $dateCheck[0] < 2100 &&
+                $dateCheck[1] > 0 && $dateCheck[1] < 13 &&
+                $dateCheck[2] > 0 && $dateCheck[2] < 33
+            ) {
+
+                $fetchResult["plot"]["available"] = $dbC->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date LIMIT 1;", ["bondkey" => $bondKey, "date" => $date]);
+                $fetchResult["plot"]["plotDate"] = $date; // Refer to availability of plot of current date
+                if ($fetchResult["plot"]["available"]) {
+                    $fetchResult["plot"]["available"] = true;
+                    $fetchResult["plot"]["data"] = $dbC->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $bondKey, "date" => $date], "ALL"); // Fetch all data from date
+                } else {
+                    $fetchResult["plot"]["available"] = false;
+                }
+                echo json_encode($fetchResult);
             }
-            echo json_encode($fetchResult);
         }
     }
 }
 
-function loadDeviceInformation($arg)
+function loadDeviceInformation($arg, $dbC)
 {
     if (isset($arg["master"])) {
         $master = $arg["master"];
         $username = $arg["username"];
         if ($master === "master") {
-            $fetchResult["deviceInfo"] = $GLOBALS["dbController"]->runQuery("SELECT bondKey,masterName FROM bond WHERE username = :name ORDER BY id ASC;", ["name" => $username]);
+            $fetchResult["deviceInfo"] = $dbC->runQuery("SELECT bondKey,masterName FROM bond WHERE username = :name ORDER BY id ASC;", ["name" => $username]);
         } else { // THIS ELSE IF STATEMENT MEAN THAT ONE USER CAN'T NAME DEVICE WITH SAME NAME.
-            $fetchResult["deviceInfo"] = $GLOBALS["dbController"]->runQuery("SELECT bondKey,masterName FROM bond WHERE username = :name AND masterName = :master;", ["name" => $username, "master" => $master]);
+            $fetchResult["deviceInfo"] = $dbC->runQuery("SELECT bondKey,masterName FROM bond WHERE username = :name AND masterName = :master;", ["name" => $username, "master" => $master]);
         }
         $bondKey = $fetchResult["deviceInfo"]["bondKey"];
         // Get every name of masterDevice with fetchAll
-        $fetchResult["otherName"] = $GLOBALS["dbController"]->runQuery("SELECT masterName FROM bond WHERE username = :name AND masterName != :exception ORDER BY id ASC;", ["name" => $arg["username"], "exception" => $fetchResult["deviceInfo"]["masterName"]], "ALL");
+        $fetchResult["otherName"] = $dbC->runQuery("SELECT masterName FROM bond WHERE username = :name AND masterName != :exception ORDER BY id ASC;", ["name" => $arg["username"], "exception" => $fetchResult["deviceInfo"]["masterName"]], "ALL");
 
-        $fetchResult["nexusBond"] = $GLOBALS["dbController"]->runQuery("SELECT * FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+        $fetchResult["nexusBond"] = $dbC->runQuery("SELECT * FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
         // Get the oldest record from daily plot data.
-        $fetchResult["plot"]["oldest"] = $GLOBALS["dbController"]->runQuery("SELECT MIN(date) AS oldestPlot FROM nexusplot WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
+        $fetchResult["plot"]["oldest"] = $dbC->runQuery("SELECT MIN(date) AS oldestPlot FROM nexusplot WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
         // Get the newest record from daily plot data.
-        $fetchResult["plot"]["newest"] = $GLOBALS["dbController"]->runQuery("SELECT MAX(date) AS newestPlot FROM nexusplot WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
+        $fetchResult["plot"]["newest"] = $dbC->runQuery("SELECT MAX(date) AS newestPlot FROM nexusplot WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
         // If the newest record from daily plot data is not current date, then create the frame of the current date.
         // Get current date plot data.
-        $fetchResult["plot"]["available"] = $GLOBALS["dbController"]->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date LIMIT 1;", ["bondkey" => $bondKey, "date" => date("Y-m-d")]);
+        $fetchResult["plot"]["available"] = $dbC->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date LIMIT 1;", ["bondkey" => $bondKey, "date" => date("Y-m-d")]);
         $fetchResult["plot"]["plotDate"] = date("Y-m-d"); // Refer to availability of plot of current date
         if ($fetchResult["plot"]["available"]) {
             $fetchResult["plot"]["available"] = true;
-            $fetchResult["plot"]["data"] = $GLOBALS["dbController"]->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $bondKey, "date" => date("Y-m-d")], "ALL"); // Fetch all data from date
+            $fetchResult["plot"]["data"] = $dbC->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $bondKey, "date" => date("Y-m-d")], "ALL"); // Fetch all data from date
             if ($fetchResult["plot"]["newest"]["newestPlot"] !== date("Y-m-d")) {
                 // Refresh the newest record
-                $fetchResult["plot"]["newest"] = $GLOBALS["dbController"]->runQuery("SELECT MAX(date) AS newestPlot FROM nexusplot WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
+                $fetchResult["plot"]["newest"] = $dbC->runQuery("SELECT MAX(date) AS newestPlot FROM nexusplot WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
             }
         } else {
             $fetchResult["plot"]["available"] = false;
@@ -304,5 +473,3 @@ function loadDeviceInformation($arg)
         echo json_encode($fetchResult);
     }
 }
-$GLOBALS["dbController"]->close();
-$GLOBALS["dbController"] = null;

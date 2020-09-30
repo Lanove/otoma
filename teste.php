@@ -1,10 +1,9 @@
 <?php
-$stringBuffer = "";
-for ($i = 1; $i < 31; $i++) {
-    $stringBuffer .= "('" . "a" . "','" . $i . "','nexus')";
-    if ($i != 30) $stringBuffer .= ",";
+$bruh = null;
+preg_match_all("/\d+/", "duck", $bruh);
+if (is_numeric($bruh[0][1])) {
+    print_r($bruh);
 }
-echo $stringBuffer;
 // $date = "2020-12-31";
 // $date = explode("-", $date);
 // if (!empty($date[0]) && !empty($date[1]) && !empty($date[2]) && is_numeric($date[0]) && is_numeric($date[1]) && is_numeric($date[2]) && $date[0] > 1970 && $date[0] < 2100 && $date[1] > 0 && $date[1] < 13 && $date[2] > 0 && $date[2] < 33) {
