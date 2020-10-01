@@ -41,7 +41,7 @@
     </div>
     <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="menu1" role="tabpanel" aria-labelledby="contact-tab">
-
+            <!-- 
             <div class="row">
                 <div class="col-12">
                     <div class="row auxheader">
@@ -54,7 +54,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <div class="row">
                 <div class="col-md-4">
                     <div class="nexusthspbox">
@@ -178,7 +178,7 @@
                         <!-- Device status box status -->
                         <div class="header">
                             <div class="row">
-                                <div class="col-12 d-inline-flex align-items-center" style="min-height: 55px;">
+                                <div class="col-12 d-inline-flex align-items-center" style="min-height: 55px;max-height:55px;">
                                     <i class="fas fa-chart-bar icon ibcolor"></i>
                                     <div class="dropdown name">
                                         <p class="text">Grafik</p>
@@ -222,10 +222,20 @@
                                     <div class="dropdown name">
                                         <p class="text">Thermal Controller</p>
                                     </div>
+
+                                    <div class="material-switch pull-right ml-auto switch" style="position:relative;top:2px;">
+                                        <input id="thSwitch" type="checkbox" />
+                                        <label for="thSwitch" class="label-primary"></label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="content">
+                            <div class="mini-overlay" id="thOverlay">
+                                <div class="mino d-flex align-items-center justify-content-center text-center" style="border-radius:0 0 10px 10px;">
+                                    <p>Thermocontrol tidak aktif</p>
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-md-6 d-inline-flex">
                                     <p>Operasi : </p>

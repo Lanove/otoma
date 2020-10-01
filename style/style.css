@@ -698,10 +698,15 @@ body {
   width: 100%;
 }
 #dashboard #goverlay{
-  z-index:10;
+  z-index:5;
 }
 #dashboard #graphoverlay{
-  z-index:11;
+  z-index:6;
+}
+#dashboard #thOverlay{
+  z-index: 5;
+  top: 55px;
+  height: calc(100% - 55px);
 }
 #dashboard .sub2 {
   min-height: 100%;

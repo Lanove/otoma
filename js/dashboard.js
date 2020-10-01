@@ -503,6 +503,70 @@ if (deviceBelonging) {
       });
     }
 
+    function buildConditionalPicker(spaceNum) {
+      $(`#condition${spaceNum} .content`).append(`
+      <div class="item ctCd">
+        <span>Jika</span>
+        <input style="max-width:150px;text-align:center;" type="text" class="form-control" id="cndCd${spaceNum}" value="Output 1" readonly>
+      </div>
+      <div class="item ctCd">
+        <span>Sedang</span>
+        <input style="max-width:150px;text-align:center;" type="text" class="form-control" id="cnddCd${spaceNum}" value="Menyala" readonly>
+      </div>
+      <div class="item ctCd">
+          <span>Aksi</span>
+          <input style="max-width:200px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+      </div>`);
+      $("#cndCd" + spaceNum).AnyPicker({
+        // Create anypicker instance
+        showComponentLabel: true,
+        mode: "select",
+        lang: "id",
+        components: [
+          {
+            component: 0,
+            name: "komponen",
+            label: "Komponen",
+            width: "50%",
+            textAlign: "center",
+          },
+        ],
+        dataSource: [
+          {
+            component: 0,
+            data: createTextDataSource([
+              "Output 1",
+              "Output 2",
+              "Pemanas",
+              "Pendingin",
+              "Thermocontrol",
+            ]),
+          },
+        ],
+      });
+      $("#cnddCd" + spaceNum).AnyPicker({
+        // Create anypicker instance
+        showComponentLabel: true,
+        mode: "select",
+        lang: "id",
+        components: [
+          {
+            component: 0,
+            name: "kondisi",
+            label: "Kondisi",
+            width: "50%",
+            textAlign: "center",
+          },
+        ],
+        dataSource: [
+          {
+            component: 0,
+            data: createTextDataSource(["Menyala", "Mati"]),
+          },
+        ],
+      });
+    }
+
     function buildTimer(spaceNum) {
       $(`#condition${spaceNum} .content`).append(`
       <div class="item ctCd">
@@ -848,6 +912,28 @@ if (deviceBelonging) {
               );
               success = false;
             }
+          } else if (ifVal == "Keadaan") {
+            passedData.cndCd = $(`#cndCd${spaceNum}`).val();
+            passedData.cnddCd = $(`#cnddCd${spaceNum}`).val();
+            passedData.acCd = $(`#acCd${spaceNum}`).val();
+            if ($(`#cndCd${spaceNum}`).val() == "") {
+              span.append(
+                `<span class="tfailed" style="display:block;">Input komponen tidak boleh kosong<span>`
+              );
+              success = false;
+            }
+            if ($(`#cnddCd${spaceNum}`).val() == "") {
+              span.append(
+                `<span class="tfailed" style="display:block;">Input kondisi tidak boleh kosong<span>`
+              );
+              success = false;
+            }
+            if ($(`#acCd${spaceNum}`).val() == "") {
+              span.append(
+                `<span class="tfailed" style="display:block;">Aksi tidak boleh kosong<span>`
+              );
+              success = false;
+            }
           } else {
             success = false;
             span.append(
@@ -932,7 +1018,7 @@ if (deviceBelonging) {
             "Nyalakan Pendingin",
             "Matikan Pemanas",
             "Matikan Pendingin",
-            "Nyalakan Sistem",
+            "Nyalakan Thermocontrol",
           ];
         } else if (val == "Nilai Suhu" || val == "Nilai Humiditas") {
           buildTempOrHum(spaceNum, val);
@@ -941,12 +1027,12 @@ if (deviceBelonging) {
             "Nyalakan Output 2",
             "Nyalakan Pemanas",
             "Nyalakan Pendingin",
-            "Nyalakan Sistem",
+            "Nyalakan Thermocontrol",
             "Matikan Output 1",
             "Matikan Output 2",
             "Matikan Pemanas",
             "Matikan Pendingin",
-            "Matikan Sistem",
+            "Matikan Thermocontrol",
           ];
         } else if (val == "Jadwal Harian") {
           buildDailyPicker(spaceNum);
@@ -955,12 +1041,12 @@ if (deviceBelonging) {
             "Nyalakan Output 2",
             "Nyalakan Pemanas",
             "Nyalakan Pendingin",
-            "Nyalakan Sistem",
+            "Nyalakan Thermocontrol",
             "Matikan Output 1",
             "Matikan Output 2",
             "Matikan Pemanas",
             "Matikan Pendingin",
-            "Matikan Sistem",
+            "Matikan Thermocontrol",
           ];
         } else if (val == "Tanggal Waktu") {
           buildDateTimePicker(spaceNum);
@@ -969,12 +1055,26 @@ if (deviceBelonging) {
             "Nyalakan Output 2",
             "Nyalakan Pemanas",
             "Nyalakan Pendingin",
-            "Nyalakan Sistem",
+            "Nyalakan Thermocontrol",
             "Matikan Output 1",
             "Matikan Output 2",
             "Matikan Pemanas",
             "Matikan Pendingin",
-            "Matikan Sistem",
+            "Matikan Thermocontrol",
+          ];
+        } else if (val == "Keadaan") {
+          buildConditionalPicker(spaceNum);
+          acContent = [
+            "Nyalakan Output 1",
+            "Nyalakan Output 2",
+            "Nyalakan Pemanas",
+            "Nyalakan Pendingin",
+            "Nyalakan Thermocontrol",
+            "Matikan Output 1",
+            "Matikan Output 2",
+            "Matikan Pemanas",
+            "Matikan Pendingin",
+            "Matikan Thermocontrol",
           ];
         }
         buildActionPicker(spaceNum, acContent);
@@ -1176,6 +1276,94 @@ if (deviceBelonging) {
       }
     }
 
+    function parameterReload(arg, long = false) {
+      // Self explanation
+      $("#tempnow").text(arg.tempNow + "°C");
+      $("#humidnow").text(arg.humidNow + "%");
+      $("#spvalue").text(arg.sp + "°C");
+      $("#spsetting").val(arg.sp);
+
+      // Adjust the position of switch based on database value
+      $("#aux1Switch").prop("checked", Boolean(Number(arg.auxStatus1)));
+      $("#aux2Switch").prop("checked", Boolean(Number(arg.auxStatus2)));
+      $("#thSwitch").prop("checked", Boolean(Number(arg.thStatus)));
+      if ($("#thSwitch").prop("checked")) $(`#thOverlay`).removeClass("active");
+      else if (!$("#thSwitch").prop("checked"))
+        $(`#thOverlay`).addClass("active");
+      $("#heaterSwitch").prop("checked", Boolean(Number(arg.htStatus)));
+      $("#coolerSwitch").prop("checked", Boolean(Number(arg.clStatus)));
+
+      // Get each data by splitting/exploding the string
+      arg.thercoInfo = arg.thercoInfo.split("%");
+      arg.heaterPar = arg.heaterPar.split("%");
+      arg.coolerPar = arg.coolerPar.split("%");
+      for (var i = 0; i < 2; i++) {
+        arg.heaterPar[i] = arg.heaterPar[i].split("/");
+        arg.coolerPar[i] = arg.coolerPar[i].split("/");
+      }
+      // Adjust thermocontrols radio checked position based on database value
+      $("input[name=operation][value='" + arg.thercoInfo[0] + "']").prop(
+        "checked",
+        true
+      );
+      $("input[name=thermmode][value='" + arg.thercoInfo[1] + "']").prop(
+        "checked",
+        true
+      );
+      $("input[name=hmode][value='" + arg.heaterMode + "']").prop(
+        "checked",
+        true
+      );
+      $("input[name=cmode][value='" + arg.coolerMode + "']").prop(
+        "checked",
+        true
+      );
+
+      // Adjust overlay and display of thermocontrol based on database value
+      modeCallback(
+        $("input[name='operation']:checked").val(),
+        "operation",
+        false
+      );
+      modeCallback(
+        $("input[name='thermmode']:checked").val(),
+        "thermmode",
+        false
+      );
+      modeCallback($("input[name='hmode']:checked").val(), "hmode", false);
+      modeCallback($("input[name='cmode']:checked").val(), "cmode", false);
+
+      if (long) {
+        // // Adjust Thermocontrol Input text value based on database
+        $("#ckp").val(parseFloat(arg.coolerPar[0][0]).toFixed(2));
+        $("#cki").val(parseFloat(arg.coolerPar[0][1]).toFixed(2));
+        $("#ckd").val(parseFloat(arg.coolerPar[0][2]).toFixed(2));
+        $("#cds").val(arg.coolerPar[0][3]);
+        $("#cba").val(parseFloat(arg.coolerPar[1][0]).toFixed(2));
+        $("#cbb").val(parseFloat(arg.coolerPar[1][1]).toFixed(2));
+        $("#hkp").val(parseFloat(arg.heaterPar[0][0]).toFixed(2));
+        $("#hki").val(parseFloat(arg.heaterPar[0][1]).toFixed(2));
+        $("#hkd").val(parseFloat(arg.heaterPar[0][2]).toFixed(2));
+        $("#hds").val(arg.heaterPar[0][3]);
+        $("#hba").val(parseFloat(arg.heaterPar[1][0]).toFixed(2));
+        $("#hbb").val(parseFloat(arg.heaterPar[1][1]).toFixed(2));
+      }
+    }
+
+    function reloadStatus() {
+      requestAJAX(
+        "NexusService",
+        {
+          requestType: "reloadStatus",
+          bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+          token: getMeta("token"),
+        },
+        function (response) {
+          parameterReload(JSON.parse(response).status);
+        }
+      );
+    }
+
     ///////////////////////////////
     function loadDeviceInformation(master) {
       requestAJAX(
@@ -1212,6 +1400,19 @@ if (deviceBelonging) {
                   parseJson.otherName[x]["masterName"] +
                   "</a>"
               );
+              $(".subMasterName" + String(x)).on("click", function () {
+                $(".absolute-overlay").removeClass("loaded");
+                loadDeviceInformation(
+                  $("." + $(this).attr("class").split(/\s+/)[1]).text()
+                );
+                const check = setInterval(function () {
+                  // Function to check every 0.1s if bondKey is available, then execute reloadStatus() and destroy itself.
+                  if ($("#dashboard #deviceheader dummy").attr("class") != "") {
+                    $(".absolute-overlay").addClass("loaded");
+                    clearInterval(check); // kill after executed
+                  }
+                }, 100);
+              });
             }
           } else {
             // If user had just only one device then
@@ -1223,116 +1424,22 @@ if (deviceBelonging) {
             ); // Add name but without caret or dropdown
           }
 
-          // Self explanation
-          $("#tempnow").text(parseJson.nexusBond.tempNow + "°C");
-          $("#humidnow").text(parseJson.nexusBond.humidNow + "%");
-          $("#spvalue").text(parseJson.nexusBond.sp + "°C");
-          $("#spsetting").val(parseJson.nexusBond.sp);
-          $("#auxname1").text(parseJson.nexusBond.auxName1);
-          $("#auxname2").text(parseJson.nexusBond.auxName2);
+          $("#auxname1").text(parseJson.nexusBond.auxName1 + " (1)");
+          $("#auxname2").text(parseJson.nexusBond.auxName2 + " (2)");
 
-          // Adjust the position of switch based on database value
-          $("#aux1Switch").prop(
-            "checked",
-            Boolean(Number(parseJson.nexusBond.auxStatus1))
-          );
-          $("#aux2Switch").prop(
-            "checked",
-            Boolean(Number(parseJson.nexusBond.auxStatus2))
-          );
-          $("#heaterSwitch").prop(
-            "checked",
-            Boolean(Number(parseJson.nexusBond.htStatus))
-          );
-          $("#coolerSwitch").prop(
-            "checked",
-            Boolean(Number(parseJson.nexusBond.clStatus))
-          );
-
-          // Get each data by splitting/exploding the string
-          parseJson.nexusBond.thercoInfo = parseJson.nexusBond.thercoInfo.split(
-            "%"
-          );
-          parseJson.nexusBond.heaterPar = parseJson.nexusBond.heaterPar.split(
-            "%"
-          );
-          parseJson.nexusBond.coolerPar = parseJson.nexusBond.coolerPar.split(
-            "%"
-          );
-          for (var i = 0; i < 2; i++) {
-            parseJson.nexusBond.heaterPar[i] = parseJson.nexusBond.heaterPar[
-              i
-            ].split("/");
-            parseJson.nexusBond.coolerPar[i] = parseJson.nexusBond.coolerPar[
-              i
-            ].split("/");
-          }
-          // // Adjust Thermocontrol Input text value based on database
-          $("#ckp").val(
-            parseFloat(parseJson.nexusBond.coolerPar[0][0]).toFixed(2)
-          );
-          $("#cki").val(
-            parseFloat(parseJson.nexusBond.coolerPar[0][1]).toFixed(2)
-          );
-          $("#ckd").val(
-            parseFloat(parseJson.nexusBond.coolerPar[0][2]).toFixed(2)
-          );
-          $("#cds").val(parseJson.nexusBond.coolerPar[0][3]);
-          $("#cba").val(
-            parseFloat(parseJson.nexusBond.coolerPar[1][0]).toFixed(2)
-          );
-          $("#cbb").val(
-            parseFloat(parseJson.nexusBond.coolerPar[1][1]).toFixed(2)
-          );
-          $("#hkp").val(
-            parseFloat(parseJson.nexusBond.heaterPar[0][0]).toFixed(2)
-          );
-          $("#hki").val(
-            parseFloat(parseJson.nexusBond.heaterPar[0][1]).toFixed(2)
-          );
-          $("#hkd").val(
-            parseFloat(parseJson.nexusBond.heaterPar[0][2]).toFixed(2)
-          );
-          $("#hds").val(parseJson.nexusBond.heaterPar[0][3]);
-          $("#hba").val(
-            parseFloat(parseJson.nexusBond.heaterPar[1][0]).toFixed(2)
-          );
-          $("#hbb").val(
-            parseFloat(parseJson.nexusBond.heaterPar[1][1]).toFixed(2)
-          );
-          // Adjust thermocontrols radio checked position based on database value
-          $(
-            "input[name=operation][value='" +
-              parseJson.nexusBond.thercoInfo[0] +
-              "']"
-          ).prop("checked", true);
-          $(
-            "input[name=thermmode][value='" +
-              parseJson.nexusBond.thercoInfo[1] +
-              "']"
-          ).prop("checked", true);
-          $(
-            "input[name=hmode][value='" + parseJson.nexusBond.heaterMode + "']"
-          ).prop("checked", true);
-          $(
-            "input[name=cmode][value='" + parseJson.nexusBond.coolerMode + "']"
-          ).prop("checked", true);
-
-          // Adjust overlay and display of thermocontrol based on database value
-          modeCallback(
-            $("input[name='operation']:checked").val(),
-            "operation",
-            false
-          );
-          modeCallback(
-            $("input[name='thermmode']:checked").val(),
-            "thermmode",
-            false
-          );
-          modeCallback($("input[name='hmode']:checked").val(), "hmode", false);
-          modeCallback($("input[name='cmode']:checked").val(), "cmode", false);
+          parameterReload(parseJson.nexusBond, true);
 
           // Initialize anypicker with correct date limit based on database
+
+          var today = new Date();
+          var dd = String(today.getDate()).padStart(2, "0");
+          var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+          var yyyy = today.getFullYear();
+          today = yyyy + "-" + mm + "-" + dd;
+          if (parseJson.plot.oldest.oldestPlot == null)
+            parseJson.plot.oldest.oldestPlot = today;
+          if (parseJson.plot.oldest.newestPlot == null)
+            parseJson.plot.newest.newestPlot = today;
           var oldest = parseJson.plot.oldest.oldestPlot.split("-");
           var newest = parseJson.plot.newest.newestPlot.split("-");
           for (index in newest) {
@@ -1367,6 +1474,7 @@ if (deviceBelonging) {
           tabletListener(checkTablet);
           checkMobile.addListener(mobileListener);
           checkTablet.addListener(tabletListener);
+          $("#conditional").html("");
           for (index in parseJson.programs) {
             const progNum = parseJson.programs[index].progNumber;
             const trigger = parseJson.programs[index].progData1;
@@ -1376,7 +1484,8 @@ if (deviceBelonging) {
               "Nilai Humiditas",
               "Jadwal Harian",
               "Tanggal Waktu",
-              "Timer",
+              //"Timer",
+              "Keadaan",
             ]);
             // buildTempOrHum(spaceNum), buildTimer(spaceNum), buildDailyPicker(spaceNum), buildDateTimePicker(spaceNum), buildActionPicker(spaceNum, acContent)
             $(`#ifCd${progNum}`).val(trigger);
@@ -1395,6 +1504,10 @@ if (deviceBelonging) {
             } else if (trigger == "Timer") {
               buildTimer(progNum);
               $(`#timerCd${progNum}`).val(parseJson.programs[index].progData3);
+            } else if (trigger == "Keadaan") {
+              buildConditionalPicker(progNum);
+              $(`#cndCd${progNum}`).val(parseJson.programs[index].progData3);
+              $(`#cnddCd${progNum}`).val(parseJson.programs[index].progData4);
             }
             var acContent = [];
             if (trigger != "timer") {
@@ -1403,12 +1516,12 @@ if (deviceBelonging) {
                 "Nyalakan Output 2",
                 "Nyalakan Pemanas",
                 "Nyalakan Pendingin",
-                "Nyalakan Sistem",
+                "Nyalakan Thermocontrol",
                 "Matikan Output 1",
                 "Matikan Output 2",
                 "Matikan Pemanas",
                 "Matikan Pendingin",
-                "Matikan Sistem",
+                "Matikan Thermocontrol",
               ];
             } else {
               acContent = [
@@ -1418,7 +1531,7 @@ if (deviceBelonging) {
                 "Nyalakan Pendingin",
                 "Matikan Pemanas",
                 "Matikan Pendingin",
-                "Nyalakan Sistem",
+                "Nyalakan Thermocontrol",
               ];
             }
             buildActionPicker(progNum, acContent);
@@ -1465,6 +1578,13 @@ if (deviceBelonging) {
     $(document).ready(function () {
       // Awal loading page load device yang paling atas.
       loadDeviceInformation("master");
+
+      setTimeout(function reload() {
+        if ($("#dashboard #deviceheader dummy").attr("class") != "") {
+          reloadStatus();
+        }
+        setTimeout(reload, 3000);
+      }, 3000);
       // Enable popover
       $('[data-toggle="popover"]').popover({ html: true });
       // Client side filter (that is kinda suck) for parameter of therco
@@ -1529,46 +1649,51 @@ if (deviceBelonging) {
       });
 
       // Onclick switches
-      $("#coolerSwitch, #heaterSwitch, #aux1Switch, #aux2Switch").click(
-        function () {
-          const switchToggle = function (arg) {
-            requestAJAX(
-              "NexusService",
-              {
-                requestType: "toggleSwitch",
-                bondKey: $("#dashboard #deviceheader dummy").attr("class"),
-                id: arg.id,
-                status: String(arg.checked),
-                token: getMeta("token"),
-              },
-              function (response) {
-                // DO SOMETHING IF THERE ARE SOME EXCEPTION SUCH AS CONDITIONAL
-              }
-            );
-          };
-          if (this.id == "coolerSwitch" || this.id == "heaterSwitch") {
-            var check = $(this).prop("checked");
-            if ($("input[name='operation']:checked").val() === "auto") {
-              $(this).prop("checked", !check);
-              bootbox.alert({
-                size: "large",
-                title: "Aksi tidak dapat dilakukan",
-                message: `Mengubah keadaan pemanas atau pendingin dengan saklar hanya dapat dilakukan saat mode manual`,
-                closeButton: false,
-                buttons: {
-                  ok: {
-                    label: "Tutup",
-                  },
-                },
-              });
-            } else {
-              switchToggle(this);
+      $(
+        "#coolerSwitch, #heaterSwitch, #aux1Switch, #aux2Switch, #thSwitch"
+      ).click(function () {
+        const switchToggle = function (arg) {
+          requestAJAX(
+            "NexusService",
+            {
+              requestType: "toggleSwitch",
+              bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+              id: arg.id,
+              status: String(arg.checked),
+              token: getMeta("token"),
+            },
+            function (response) {
+              // DO SOMETHING IF THERE ARE SOME EXCEPTION SUCH AS CONDITIONAL
             }
+          );
+        };
+
+        var check = $(this).prop("checked");
+        if (this.id == "coolerSwitch" || this.id == "heaterSwitch") {
+          if ($("input[name='operation']:checked").val() === "auto") {
+            $(this).prop("checked", !check);
+            bootbox.alert({
+              size: "large",
+              title: "Aksi tidak dapat dilakukan",
+              message: `Mengubah keadaan pemanas atau pendingin dengan saklar hanya dapat dilakukan saat mode manual`,
+              closeButton: false,
+              buttons: {
+                ok: {
+                  label: "Tutup",
+                },
+              },
+            });
           } else {
             switchToggle(this);
           }
+        } else {
+          switchToggle(this);
+          if (this.id == "thSwitch" && check)
+            $(`#thOverlay`).removeClass("active");
+          else if (this.id == "thSwitch" && !check)
+            $(`#thOverlay`).addClass("active");
         }
-      );
+      });
 
       // Onclick add condition button
       $("#addCond").click(function () {
@@ -1589,8 +1714,19 @@ if (deviceBelonging) {
             "Nilai Humiditas",
             "Jadwal Harian",
             "Tanggal Waktu",
-            "Timer",
+            // "Timer",
+            "Keadaan",
           ]);
+          $("html, body").animate(
+            {
+              scrollTop:
+                $(`#condition${spaceNum}`).offset().top -
+                $(`#conditional`).offset().top +
+                $(`#conditional`).scrollTop() -
+                60,
+            },
+            500
+          );
         } else {
           bootbox.alert({
             size: "large",

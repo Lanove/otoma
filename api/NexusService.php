@@ -50,15 +50,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                             updateProgram($json, $dbController);
                         } else if ($requestType === "deleteProgram") {
                             deleteProgram($json, $dbController);
+                        } else if ($requestType == "reloadStatus") {
+                            requestStatus($json, $dbController);
                         }
                     }
                 }
             }
         }
     }
-
     $dbController->close();
     $dbController = null;
+}
+
+function requestStatus($arg, $dbC)
+{
+    $bondKey = $arg["bondKey"];
+    $fetchResult["status"] = $dbC->runQuery("SELECT auxStatus1, auxStatus2, thStatus, htStatus, clStatus, tempNow, humidNow, sp, thercoInfo, heaterMode, coolerMode, heaterPar, coolerPar FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
+    echo json_encode($fetchResult);
 }
 
 function deleteProgram($arg, $dbC)
@@ -118,12 +126,12 @@ function updateProgram($arg, $dbC) // Be careful, within this function there are
             "Nyalakan Output 2",
             "Nyalakan Pemanas",
             "Nyalakan Pendingin",
-            "Nyalakan Sistem",
+            "Nyalakan Thermocontrol",
             "Matikan Output 1",
             "Matikan Output 2",
             "Matikan Pemanas",
             "Matikan Pendingin",
-            "Matikan Sistem"
+            "Matikan Thermocontrol"
         );
         $validFlag = false;
         foreach ($validAction as $k) {
@@ -261,6 +269,24 @@ function updateProgram($arg, $dbC) // Be careful, within this function there are
                             if ($doubleCheck["progData1"] == $trigger && $doubleCheck["progData2"] == $action && $doubleCheck["progData3"] == $timerCd && $doubleCheck["exist"] == '1')
                                 $response["success"] = true;
                         }
+                    }
+                }
+            } else if ($trigger == "Keadaan") {
+                if (isset($arg["passedData"]["cndCd"]) && isset($arg["passedData"]["cnddCd"])) {
+                    $component = $arg["passedData"]["cndCd"];
+                    $condition = $arg["passedData"]["cnddCd"];
+                    $bondKey = $arg["bondKey"];
+                    if (($component == "Output 1" || $component == "Output 2" ||
+                            $component == "Pemanas" || $component == "Pendingin" ||
+                            $component == "Thermocontrol") &&
+                        ($condition == "Menyala" || $condition == "Mati")
+                    ) {
+                        $dbC->runQuery("UPDATE nexusautomation SET exist='1', progData1=:trigger, progData2=:action, progData3=:component, progData4=:condition, progData5='', progData6='', progData7='', progData8='' WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "component" => $component, "condition" => $condition, "bondKey" => $bondKey, "progNum" => $progNum]);
+
+                        $doubleCheck = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondKey AND progNumber = :progNumber;", ["bondKey" => $bondKey, "progNumber" => $progNum]);
+
+                        if ($doubleCheck["progData1"] == $trigger && $doubleCheck["progData2"] == $action && $doubleCheck["progData3"] == $component && $doubleCheck["progData4"] == $condition && $doubleCheck["exist"] == '1')
+                            $response["success"] = true;
                     }
                 }
             }
@@ -441,6 +467,8 @@ function toggleSwitch($arg, $dbC)
             $columnData = "htStatus";
         else if ($id === "coolerSwitch")
             $columnData = "clStatus";
+        else if ($id === "thSwitch")
+            $columnData = "thStatus";
         $dbC->runQuery("UPDATE nexusbond SET {$columnData}='{$status}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
     }
 }
