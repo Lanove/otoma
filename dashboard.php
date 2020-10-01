@@ -131,6 +131,7 @@ if ($fetchResult) {
     </nav>
     <!-- Page Content  -->
     <div id="content">
+      <div id="bondContainer" value=""></div>
       <?php
       //require "pagecon/main-device-settings.php";
       if ($deviceBelonging) {
@@ -149,11 +150,6 @@ if ($fetchResult) {
           <span class="text-muted">© 2020</span>
           <a href="#0">Eldi4</a>
           <span class="text-muted">All rights reserved</span>
-        </div>
-      </div>
-      <div class="row d-flex justify-content-center">
-        <div class="col-12 text-center">
-          <div class="text-muted">Icons made by <a href="https://www.flaticon.com/authors/srip" title="srip">srip</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
         </div>
       </div>
     </div>

@@ -91,6 +91,14 @@ if (deviceBelonging) {
     return "";
   }
 
+  function getBondKey() {
+    return $("#bondContainer").val();
+  }
+
+  function setBondKey(value) {
+    $("#bondContainer").val(value);
+  }
+
   function downloadCSV(csv, filename) {
     var csvFile;
     var downloadLink;
@@ -349,10 +357,15 @@ if (deviceBelonging) {
       };
     $(window).on("resize", function () {
       if (nexusChart != null && nexusChart != undefined) {
-        const checkMobile = window.matchMedia("screen and (max-width: 611px)");
-        const checkTablet = window.matchMedia(
-          "screen and (min-width: 612px) and (max-width: 991px)"
+        // Add event listener for device size, if it's mobile just show the download image icon.
+        const checkUltraMobile = window.matchMedia(
+          "screen and (max-width: 380px)"
         );
+        const checkMobile = window.matchMedia(
+          "screen and (min-width: 381px) and (max-width: 611px)"
+        );
+        const checkTablet = window.matchMedia("screen and (min-width: 612px)");
+        ultraMobileListener(checkUltraMobile);
         mobileListener(checkMobile);
         tabletListener(checkTablet);
         nexusChart.resize();
@@ -387,10 +400,15 @@ if (deviceBelonging) {
 
         nexusChart = echarts.init(document.getElementById("graph"));
         nexusChart.setOption(config);
-        const checkMobile = window.matchMedia("screen and (max-width: 611px)");
-        const checkTablet = window.matchMedia(
-          "screen and (min-width: 612px) and (max-width: 991px)"
+        // Add event listener for device size, if it's mobile just show the download image icon.
+        const checkUltraMobile = window.matchMedia(
+          "screen and (max-width: 380px)"
         );
+        const checkMobile = window.matchMedia(
+          "screen and (min-width: 381px) and (max-width: 611px)"
+        );
+        const checkTablet = window.matchMedia("screen and (min-width: 612px)");
+        ultraMobileListener(checkUltraMobile);
         mobileListener(checkMobile);
         tabletListener(checkTablet);
       } else {
@@ -455,7 +473,7 @@ if (deviceBelonging) {
       </div>
       <div class="item ctCd">
           <span>Aksi</span>
-          <input style="max-width:200px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+          <input style="max-width:220px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
       </div>`);
       $("#nscmpCd" + spaceNum).AnyPicker({
         // Create anypicker instance
@@ -515,7 +533,7 @@ if (deviceBelonging) {
       </div>
       <div class="item ctCd">
           <span>Aksi</span>
-          <input style="max-width:200px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+          <input style="max-width:220px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
       </div>`);
       $("#cndCd" + spaceNum).AnyPicker({
         // Create anypicker instance
@@ -579,7 +597,7 @@ if (deviceBelonging) {
       </div>
       <div class="item ctCd">
           <span>Aksi</span>
-          <input style="max-width:200px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+          <input style="max-width:220px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
       </div>`);
       // Create anypicker object for timer selector
       var oArrData = [];
@@ -644,7 +662,7 @@ if (deviceBelonging) {
       </div>
       <div class="item ctCd">
           <span>Aksi</span>
-          <input style="max-width:200px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+          <input style="max-width:220px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
       </div>`);
       $(`#faCd${spaceNum}`).AnyPicker({
         mode: "datetime",
@@ -692,7 +710,7 @@ if (deviceBelonging) {
       </div>
       <div class="item ctCd">
           <span>Aksi</span>
-          <input style="max-width:200px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+          <input style="max-width:220px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
       </div>`);
       $(`#dfaCd${spaceNum}`).AnyPicker({
         mode: "datetime",
@@ -951,7 +969,7 @@ if (deviceBelonging) {
               "NexusService",
               {
                 token: getMeta("token"),
-                bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+                bondKey: getBondKey(),
                 requestType: "updateProgram",
                 passedData,
               },
@@ -980,7 +998,7 @@ if (deviceBelonging) {
             "NexusService",
             {
               token: getMeta("token"),
-              bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+              bondKey: getBondKey(),
               requestType: "deleteProgram",
               passedData,
             },
@@ -1086,7 +1104,7 @@ if (deviceBelonging) {
       $("#spvalue").text(String(oSelectedValues.values[0].label) + "°C");
       requestAJAX("NexusService", {
         token: getMeta("token"),
-        bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+        bondKey: getBondKey(),
         requestType: "changeSetpoint",
         data: oSelectedValues.values[0].label,
       });
@@ -1106,7 +1124,7 @@ if (deviceBelonging) {
           "NexusService",
           {
             token: getMeta("token"),
-            bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+            bondKey: getBondKey(),
             requestType: "loadPlot",
             date: requestedDate,
           },
@@ -1133,7 +1151,7 @@ if (deviceBelonging) {
         ];
         modeCallback($("input[name='cmode']:checked").val(), "cmode");
       } else if (id === "submitchys") {
-        par = [$("#cba").val(), $("#cbb").val()];
+        par = [$("#cbb").val(), $("#cba").val()];
         modeCallback($("input[name='cmode']:checked").val(), "cmode");
       } else if (id === "submithpid") {
         par = [
@@ -1144,14 +1162,14 @@ if (deviceBelonging) {
         ];
         modeCallback($("input[name='hmode']:checked").val(), "hmode");
       } else if (id === "submithhys") {
-        par = [$("#hba").val(), $("#hbb").val()];
+        par = [$("#hbb").val(), $("#hba").val()];
         modeCallback($("input[name='hmode']:checked").val(), "hmode");
       }
       requestAJAX(
         "NexusService",
         {
           requestType: "submitParameter",
-          bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+          bondKey: getBondKey(),
           id: id,
           par: par,
           token: getMeta("token"),
@@ -1261,7 +1279,7 @@ if (deviceBelonging) {
           "NexusService",
           {
             requestType: "modeSwitch",
-            bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+            bondKey: getBondKey(),
             mode: mode,
             docchi: docchi,
             token: getMeta("token"),
@@ -1310,14 +1328,6 @@ if (deviceBelonging) {
         "checked",
         true
       );
-      $("input[name=hmode][value='" + arg.heaterMode + "']").prop(
-        "checked",
-        true
-      );
-      $("input[name=cmode][value='" + arg.coolerMode + "']").prop(
-        "checked",
-        true
-      );
 
       // Adjust overlay and display of thermocontrol based on database value
       modeCallback(
@@ -1330,23 +1340,30 @@ if (deviceBelonging) {
         "thermmode",
         false
       );
-      modeCallback($("input[name='hmode']:checked").val(), "hmode", false);
-      modeCallback($("input[name='cmode']:checked").val(), "cmode", false);
-
       if (long) {
+        $("input[name=hmode][value='" + arg.heaterMode + "']").prop(
+          "checked",
+          true
+        );
+        $("input[name=cmode][value='" + arg.coolerMode + "']").prop(
+          "checked",
+          true
+        );
+        modeCallback($("input[name='hmode']:checked").val(), "hmode", false);
+        modeCallback($("input[name='cmode']:checked").val(), "cmode", false);
         // // Adjust Thermocontrol Input text value based on database
         $("#ckp").val(parseFloat(arg.coolerPar[0][0]).toFixed(2));
         $("#cki").val(parseFloat(arg.coolerPar[0][1]).toFixed(2));
         $("#ckd").val(parseFloat(arg.coolerPar[0][2]).toFixed(2));
         $("#cds").val(arg.coolerPar[0][3]);
-        $("#cba").val(parseFloat(arg.coolerPar[1][0]).toFixed(2));
-        $("#cbb").val(parseFloat(arg.coolerPar[1][1]).toFixed(2));
+        $("#cba").val(parseFloat(arg.coolerPar[1][1]).toFixed(2));
+        $("#cbb").val(parseFloat(arg.coolerPar[1][0]).toFixed(2));
         $("#hkp").val(parseFloat(arg.heaterPar[0][0]).toFixed(2));
         $("#hki").val(parseFloat(arg.heaterPar[0][1]).toFixed(2));
         $("#hkd").val(parseFloat(arg.heaterPar[0][2]).toFixed(2));
         $("#hds").val(arg.heaterPar[0][3]);
-        $("#hba").val(parseFloat(arg.heaterPar[1][0]).toFixed(2));
-        $("#hbb").val(parseFloat(arg.heaterPar[1][1]).toFixed(2));
+        $("#hba").val(parseFloat(arg.heaterPar[1][1]).toFixed(2));
+        $("#hbb").val(parseFloat(arg.heaterPar[1][0]).toFixed(2));
       }
     }
 
@@ -1355,7 +1372,7 @@ if (deviceBelonging) {
         "NexusService",
         {
           requestType: "reloadStatus",
-          bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+          bondKey: getBondKey(),
           token: getMeta("token"),
         },
         function (response) {
@@ -1376,9 +1393,8 @@ if (deviceBelonging) {
         function callback(response) {
           var parseJson = JSON.parse(response);
 
-          // Add device bondKey information to dummy class within main header
-          $("#deviceheader dummy").removeClass();
-          $("#deviceheader dummy").addClass(parseJson["deviceInfo"]["bondKey"]);
+          // Add device bondKey information
+          setBondKey(parseJson["deviceInfo"]["bondKey"]);
 
           if (parseJson.otherName) {
             // If user had more than one device
@@ -1401,13 +1417,14 @@ if (deviceBelonging) {
                   "</a>"
               );
               $(".subMasterName" + String(x)).on("click", function () {
+                setBondKey("");
                 $(".absolute-overlay").removeClass("loaded");
                 loadDeviceInformation(
                   $("." + $(this).attr("class").split(/\s+/)[1]).text()
                 );
                 const check = setInterval(function () {
                   // Function to check every 0.1s if bondKey is available, then execute reloadStatus() and destroy itself.
-                  if ($("#dashboard #deviceheader dummy").attr("class") != "") {
+                  if (getBondKey() != "") {
                     $(".absolute-overlay").addClass("loaded");
                     clearInterval(check); // kill after executed
                   }
@@ -1464,14 +1481,19 @@ if (deviceBelonging) {
           redrawChart(parseJson.plot);
 
           // Add event listener for device size, if it's mobile just show the download image icon.
+          const checkUltraMobile = window.matchMedia(
+            "screen and (max-width: 380px)"
+          );
           const checkMobile = window.matchMedia(
-            "screen and (max-width: 611px)"
+            "screen and (min-width: 381px) and (max-width: 611px)"
           );
           const checkTablet = window.matchMedia(
-            "screen and (min-width: 612px) and (max-width: 991px)"
+            "screen and (min-width: 612px)"
           );
+          ultraMobileListener(checkUltraMobile);
           mobileListener(checkMobile);
           tabletListener(checkTablet);
+          checkUltraMobile.addListener(ultraMobileListener);
           checkMobile.addListener(mobileListener);
           checkTablet.addListener(tabletListener);
           $("#conditional").html("");
@@ -1541,12 +1563,21 @@ if (deviceBelonging) {
       );
     }
     function tabletListener(e) {
-      if (nexusChart != null && nexusChart != undefined) {
-        if (e.matches) {
+      if (e.matches) {
+        console.log("tablet++");
+        $("#dashboard .navbar").css("padding", "0.5rem 1rem");
+        $("#dashboard .nexustcon .switch-field label").css(
+          "padding",
+          "8px 16px"
+        );
+        $("#dashboard #ultraM label").css("padding", "8px 16px");
+        $("#dashboard .numin").css("max-width", "180px");
+        if (nexusChart != null && nexusChart != undefined) {
           nexusChart.setOption({
             toolbox: {
               itemGap: 10,
               itemSize: 25,
+              orient: "horizontal",
             },
             title: {
               textStyle: {
@@ -1558,8 +1589,16 @@ if (deviceBelonging) {
       }
     }
     function mobileListener(e) {
-      if (nexusChart != null && nexusChart != undefined) {
-        if (e.matches) {
+      if (e.matches) {
+        console.log("Mobile");
+        $("#dashboard .navbar").css("padding", "0.5rem 1rem");
+        $("#dashboard .nexustcon .switch-field label").css(
+          "padding",
+          "8px 16px"
+        );
+        $("#dashboard #ultraM label").css("padding", "8px 16px");
+        $("#dashboard .numin").css("max-width", "180px");
+        if (nexusChart != null && nexusChart != undefined) {
           nexusChart.setOption({
             title: {
               textStyle: {
@@ -1569,6 +1608,33 @@ if (deviceBelonging) {
             toolbox: {
               itemGap: 6,
               itemSize: 16,
+              orient: "horizontal",
+            },
+          });
+        }
+      }
+    }
+    function ultraMobileListener(e) {
+      if (e.matches) {
+        console.log("ultraMobile");
+        $("#dashboard .navbar").css("padding", "0");
+        $("#dashboard .nexustcon .switch-field label").css(
+          "padding",
+          "8px 10px"
+        );
+        $("#dashboard #ultraM label").css("padding", "8px 6px");
+        $("#dashboard .numin").css("max-width", "140px");
+        if (nexusChart != null && nexusChart != undefined) {
+          nexusChart.setOption({
+            title: {
+              textStyle: {
+                fontSize: 14,
+              },
+            },
+            toolbox: {
+              itemGap: 4,
+              itemSize: 16,
+              orient: "vertical",
             },
           });
         }
@@ -1580,7 +1646,7 @@ if (deviceBelonging) {
       loadDeviceInformation("master");
 
       setTimeout(function reload() {
-        if ($("#dashboard #deviceheader dummy").attr("class") != "") {
+        if (getBondKey() != "") {
           reloadStatus();
         }
         setTimeout(reload, 3000);
@@ -1588,31 +1654,39 @@ if (deviceBelonging) {
       // Enable popover
       $('[data-toggle="popover"]').popover({ html: true });
       // Client side filter (that is kinda suck) for parameter of therco
-      $("#ckp, #cki, #ckd, #hkp, #hki, #hkd").on("input", function () {
-        var v = parseFloat(this.value);
-        if (isNaN(v)) {
-          if (this.value.charAt(0) != "-") this.value = "";
-          else this.value = "-";
-        } else {
-          if (v > 100) v = 100;
-          else if (v < -100) v = -100;
-          if (this.value.split(".").length > 1) this.value = v.toFixed(2);
-          else this.value = v.toFixed(0);
+      $("#ckp, #cki, #ckd, #hkp, #hki, #hkd, #cba, #cbb, #hba, #hbb").on(
+        "input",
+        function () {
+          var v = parseFloat(this.value);
+          if (isNaN(v)) {
+            if (this.value.charAt(0) != "-") this.value = "";
+            else this.value = "-";
+          } else {
+            if (
+              this.id === "hbb" ||
+              this.id === "hba" ||
+              this.id === "cbb" ||
+              this.id === "cba"
+            ) {
+              if (v > 30) v = 30;
+              else if (v < 0) v = 0;
+            } else {
+              if (v > 100) v = 100;
+              else if (v < -100) v = -100;
+            }
+            if (this.value.split(".").length > 1) this.value = v.toFixed(2);
+            else this.value = v.toFixed(0);
+          }
         }
-      });
+      );
       // Client side filter (that is kinda suck) for duration of pid
-      $("#hds, #cds, #cba, #cbb, #hba, #hbb").on("input", function () {
+      $("#hds, #cds").on("input", function () {
         var v = parseFloat(this.value);
         if (isNaN(v)) {
           this.value = "";
         } else {
-          if (this.id === "hds" || this.id === "cds") {
-            if (v > 1000000) v = 1000000;
-            else if (v < 0) v = 0;
-          } else {
-            if (v > 30) v = 30;
-            else if (v < 0) v = 0;
-          }
+          if (v > 1000000) v = 1000000;
+          else if (v < 0) v = 0;
           this.value = v.toFixed(0);
         }
       });
@@ -1657,7 +1731,7 @@ if (deviceBelonging) {
             "NexusService",
             {
               requestType: "toggleSwitch",
-              bondKey: $("#dashboard #deviceheader dummy").attr("class"),
+              bondKey: getBondKey(),
               id: arg.id,
               status: String(arg.checked),
               token: getMeta("token"),
@@ -1756,9 +1830,8 @@ if (deviceBelonging) {
 
     const check = setInterval(function () {
       // Function to check every 0.1s if bondKey is available, then execute reloadStatus() and destroy itself.
-      if ($("#dashboard #deviceheader dummy").attr("class") != "") {
+      if (getBondKey() != "") {
         $(".absolute-overlay").addClass("loaded");
-        //   reloadStatus();
         clearInterval(check); // kill after executed
       }
     }, 100);
