@@ -118,8 +118,8 @@ if ($fetchResult) {
           <i class="fas fa-align-justify icone active open"></i>
           <i class="fas fa-times icone close"></i>
         </button>
-        <a href="#">
-          <img alt="Otoma" src="img/logo/otoma_withtext.png" height="45">
+        <a href="#" id="otomaIcon">
+          <img alt="Otoma" src="img/logo/otoma_withtext.png" height="42">
         </a>
         <a href="logout.php">
           <button type="button" id="topnavButton" class="btn btn-info">
@@ -130,10 +130,11 @@ if ($fetchResult) {
       </div>
     </nav>
     <!-- Page Content  -->
+
+    <div id="bondContainer" value=""></div>
     <div id="content">
-      <div id="bondContainer" value=""></div>
       <?php
-      //require "pagecon/main-device-settings.php";
+      // require "pagecon/nexus-settings.php";
       if ($deviceBelonging) {
         if ($deviceBelongingType == "main")
           require "pagecon/main-device.php";
@@ -159,7 +160,7 @@ if ($fetchResult) {
   <!--Bottom Footer-->
   <!--Bottom Footer-->
 
-  <!-- jQuery CDN - Slim version (=without AJAX) -->
+  <!-- jQuery CDN -->
   <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
   <!-- Popper.JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>

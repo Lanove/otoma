@@ -1,4 +1,5 @@
 <div class="container-fluid nexusdevice" id="bigdevicebox">
+    <div id="nexus-dashboard"></div>
     <div class="row" id="deviceheader">
         <div class="col-12">
             <div class="row">
@@ -9,7 +10,7 @@
                             <div class="dropdown-menu"></div>
                         </a>
                     </div>
-                    <a href="#0" class="cog">
+                    <a href="#0" class="cog" id="deviceSetting">
                         <i class="fas fa-cog ml-auto ibcolor"></i>
                     </a>
                 </div>

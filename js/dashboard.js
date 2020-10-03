@@ -1,4 +1,122 @@
+var deviceBelonging = $("#bigdevicebox");
+
+function tabletListener(e) {
+  if (e.matches) {
+    $("#dashboard .navbar").css("padding", "0.5rem 1rem");
+    $("#dashboard .nexustcon .switch-field label").css("padding", "8px 16px");
+    $("#dashboard #ultraM label").css("padding", "8px 16px");
+    $("#dashboard .numin").css("max-width", "180px");
+    if (nexusChart != null && nexusChart != undefined) {
+      nexusChart.setOption({
+        toolbox: {
+          itemGap: 10,
+          itemSize: 25,
+          orient: "horizontal",
+        },
+        title: {
+          textStyle: {
+            fontSize: 18,
+          },
+        },
+      });
+    }
+  }
+}
+function mobileListener(e) {
+  if (e.matches) {
+    $("#dashboard .navbar").css("padding", "0.5rem 1rem");
+    $("#dashboard .nexustcon .switch-field label").css("padding", "8px 16px");
+    $("#dashboard #ultraM label").css("padding", "8px 16px");
+    $("#dashboard .numin").css("max-width", "180px");
+    if (nexusChart != null && nexusChart != undefined) {
+      nexusChart.setOption({
+        title: {
+          textStyle: {
+            fontSize: 14,
+          },
+        },
+        toolbox: {
+          itemGap: 6,
+          itemSize: 16,
+          orient: "horizontal",
+        },
+      });
+    }
+  }
+}
+function ultraMobileListener(e) {
+  if (e.matches) {
+    $("#dashboard .navbar").css("padding", "0");
+    $("#dashboard .nexustcon .switch-field label").css("padding", "8px 10px");
+    $("#dashboard #ultraM label").css("padding", "8px 6px");
+    $("#dashboard .numin").css("max-width", "140px");
+
+    if (nexusChart != null && nexusChart != undefined) {
+      nexusChart.setOption({
+        title: {
+          textStyle: {
+            fontSize: 14,
+          },
+        },
+        toolbox: {
+          itemGap: 4,
+          itemSize: 16,
+          orient: "vertical",
+        },
+      });
+    }
+  }
+}
+
+$(window).on("resize", function () {
+  if (nexusChart != null && nexusChart != undefined) {
+    // Add event listener for device size, if it's mobile just show the download image icon.
+    const checkUltraMobile = window.matchMedia("screen and (max-width: 380px)");
+    const checkMobile = window.matchMedia(
+      "screen and (min-width: 381px) and (max-width: 611px)"
+    );
+    const checkTablet = window.matchMedia("screen and (min-width: 612px)");
+    ultraMobileListener(checkUltraMobile);
+    mobileListener(checkMobile);
+    tabletListener(checkTablet);
+    nexusChart.resize();
+  }
+});
+
 $(document).ready(function () {
+  // Add event listener for device size
+  const checkUltraMobile = window.matchMedia("screen and (max-width: 380px)");
+  const checkMobile = window.matchMedia(
+    "screen and (min-width: 381px) and (max-width: 611px)"
+  );
+  const checkTablet = window.matchMedia("screen and (min-width: 612px)");
+  ultraMobileListener(checkUltraMobile);
+  mobileListener(checkMobile);
+  tabletListener(checkTablet);
+  checkUltraMobile.addListener(ultraMobileListener);
+  checkMobile.addListener(mobileListener);
+  checkTablet.addListener(tabletListener);
+
+  $("#otomaIcon").on("click", function () {
+    if (
+      deviceBelonging.hasClass("nexusdevice") &&
+      !$("#nexus-dashboard").length
+    ) {
+      $(".absolute-overlay").removeClass("loaded");
+      $("#content").html("");
+      $("#content").load("pagecon/nexus-device.php", function (
+        responseTxt,
+        statusTxt,
+        xhr
+      ) {
+        if (statusTxt == "success") {
+          nexusFirstLoad(getBondKey());
+          $(".absolute-overlay").addClass("loaded");
+        }
+      });
+    }
+  });
+
   $("#sidebar").mCustomScrollbar({ theme: "minimal" });
   $("#dismiss, .overlay").on("click", function () {
     $(".sidebarCollapse .close").removeClass("active");
@@ -24,7 +142,6 @@ $(document).ready(function () {
   });
 });
 
-var deviceBelonging = $("#bigdevicebox");
 if (deviceBelonging) {
   // Utility function for anypicker
   function createDataSource(outputData, dataNum) {
@@ -355,22 +472,6 @@ if (deviceBelonging) {
           },
         ],
       };
-    $(window).on("resize", function () {
-      if (nexusChart != null && nexusChart != undefined) {
-        // Add event listener for device size, if it's mobile just show the download image icon.
-        const checkUltraMobile = window.matchMedia(
-          "screen and (max-width: 380px)"
-        );
-        const checkMobile = window.matchMedia(
-          "screen and (min-width: 381px) and (max-width: 611px)"
-        );
-        const checkTablet = window.matchMedia("screen and (min-width: 612px)");
-        ultraMobileListener(checkUltraMobile);
-        mobileListener(checkMobile);
-        tabletListener(checkTablet);
-        nexusChart.resize();
-      }
-    });
     jQuery.fn.sortDivs = function sortDivs() {
       $("> div", this[0]).sort(dec_sort).appendTo(this[0]);
       function dec_sort(a, b) {
@@ -475,6 +576,10 @@ if (deviceBelonging) {
           <span>Aksi</span>
           <input style="max-width:220px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
       </div>`);
+
+      $("#nscmpCd" + spaceNum)
+        .unbind()
+        .removeData();
       $("#nscmpCd" + spaceNum).AnyPicker({
         // Create anypicker instance
         showComponentLabel: true,
@@ -498,6 +603,10 @@ if (deviceBelonging) {
       });
       var oArrData = [];
       createDataSource(oArrData, [100]);
+
+      $("#nsvalCd" + spaceNum)
+        .unbind()
+        .removeData();
       $(`#nsvalCd${spaceNum}`).AnyPicker({
         // Add anypicker to every timer
         showComponentLabel: true,
@@ -535,6 +644,10 @@ if (deviceBelonging) {
           <span>Aksi</span>
           <input style="max-width:220px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
       </div>`);
+
+      $("#cndCd" + spaceNum)
+        .unbind()
+        .removeData();
       $("#cndCd" + spaceNum).AnyPicker({
         // Create anypicker instance
         showComponentLabel: true,
@@ -562,6 +675,10 @@ if (deviceBelonging) {
           },
         ],
       });
+
+      $("#cnddCd" + spaceNum)
+        .unbind()
+        .removeData();
       $("#cnddCd" + spaceNum).AnyPicker({
         // Create anypicker instance
         showComponentLabel: true,
@@ -602,6 +719,10 @@ if (deviceBelonging) {
       // Create anypicker object for timer selector
       var oArrData = [];
       createDataSource(oArrData, [30, 23, 59]); // Maximum duration is 30 day 23 hour 59 minute
+
+      $("#timerCd" + spaceNum)
+        .unbind()
+        .removeData();
       $(`#timerCd${spaceNum}`).AnyPicker({
         // Add anypicker to every timer
         mode: "select",
@@ -664,6 +785,10 @@ if (deviceBelonging) {
           <span>Aksi</span>
           <input style="max-width:220px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
       </div>`);
+
+      $("#faCd" + spaceNum)
+        .unbind()
+        .removeData();
       $(`#faCd${spaceNum}`).AnyPicker({
         mode: "datetime",
         lang: "id",
@@ -680,6 +805,10 @@ if (deviceBelonging) {
           oAP2[spaceNum].setMinimumDate(sStartD);
         },
       });
+
+      $("#feCd" + spaceNum)
+        .unbind()
+        .removeData();
       $(`#feCd${spaceNum}`).AnyPicker({
         mode: "datetime",
         lang: "id",
@@ -712,6 +841,10 @@ if (deviceBelonging) {
           <span>Aksi</span>
           <input style="max-width:220px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
       </div>`);
+
+      $("#dfaCd" + spaceNum)
+        .unbind()
+        .removeData();
       $(`#dfaCd${spaceNum}`).AnyPicker({
         mode: "datetime",
         lang: "id",
@@ -720,6 +853,10 @@ if (deviceBelonging) {
         minValue: new Date(2020, 00, 01),
         maxValue: new Date(2025, 12, 31),
       });
+
+      $("#dfeCd" + spaceNum)
+        .unbind()
+        .removeData();
       $(`#dfeCd${spaceNum}`).AnyPicker({
         mode: "datetime",
         lang: "id",
@@ -731,6 +868,9 @@ if (deviceBelonging) {
     }
 
     function buildActionPicker(spaceNum, acContent) {
+      $("#acCd" + spaceNum)
+        .unbind()
+        .removeData();
       $("#acCd" + spaceNum).AnyPicker({
         // Create anypicker instance
         showComponentLabel: true,
@@ -777,6 +917,10 @@ if (deviceBelonging) {
           </div>
       </div>`);
       $("#conditional").sortDivs();
+
+      $("#ifCd" + spaceNum)
+        .unbind()
+        .removeData();
       $(`#ifCd${spaceNum}`).AnyPicker({
         // Create anypicker instance
         showComponentLabel: true,
@@ -800,6 +944,7 @@ if (deviceBelonging) {
         ],
       });
 
+      $(`#submitCd${spaceNum}, #deleteCd${spaceNum}`).unbind().removeData();
       $(`#submitCd${spaceNum}, #deleteCd${spaceNum}`).click(function () {
         var passedData = {};
         var span = $(`#nSpan${spaceNum}`);
@@ -1383,276 +1528,301 @@ if (deviceBelonging) {
 
     ///////////////////////////////
     function loadDeviceInformation(master) {
+      requestAJAX("NexusService", master, function callback(response) {
+        var parseJson = JSON.parse(response);
+
+        // Add device bondKey information
+        setBondKey(parseJson["deviceInfo"]["bondKey"]);
+
+        if (parseJson.otherName) {
+          // If user had more than one device
+          // Add text and icon to the title of the main header
+          $("#deviceheader .text").text(parseJson["deviceInfo"]["masterName"]);
+          $("#deviceheader .text").append(
+            "<i class = 'fas fa-caret-down'></i>"
+          );
+          //Add submasters name that user had to dropdown
+          $("#deviceheader .dropdown-menu").html("");
+          for (x in parseJson.otherName) {
+            $("#deviceheader .dropdown-menu").append(
+              '<a href="#" class="dropdown-item ' +
+                "subMasterName" +
+                String(x) +
+                '">' +
+                parseJson.otherName[x]["masterName"] +
+                "</a>"
+            );
+
+            $(".subMasterName" + String(x))
+              .unbind()
+              .removeData();
+            $(".subMasterName" + String(x)).on("click", function () {
+              setBondKey("");
+              $(".absolute-overlay").removeClass("loaded");
+              loadDeviceInformation({
+                requestType: "loadDeviceInformation",
+                master: $("." + $(this).attr("class").split(/\s+/)[1]).text(),
+                token: getMeta("token"),
+              });
+              const check = setInterval(function () {
+                // Function to check every 0.1s if bondKey is available, then execute reloadStatus() and destroy itself.
+                if (getBondKey() != "") {
+                  $(".absolute-overlay").addClass("loaded");
+                  clearInterval(check); // kill after executed
+                }
+              }, 100);
+            });
+          }
+        } else {
+          // If user had just only one device then
+          $("#deviceheader .dropdown").html(""); // remove dropdown menu
+          $("#deviceheader .dropdown").prepend(
+            "<p class='text'>" + parseJson["deviceInfo"]["masterName"] + "</p>"
+          ); // Add name but without caret or dropdown
+        }
+
+        $("#auxname1").text(parseJson.nexusBond.auxName1 + " (1)");
+        $("#auxname2").text(parseJson.nexusBond.auxName2 + " (2)");
+
+        parameterReload(parseJson.nexusBond, true);
+
+        // Initialize anypicker with correct date limit based on database
+
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, "0");
+        var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+        var yyyy = today.getFullYear();
+        today = yyyy + "-" + mm + "-" + dd;
+        if (parseJson.plot.oldest.oldestPlot == null)
+          parseJson.plot.oldest.oldestPlot = today;
+        if (parseJson.plot.oldest.newestPlot == null)
+          parseJson.plot.newest.newestPlot = today;
+        var oldest = parseJson.plot.oldest.oldestPlot.split("-");
+        var newest = parseJson.plot.newest.newestPlot.split("-");
+        for (index in newest) {
+          // Convert every string array that is splitted into integer array
+          newest[index] = parseInt(newest[index]);
+          oldest[index] = parseInt(oldest[index]);
+        }
+        oldest[1]--; // Dk what is this, but keep it.
+        $("#dateselector").unbind().removeData(); // Remove any anypicker instance to make sure it's not duplicating.
+        $("#dateselector").AnyPicker({
+          // Create anypicker instance
+          showComponentLabel: true,
+          mode: "datetime",
+          dateTimeFormat: "yyyy-MM-dd",
+          lang: "id",
+          formatOutput: setTrigger,
+          minValue: new Date(oldest[0], oldest[1], 01),
+          maxValue: new Date(newest[0], newest[1], 00),
+        });
+
+        // Draw a chart
+        redrawChart(parseJson.plot);
+
+        $("#conditional").html("");
+        for (index in parseJson.programs) {
+          const progNum = parseJson.programs[index].progNumber;
+          const trigger = parseJson.programs[index].progData1;
+          const action = parseJson.programs[index].progData2;
+          appendConditionalChild(progNum, [
+            "Nilai Suhu",
+            "Nilai Humiditas",
+            "Jadwal Harian",
+            "Tanggal Waktu",
+            //"Timer",
+            "Keadaan",
+          ]);
+          // buildTempOrHum(spaceNum), buildTimer(spaceNum), buildDailyPicker(spaceNum), buildDateTimePicker(spaceNum), buildActionPicker(spaceNum, acContent)
+          $(`#ifCd${progNum}`).val(trigger);
+          if (trigger == "Nilai Suhu" || trigger == "Nilai Humiditas") {
+            buildTempOrHum(progNum, trigger);
+            $(`#nscmpCd${progNum}`).val(parseJson.programs[index].progData3);
+            $(`#nsvalCd${progNum}`).val(parseJson.programs[index].progData4);
+          } else if (trigger == "Jadwal Harian") {
+            buildDailyPicker(progNum);
+            $(`#faCd${progNum}`).val(parseJson.programs[index].progData3);
+            $(`#feCd${progNum}`).val(parseJson.programs[index].progData4);
+          } else if (trigger == "Tanggal Waktu") {
+            buildDateTimePicker(progNum);
+            $(`#dfaCd${progNum}`).val(parseJson.programs[index].progData3);
+            $(`#dfeCd${progNum}`).val(parseJson.programs[index].progData4);
+          } else if (trigger == "Timer") {
+            buildTimer(progNum);
+            $(`#timerCd${progNum}`).val(parseJson.programs[index].progData3);
+          } else if (trigger == "Keadaan") {
+            buildConditionalPicker(progNum);
+            $(`#cndCd${progNum}`).val(parseJson.programs[index].progData3);
+            $(`#cnddCd${progNum}`).val(parseJson.programs[index].progData4);
+          }
+          var acContent = [];
+          if (trigger != "timer") {
+            acContent = [
+              "Nyalakan Output 1",
+              "Nyalakan Output 2",
+              "Nyalakan Pemanas",
+              "Nyalakan Pendingin",
+              "Nyalakan Thermocontrol",
+              "Matikan Output 1",
+              "Matikan Output 2",
+              "Matikan Pemanas",
+              "Matikan Pendingin",
+              "Matikan Thermocontrol",
+            ];
+          } else {
+            acContent = [
+              "Nyalakan Output 1",
+              "Nyalakan Output 2",
+              "Nyalakan Pemanas",
+              "Nyalakan Pendingin",
+              "Matikan Pemanas",
+              "Matikan Pendingin",
+              "Nyalakan Thermocontrol",
+            ];
+          }
+          buildActionPicker(progNum, acContent);
+          $(`#acCd${progNum}`).val(action);
+        }
+      });
+    }
+
+    function nexusSettingLoad() {
+      $("#delDevice").unbind().removeData();
+      $("#delDevice").click(function () {
+        bootbox.confirm({
+          title: "Apakah anda yakin ingin menghapus kontroller?",
+          className: "bootBoxPop",
+          message: `Aksi ini tidak dapat dipulihkan. Seluruh informasi kontroller yang terhubung dengan akun ini akan terhapus seluruhnya`,
+          buttons: {
+            cancel: {
+              label: '<i class="fa fa-times"></i> Tidak',
+              className: "bootBoxCancelButton",
+            },
+            confirm: {
+              label: '<i class="fa fa-check"></i> Ya',
+              className: "btn-danger",
+            },
+          },
+          callback: function (result) {
+            if (result) {
+              requestAJAX(
+                "NexusService",
+                {
+                  requestType: "deleteController",
+                  bondKey: getBondKey(),
+                  token: getMeta("token"),
+                },
+                function (response) {
+                  if (response.success) {
+                    bootbox.alert({
+                      size: "large",
+                      title: "Berhasil menghapus",
+                      message: `Kontroller sudah terhapus dari akun ini, merefresh halaman dalam 3 detik...`,
+                      closeButton: false,
+                      buttons: {
+                        ok: {
+                          label: "Tutup",
+                        },
+                      },
+                    });
+                    setTimeout(function () {
+                      location.reload();
+                    }, 3000);
+                  }
+                }
+              );
+            }
+          },
+        });
+      });
+
+      $("#auxNameSubmit").unbind().removeData();
+      $("#auxNameSubmit").click(function () {
+        $("#infoAuxName").removeClass();
+        $("#infoAuxName").text("Mengupdate ke database...");
+        requestAJAX(
+          "NexusService",
+          {
+            requestType: "updateName",
+            docchi: "aux",
+            name: [$("#aux1Name").val(), $("#aux2Name").val()],
+            bondKey: getBondKey(),
+            token: getMeta("token"),
+          },
+          function (response) {
+            $("#infoAuxName").addClass("tsucceed2");
+            $("#infoAuxName").text("Sukses mengupdate");
+            setTimeout(function () {
+              $("#infoAuxName").removeClass();
+              $("#infoAuxName").text("");
+            }, 5000);
+          }
+        );
+      });
+
+      $("#submitEdit").unbind().removeData();
+      $("#submitEdit").click(function () {
+        $("#infoName").removeClass();
+        $("#infoName").text("Mengupdate ke database...");
+        requestAJAX(
+          "NexusService",
+          {
+            requestType: "updateName",
+            docchi: "master",
+            name: $("#deviceNameEdit").val(),
+            bondKey: getBondKey(),
+            token: getMeta("token"),
+          },
+          function (response) {
+            $("#deviceName").text($("#deviceNameEdit").val());
+            $("#infoName").addClass("tsucceed2");
+            $("#infoName").text("Sukses mengupdate");
+            setTimeout(function () {
+              $("#infoName").removeClass();
+              $("#infoName").text("");
+            }, 5000);
+          }
+        );
+      });
       requestAJAX(
         "NexusService",
         {
-          requestType: "loadDeviceInformation",
-          master: master,
+          requestType: "loadSetting",
+          bondKey: getBondKey(),
           token: getMeta("token"),
         },
-        function callback(response) {
-          var parseJson = JSON.parse(response);
-
-          // Add device bondKey information
-          setBondKey(parseJson["deviceInfo"]["bondKey"]);
-
-          if (parseJson.otherName) {
-            // If user had more than one device
-            // Add text and icon to the title of the main header
-            $("#deviceheader .text").text(
-              parseJson["deviceInfo"]["masterName"]
-            );
-            $("#deviceheader .text").append(
-              "<i class = 'fas fa-caret-down'></i>"
-            );
-            //Add submasters name that user had to dropdown
-            $("#deviceheader .dropdown-menu").html("");
-            for (x in parseJson.otherName) {
-              $("#deviceheader .dropdown-menu").append(
-                '<a href="#" class="dropdown-item ' +
-                  "subMasterName" +
-                  String(x) +
-                  '">' +
-                  parseJson.otherName[x]["masterName"] +
-                  "</a>"
-              );
-              $(".subMasterName" + String(x)).on("click", function () {
-                setBondKey("");
-                $(".absolute-overlay").removeClass("loaded");
-                loadDeviceInformation(
-                  $("." + $(this).attr("class").split(/\s+/)[1]).text()
-                );
-                const check = setInterval(function () {
-                  // Function to check every 0.1s if bondKey is available, then execute reloadStatus() and destroy itself.
-                  if (getBondKey() != "") {
-                    $(".absolute-overlay").addClass("loaded");
-                    clearInterval(check); // kill after executed
-                  }
-                }, 100);
-              });
-            }
-          } else {
-            // If user had just only one device then
-            $("#deviceheader .dropdown").html(""); // remove dropdown menu
-            $("#deviceheader .dropdown").prepend(
-              "<p class='text'>" +
-                parseJson["deviceInfo"]["masterName"] +
-                "</p>"
-            ); // Add name but without caret or dropdown
-          }
-
-          $("#auxname1").text(parseJson.nexusBond.auxName1 + " (1)");
-          $("#auxname2").text(parseJson.nexusBond.auxName2 + " (2)");
-
-          parameterReload(parseJson.nexusBond, true);
-
-          // Initialize anypicker with correct date limit based on database
-
-          var today = new Date();
-          var dd = String(today.getDate()).padStart(2, "0");
-          var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
-          var yyyy = today.getFullYear();
-          today = yyyy + "-" + mm + "-" + dd;
-          if (parseJson.plot.oldest.oldestPlot == null)
-            parseJson.plot.oldest.oldestPlot = today;
-          if (parseJson.plot.oldest.newestPlot == null)
-            parseJson.plot.newest.newestPlot = today;
-          var oldest = parseJson.plot.oldest.oldestPlot.split("-");
-          var newest = parseJson.plot.newest.newestPlot.split("-");
-          for (index in newest) {
-            // Convert every string array that is splitted into integer array
-            newest[index] = parseInt(newest[index]);
-            oldest[index] = parseInt(oldest[index]);
-          }
-          oldest[1]--; // Dk what is this, but keep it.
-          $("#dateselector").unbind().removeData(); // Remove any anypicker instance to make sure it's not duplicating.
-          $("#dateselector").AnyPicker({
-            // Create anypicker instance
-            showComponentLabel: true,
-            mode: "datetime",
-            dateTimeFormat: "yyyy-MM-dd",
-            lang: "id",
-            formatOutput: setTrigger,
-            minValue: new Date(oldest[0], oldest[1], 01),
-            maxValue: new Date(newest[0], newest[1], 00),
-          });
-
-          // Draw a chart
-          redrawChart(parseJson.plot);
-
-          // Add event listener for device size, if it's mobile just show the download image icon.
-          const checkUltraMobile = window.matchMedia(
-            "screen and (max-width: 380px)"
-          );
-          const checkMobile = window.matchMedia(
-            "screen and (min-width: 381px) and (max-width: 611px)"
-          );
-          const checkTablet = window.matchMedia(
-            "screen and (min-width: 612px)"
-          );
-          ultraMobileListener(checkUltraMobile);
-          mobileListener(checkMobile);
-          tabletListener(checkTablet);
-          checkUltraMobile.addListener(ultraMobileListener);
-          checkMobile.addListener(mobileListener);
-          checkTablet.addListener(tabletListener);
-          $("#conditional").html("");
-          for (index in parseJson.programs) {
-            const progNum = parseJson.programs[index].progNumber;
-            const trigger = parseJson.programs[index].progData1;
-            const action = parseJson.programs[index].progData2;
-            appendConditionalChild(progNum, [
-              "Nilai Suhu",
-              "Nilai Humiditas",
-              "Jadwal Harian",
-              "Tanggal Waktu",
-              //"Timer",
-              "Keadaan",
-            ]);
-            // buildTempOrHum(spaceNum), buildTimer(spaceNum), buildDailyPicker(spaceNum), buildDateTimePicker(spaceNum), buildActionPicker(spaceNum, acContent)
-            $(`#ifCd${progNum}`).val(trigger);
-            if (trigger == "Nilai Suhu" || trigger == "Nilai Humiditas") {
-              buildTempOrHum(progNum, trigger);
-              $(`#nscmpCd${progNum}`).val(parseJson.programs[index].progData3);
-              $(`#nsvalCd${progNum}`).val(parseJson.programs[index].progData4);
-            } else if (trigger == "Jadwal Harian") {
-              buildDailyPicker(progNum);
-              $(`#faCd${progNum}`).val(parseJson.programs[index].progData3);
-              $(`#feCd${progNum}`).val(parseJson.programs[index].progData4);
-            } else if (trigger == "Tanggal Waktu") {
-              buildDateTimePicker(progNum);
-              $(`#dfaCd${progNum}`).val(parseJson.programs[index].progData3);
-              $(`#dfeCd${progNum}`).val(parseJson.programs[index].progData4);
-            } else if (trigger == "Timer") {
-              buildTimer(progNum);
-              $(`#timerCd${progNum}`).val(parseJson.programs[index].progData3);
-            } else if (trigger == "Keadaan") {
-              buildConditionalPicker(progNum);
-              $(`#cndCd${progNum}`).val(parseJson.programs[index].progData3);
-              $(`#cnddCd${progNum}`).val(parseJson.programs[index].progData4);
-            }
-            var acContent = [];
-            if (trigger != "timer") {
-              acContent = [
-                "Nyalakan Output 1",
-                "Nyalakan Output 2",
-                "Nyalakan Pemanas",
-                "Nyalakan Pendingin",
-                "Nyalakan Thermocontrol",
-                "Matikan Output 1",
-                "Matikan Output 2",
-                "Matikan Pemanas",
-                "Matikan Pendingin",
-                "Matikan Thermocontrol",
-              ];
-            } else {
-              acContent = [
-                "Nyalakan Output 1",
-                "Nyalakan Output 2",
-                "Nyalakan Pemanas",
-                "Nyalakan Pendingin",
-                "Matikan Pemanas",
-                "Matikan Pendingin",
-                "Nyalakan Thermocontrol",
-              ];
-            }
-            buildActionPicker(progNum, acContent);
-            $(`#acCd${progNum}`).val(action);
-          }
+        function (response) {
+          const json = JSON.parse(response);
+          $("#deviceName").text(json.masterName);
+          $("#aux1Name").val(json.auxName1);
+          $("#aux2Name").val(json.auxName2);
+          $("#deviceNameEdit").val(json.masterName);
         }
       );
     }
-    function tabletListener(e) {
-      if (e.matches) {
-        console.log("tablet++");
-        $("#dashboard .navbar").css("padding", "0.5rem 1rem");
-        $("#dashboard .nexustcon .switch-field label").css(
-          "padding",
-          "8px 16px"
-        );
-        $("#dashboard #ultraM label").css("padding", "8px 16px");
-        $("#dashboard .numin").css("max-width", "180px");
-        if (nexusChart != null && nexusChart != undefined) {
-          nexusChart.setOption({
-            toolbox: {
-              itemGap: 10,
-              itemSize: 25,
-              orient: "horizontal",
-            },
-            title: {
-              textStyle: {
-                fontSize: 18,
-              },
-            },
-          });
-        }
-      }
-    }
-    function mobileListener(e) {
-      if (e.matches) {
-        console.log("Mobile");
-        $("#dashboard .navbar").css("padding", "0.5rem 1rem");
-        $("#dashboard .nexustcon .switch-field label").css(
-          "padding",
-          "8px 16px"
-        );
-        $("#dashboard #ultraM label").css("padding", "8px 16px");
-        $("#dashboard .numin").css("max-width", "180px");
-        if (nexusChart != null && nexusChart != undefined) {
-          nexusChart.setOption({
-            title: {
-              textStyle: {
-                fontSize: 14,
-              },
-            },
-            toolbox: {
-              itemGap: 6,
-              itemSize: 16,
-              orient: "horizontal",
-            },
-          });
-        }
-      }
-    }
-    function ultraMobileListener(e) {
-      if (e.matches) {
-        console.log("ultraMobile");
-        $("#dashboard .navbar").css("padding", "0");
-        $("#dashboard .nexustcon .switch-field label").css(
-          "padding",
-          "8px 10px"
-        );
-        $("#dashboard #ultraM label").css("padding", "8px 6px");
-        $("#dashboard .numin").css("max-width", "140px");
-        if (nexusChart != null && nexusChart != undefined) {
-          nexusChart.setOption({
-            title: {
-              textStyle: {
-                fontSize: 14,
-              },
-            },
-            toolbox: {
-              itemGap: 4,
-              itemSize: 16,
-              orient: "vertical",
-            },
-          });
-        }
-      }
-    }
-    var prevInput = {};
-    $(document).ready(function () {
-      // Awal loading page load device yang paling atas.
-      loadDeviceInformation("master");
 
-      setTimeout(function reload() {
-        if (getBondKey() != "") {
-          reloadStatus();
-        }
-        setTimeout(reload, 3000);
-      }, 3000);
+    function nexusFirstLoad(bondKey = null) {
+      // Awal loading page load device yang paling atas.
+      if (bondKey == null)
+        loadDeviceInformation({
+          requestType: "loadDeviceInformation",
+          master: "master",
+          token: getMeta("token"),
+        });
+      else
+        loadDeviceInformation({
+          requestType: "loadDeviceInformation",
+          bondKey: bondKey,
+          token: getMeta("token"),
+        });
       // Enable popover
+
+      $('[data-toggle="popover"]').unbind().removeData();
       $('[data-toggle="popover"]').popover({ html: true });
+
+      $("#ckp, #cki, #ckd, #hkp, #hki, #hkd, #cba, #cbb, #hba, #hbb")
+        .unbind()
+        .removeData();
       // Client side filter (that is kinda suck) for parameter of therco
       $("#ckp, #cki, #ckd, #hkp, #hki, #hkd, #cba, #cbb, #hba, #hbb").on(
         "input",
@@ -1679,6 +1849,7 @@ if (deviceBelonging) {
           }
         }
       );
+      $("#hds, #cds").unbind().removeData();
       // Client side filter (that is kinda suck) for duration of pid
       $("#hds, #cds").on("input", function () {
         var v = parseFloat(this.value);
@@ -1700,6 +1871,7 @@ if (deviceBelonging) {
       // Enable anypicker on setpoint setting
       var oArrData = [];
       createDataSource(oArrData, [100]);
+      $("#spsetting").unbind().removeData();
       $("#spsetting").AnyPicker({
         mode: "select",
         lang: "id",
@@ -1722,6 +1894,9 @@ if (deviceBelonging) {
         formatOutput: spsetOut,
       });
 
+      $("#coolerSwitch, #heaterSwitch, #aux1Switch, #aux2Switch, #thSwitch")
+        .unbind()
+        .removeData();
       // Onclick switches
       $(
         "#coolerSwitch, #heaterSwitch, #aux1Switch, #aux2Switch, #thSwitch"
@@ -1769,6 +1944,7 @@ if (deviceBelonging) {
         }
       });
 
+      $("#addCond").unbind().removeData();
       // Onclick add condition button
       $("#addCond").click(function () {
         var space = true;
@@ -1816,6 +1992,11 @@ if (deviceBelonging) {
         }
       });
 
+      $(
+        "input[name='thermmode'],input[name='operation'],input[name='cmode'],input[name='hmode']"
+      )
+        .unbind()
+        .removeData();
       // Onclick mode select
       $(
         "input[name='thermmode'],input[name='operation'],input[name='cmode'],input[name='hmode']"
@@ -1826,6 +2007,49 @@ if (deviceBelonging) {
           !(this.name == "cmode" || this.name == "hmode")
         );
       });
+    }
+
+    var prevInput = {};
+    $(document).ready(function () {
+      nexusFirstLoad();
+
+      $("#content").on("click", "#deviceSetting", function () {
+        $(".absolute-overlay").removeClass("loaded");
+        $("#content").html("");
+        $("#content").load("pagecon/nexus-settings.php", function (
+          responseTxt,
+          statusTxt,
+          xhr
+        ) {
+          if (statusTxt == "success") {
+            console.log("success");
+            $(".absolute-overlay").addClass("loaded");
+            nexusSettingLoad();
+          }
+        });
+      });
+
+      $("#content").on("click", "#deviceHome", function () {
+        $(".absolute-overlay").removeClass("loaded");
+        $("#content").html("");
+        $("#content").load("pagecon/nexus-device.php", function (
+          responseTxt,
+          statusTxt,
+          xhr
+        ) {
+          if (statusTxt == "success") {
+            nexusFirstLoad(getBondKey());
+            $(".absolute-overlay").addClass("loaded");
+          }
+        });
+      });
+
+      setTimeout(function reload() {
+        if (getBondKey() != "" && $("#nexus-dashboard").length) {
+          reloadStatus();
+        }
+        setTimeout(reload, 3000);
+      }, 3000);
     });
 
     const check = setInterval(function () {

@@ -52,6 +52,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                             deleteProgram($json, $dbController);
                         } else if ($requestType == "reloadStatus") {
                             requestStatus($json, $dbController);
+                        } else if ($requestType == "loadSetting") {
+                            loadSetting($json, $dbController);
+                        } else if ($requestType == "updateName") {
+                            updateName($json, $dbController);
                         }
                     }
                 }
@@ -60,6 +64,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
     }
     $dbController->close();
     $dbController = null;
+}
+
+function updateName($arg, $dbC)
+{
+    $bondKey = $arg["bondKey"];
+    if (isset($arg["docchi"]) && isset($arg["name"])) {
+        if ($arg["docchi"] == "master") {
+            $dbC->runQuery("UPDATE bond SET masterName=:masterName WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "masterName" => $arg["name"]]);
+        } else if ($arg["docchi"] == "aux" && isset($arg["name"][0]) && isset($arg["name"][1])) {
+            $dbC->runQuery("UPDATE nexusbond SET auxName1=:auxName1, auxName2=:auxName2 WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "auxName1" => $arg["name"][0], "auxName2" => $arg["name"][1]]);
+        }
+    }
+}
+
+function loadSetting($arg, $dbC)
+{
+    $bondKey = $arg["bondKey"];
+    echo json_encode(array_merge($dbC->runQuery("SELECT masterName FROM bond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]), $dbC->runQuery("SELECT auxName1, auxName2 FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey])));
 }
 
 function requestStatus($arg, $dbC)
@@ -509,15 +531,21 @@ function loadPlot($arg, $dbC)
 
 function loadDeviceInformation($arg, $dbC)
 {
-    if (isset($arg["master"])) {
-        $master = $arg["master"];
+    if (isset($arg["master"]) || isset($arg["bondKey"])) {
+
         $username = $arg["username"];
-        if ($master === "master") {
-            $fetchResult["deviceInfo"] = $dbC->runQuery("SELECT bondKey,masterName FROM bond WHERE username = :name ORDER BY id ASC;", ["name" => $username]);
-        } else { // THIS ELSE IF STATEMENT MEAN THAT ONE USER CAN'T NAME DEVICE WITH SAME NAME.
-            $fetchResult["deviceInfo"] = $dbC->runQuery("SELECT bondKey,masterName FROM bond WHERE username = :name AND masterName = :master;", ["name" => $username, "master" => $master]);
+        if (isset($arg["master"])) {
+            $master = $arg["master"];
+            if ($master === "master") {
+                $fetchResult["deviceInfo"] = $dbC->runQuery("SELECT bondKey,masterName FROM bond WHERE username = :name ORDER BY id ASC;", ["name" => $username]);
+            } else { // THIS ELSE IF STATEMENT MEAN THAT ONE USER CAN'T NAME DEVICE WITH SAME NAME.
+                $fetchResult["deviceInfo"] = $dbC->runQuery("SELECT bondKey,masterName FROM bond WHERE username = :name AND masterName = :master;", ["name" => $username, "master" => $master]);
+            }
+            $bondKey = $fetchResult["deviceInfo"]["bondKey"];
+        } else if (isset($arg["bondKey"])) {
+            $bondKey = $arg["bondKey"];
+            $fetchResult["deviceInfo"] = $dbC->runQuery("SELECT bondKey,masterName FROM bond WHERE bondKey = :bondKey ORDER BY id ASC;", ["bondKey" => $bondKey]);
         }
-        $bondKey = $fetchResult["deviceInfo"]["bondKey"];
         // Get every name of masterDevice with fetchAll
         $fetchResult["otherName"] = $dbC->runQuery("SELECT masterName FROM bond WHERE username = :name AND masterName != :exception ORDER BY id ASC;", ["name" => $arg["username"], "exception" => $fetchResult["deviceInfo"]["masterName"]], "ALL");
 

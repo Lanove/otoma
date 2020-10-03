@@ -791,51 +791,14 @@ body {
   background:inherit;
   transition:none;
 }
-#dashboard #maindev-setting {
-  background-color: var(--bigdevicebox-color);
-  color: var(--text-color1);
-  border-radius: 0px 0px 10px 10px;
-  padding-bottom: 10px;
-}
-#dashboard #maindev-setting .header {
-  background-color: var(--third-color);
-  color: var(--text-color1);
-  border-radius: 10px 10px 0px 0px;
-}
-#dashboard #maindev-setting .header .text {
-  padding-left: 10px;
-  padding-right: 10px;
-  font-size: 1.5rem;
-  color: var(--text-color1);
-  position: relative;
-  top: 0px;
-  left: 5px;
-}
-#dashboard #maindev-setting .header #tabs {
-  background-color: var(--third-color);
-  color: var(--text-color1);
-  font-size: 1.1em;
-}
-#dashboard #maindev-setting .header #tabs .nav-link {
-  border: 5px solid transparent;
-}
-#dashboard #maindev-setting .header #tabs .nav-link:hover {
-  border: 3px solid transparent;
-}
-#dashboard #maindev-setting .header #tabs .nav-link.active {
-  border-bottom: 5px solid var(--text-color1);
-  background-color: var(--third-color);
-}
-#dashboard #maindev-setting .header #tabs .nav-tabs {
-  border-bottom: 2px solid var(--text-color1);
-}
 
-#dashboard #maindev-setting .setting-box {
+#dashboard .setting-box {
   margin-top: 20px;
   background-color: var(--statusbox-color);
   border-radius: 10px;
+  color: var(--text-color1);
 }
-#dashboard #maindev-setting .setting-box .header {
+#dashboard .setting-box .header {
   padding-top: 10px;
   padding-left: 10px;
   padding-right: 10px;
@@ -844,20 +807,20 @@ body {
   font-size: 1.25rem;
   color: var(--text-color2);
 }
-#dashboard #maindev-setting .setting-box .line {
+#dashboard .setting-box .line {
   width: 100%;
   margin: 0px;
   margin-top: 10px;
   margin-bottom: -10px;
   border-bottom: 1px solid #ced4da;
 }
-#dashboard #maindev-setting .setting-box .content {
+#dashboard .setting-box .content {
   padding: 20px;
 }
-#dashboard #maindev-setting .setting-box .content .row {
+#dashboard .setting-box .content .row {
   margin-top: 10px;
 }
-#dashboard #maindev-setting .setting-box .content .form-control {
+#dashboard .setting-box .content .form-control {
   display: block;
   width: 100%;
   height: calc(2.25rem + 2px);
@@ -870,21 +833,6 @@ body {
   background-clip: padding-box;
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
-}
-#dashboard #maindev-setting .setting-box .content .btn {
-  color: var(--text-color1);
-  transition: 0.5s all ease-in-out;
-  margin-left: 5px;
-}
-#dashboard #maindev-setting .setting-box .content .btn-theme {
-  background-color: var(--third-color);
-  color: var(--text-color1);
-}
-#dashboard #maindev-setting .setting-box .content .btn:hover {
-  transform: scale(1.0375, 1.0375);
-}
-#dashboard #maindev-setting .setting-box .content .block-but {
-  margin-top: 15px;
 }
 
 
@@ -1303,14 +1251,6 @@ font-size: 3rem;
   margin-bottom: 15px;
 }
 
-.noDeviceError .error-actions .btn:hover,
-.noDeviceError .error-actions .btn:focus {
-  opacity: 0.8;
-  transform: scale(1.055, 1.05);
-  font-size: 1.2rem;
-  transition: all 0.5s;
-}
-
 .noDeviceError .error-actions .btn {
   margin-right: 10px;
   box-shadow: none;
@@ -1319,7 +1259,6 @@ font-size: 3rem;
   border-radius: 2px;
   color: white;
   font-size: 1.2rem;
-  background-color: var(--third-color);
   transition: all 0.5s;
 }
 

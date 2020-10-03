@@ -16,9 +16,9 @@
                 </div>
                 <div class="error-actions">
                     <a href="#">
-                        <button class="btn"><i class="fa fa-question-circle"></i> Panduan</button></a>
+                        <button class="btn btn-info"><i class="fa fa-question-circle"></i> Panduan</button></a>
                     <a href="#">
-                        <button class="btn"><i class="fas fa-paper-plane"></i> Kontak Kami</button></a>
+                        <button class="btn btn-info"><i class="fas fa-paper-plane"></i> Kontak Kami</button></a>
                 </div>
             </div>
         </div>
