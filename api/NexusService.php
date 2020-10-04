@@ -56,6 +56,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                             loadSetting($json, $dbController);
                         } else if ($requestType == "updateName") {
                             updateName($json, $dbController);
+                        } else if ($requestType == "deleteController") {
+                            deleteController($json, $dbController);
                         }
                     }
                 }
@@ -64,6 +66,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
     }
     $dbController->close();
     $dbController = null;
+}
+
+function deleteController($arg, $dbC)
+{
+    $bondKey =  $arg["bondKey"];
+    $dbC->runQuery("DELETE FROM bond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+
+    $doubleCheck = $dbC->runQuery("SELECT * FROM bond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+    if ($doubleCheck)
+        echo false;
+    else
+        echo true;
 }
 
 function updateName($arg, $dbC)

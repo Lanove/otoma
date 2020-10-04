@@ -1,5 +1,28 @@
 var deviceBelonging = $("#bigdevicebox");
 
+function requestAJAX(fileName, jsonobject, callback = function () {}) {
+  var xhr = new XMLHttpRequest();
+  var json = JSON.stringify(jsonobject);
+  xhr.open("POST", "api/" + fileName + ".php");
+  xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
+  xhr.send(json);
+  xhr.onload = function () {
+    if (xhr.status == 200 && xhr.readyState == 4) {
+      callback(xhr.responseText);
+    }
+  };
+}
+
+function getMeta(metaName) {
+  const metas = document.getElementsByTagName("meta");
+  for (let i = 0; i < metas.length; i++) {
+    if (metas[i].getAttribute("name") === metaName) {
+      return metas[i].getAttribute("content");
+    }
+  }
+  return "";
+}
+
 function tabletListener(e) {
   if (e.matches) {
     $("#dashboard .navbar").css("padding", "0.5rem 1rem");
@@ -84,6 +107,14 @@ $(window).on("resize", function () {
 });
 
 $(document).ready(function () {
+  $('[data-toggle="popover"]').popover({ html: true });
+  const retractSidebar = function () {
+    $(".sidebarCollapse .close").removeClass("active");
+    $(".sidebarCollapse .open").addClass("active");
+    $("#sidebar").removeClass("active");
+    $(".overlay").removeClass("active");
+  };
+
   // Add event listener for device size
   const checkUltraMobile = window.matchMedia("screen and (max-width: 380px)");
   const checkMobile = window.matchMedia(
@@ -97,32 +128,87 @@ $(document).ready(function () {
   checkMobile.addListener(mobileListener);
   checkTablet.addListener(tabletListener);
 
-  $("#otomaIcon").on("click", function () {
-    if (
-      deviceBelonging.hasClass("nexusdevice") &&
-      !$("#nexus-dashboard").length
+  if (!deviceBelonging.length) {
+    $(".absolute-overlay").addClass("loaded");
+  }
+  $("#contactUs").click(function () {
+    $(".absolute-overlay").removeClass("loaded");
+    $("#content").html("");
+    $("#content").load("pagecon/contact-us.php", function (
+      responseTxt,
+      statusTxt,
+      xhr
     ) {
-      $(".absolute-overlay").removeClass("loaded");
-      $("#content").html("");
-      $("#content").load("pagecon/nexus-device.php", function (
-        responseTxt,
-        statusTxt,
-        xhr
+      if (statusTxt == "success") {
+        $("#submitContact").click(function () {
+          if (
+            $("#nameContact").val() != "" &&
+            $("#phoneContact").val() != "" &&
+            $("#emailContact").val() != "" &&
+            $("#messageContact").val() != ""
+          ) {
+            requestAJAX(
+              "GlobalService",
+              {
+                requestType: "submitMessage",
+                token: getMeta("token"),
+                name: $("#nameContact").val(),
+                phone: $("#phoneContact").val(),
+                email: $("#emailContact").val(),
+                message: $("#messageContact").val(),
+              },
+              function (response) {
+                $("#nameContact").val("");
+                $("#phoneContact").val("");
+                $("#emailContact").val("");
+                $("#messageContact").val("");
+                $("#notifContact").text("Pesan terkirim!");
+              }
+            );
+          } else {
+            $("#notifContact").text(
+              "Gagal mengirim pesan, terdapat form isian yang belum di isi"
+            );
+          }
+          setTimeout(function () {
+            $("#notifContact").text("");
+          }, 5000);
+        });
+        retractSidebar();
+        $(".absolute-overlay").addClass("loaded");
+      }
+    });
+  });
+  $("#otomaIcon, #goHome").on("click", function () {
+    if (deviceBelonging) {
+      if (
+        deviceBelonging.hasClass("nexusdevice") &&
+        !$("#nexus-dashboard").length
       ) {
-        if (statusTxt == "success") {
-          nexusFirstLoad(getBondKey());
-          $(".absolute-overlay").addClass("loaded");
-        }
-      });
+        retractSidebar();
+        $(".absolute-overlay").removeClass("loaded");
+        $("#content").html("");
+        $("#content").load("pagecon/nexus-device.php", function (
+          responseTxt,
+          statusTxt,
+          xhr
+        ) {
+          if (statusTxt == "success") {
+            nexusFirstLoad(getBondKey());
+            $(".absolute-overlay").addClass("loaded");
+          }
+        });
+      } else {
+        retractSidebar();
+      }
+    } else {
+      location.reload();
     }
   });
 
   $("#sidebar").mCustomScrollbar({ theme: "minimal" });
   $("#dismiss, .overlay").on("click", function () {
-    $(".sidebarCollapse .close").removeClass("active");
-    $(".sidebarCollapse .open").addClass("active");
-    $("#sidebar").removeClass("active");
-    $(".overlay").removeClass("active");
+    retractSidebar();
   });
 
   $(".sidebarCollapse").on("click", function () {
@@ -134,10 +220,7 @@ $(document).ready(function () {
       $(".collapse.in").toggleClass("in");
       $("a[aria-expanded=true]").attr("aria-expanded", "false");
     } else {
-      $(".sidebarCollapse .close").removeClass("active");
-      $(".sidebarCollapse .open").addClass("active");
-      $("#sidebar").removeClass("active");
-      $(".overlay").removeClass("active");
+      retractSidebar();
     }
   });
 });
@@ -185,27 +268,6 @@ if (deviceBelonging) {
       "Desember",
     ][parseInt(buffer[1]) - 1];
     return buffer[2] + " " + month + " " + buffer[0];
-  }
-  function requestAJAX(fileName, jsonobject, callback = function () {}) {
-    var xhr = new XMLHttpRequest();
-    var json = JSON.stringify(jsonobject);
-    xhr.open("POST", "api/" + fileName + ".php");
-    xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
-    xhr.send(json);
-    xhr.onload = function () {
-      if (xhr.status == 200 && xhr.readyState == 4) {
-        callback(xhr.responseText);
-      }
-    };
-  }
-  function getMeta(metaName) {
-    const metas = document.getElementsByTagName("meta");
-    for (let i = 0; i < metas.length; i++) {
-      if (metas[i].getAttribute("name") === metaName) {
-        return metas[i].getAttribute("content");
-      }
-    }
-    return "";
   }
 
   function getBondKey() {
@@ -1713,7 +1775,7 @@ if (deviceBelonging) {
                   token: getMeta("token"),
                 },
                 function (response) {
-                  if (response.success) {
+                  if (response) {
                     bootbox.alert({
                       size: "large",
                       title: "Berhasil menghapus",
@@ -1815,10 +1877,6 @@ if (deviceBelonging) {
           bondKey: bondKey,
           token: getMeta("token"),
         });
-      // Enable popover
-
-      $('[data-toggle="popover"]').unbind().removeData();
-      $('[data-toggle="popover"]').popover({ html: true });
 
       $("#ckp, #cki, #ckd, #hkp, #hki, #hkd, #cba, #cbb, #hba, #hbb")
         .unbind()

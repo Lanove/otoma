@@ -72,43 +72,18 @@ if ($fetchResult) {
     <nav id="sidebar">
       <ul class="list-unstyled components">
         <li>
-          <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+          <a href="#" id="goHome">
             <i class="fas fa-home"></i>
             Home</a>
-          <ul class="collapse list-unstyled" id="homeSubmenu">
-            <li>
-              <a href="#">Home 1</a>
-            </li>
-            <li>
-              <a href="#">Home 2</a>
-            </li>
-            <li>
-              <a href="#">Home 3</a>
-            </li>
-          </ul>
         </li>
         <li>
-          <a href="#"><i class="fas fa-briefcase"></i> About</a>
+          <a href="#"><i class="fas fa-user-circle"></i> Akun</a>
         </li>
         <li>
-          <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><i class="fas fa-copy"></i> Pages</a>
-          <ul class="collapse list-unstyled" id="pageSubmenu">
-            <li>
-              <a href="#">Page 1</a>
-            </li>
-            <li>
-              <a href="#">Page 2</a>
-            </li>
-            <li>
-              <a href="#">Page 3</a>
-            </li>
-          </ul>
+          <a href="#"><i class="fas fa-question-circle"></i> Bantuan</a>
         </li>
         <li>
-          <a href="#"><i class="fas fa-image"></i> Portfolio</a>
-        </li>
-        <li>
-          <a href="#"><i class="fas fa-paper-plane"></i> Contact</a>
+          <a href="#" id="contactUs"><i class="fas fa-paper-plane"></i> Kontak Kami</a>
         </li>
       </ul>
     </nav>
