@@ -15,6 +15,11 @@
 
         .contact-info h2 {
             margin-bottom: 10%;
+            color: white;
+        }
+
+        .contact-info h5 {
+            color: white;
         }
 
         .col-md-9 {
@@ -106,7 +111,9 @@
                 }
             }
         </script>
-        <div class="row">
+        <div class="row" style="-webkit-box-shadow: 0px 0px 53px 4px rgba(0,0,0,0.36);
+-moz-box-shadow: 0px 0px 53px 4px rgba(0,0,0,0.36);
+box-shadow: 0px 0px 53px 4px rgba(0,0,0,0.36);border-radius:0.5rem;">
             <div class="col-md-3">
                 <div class="contact-info" style="
     text-align: center;

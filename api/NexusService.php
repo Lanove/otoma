@@ -85,8 +85,18 @@ function updateName($arg, $dbC)
     $bondKey = $arg["bondKey"];
     if (isset($arg["docchi"]) && isset($arg["name"])) {
         if ($arg["docchi"] == "master") {
-            $dbC->runQuery("UPDATE bond SET masterName=:masterName WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "masterName" => $arg["name"]]);
+            $arg["name"] = filter_var($arg["name"], FILTER_SANITIZE_STRING);
+            $validFlag = true;
+            $fetchResult = $dbC->runQuery("SELECT masterName FROM bond WHERE username = :username;", ["username" => $arg["username"]], "ALL");
+            foreach ($fetchResult as $k) {
+                if (strtolower($k["masterName"]) === strtolower($arg["name"])) $validFlag = false;
+            }
+            if ($validFlag)
+                $dbC->runQuery("UPDATE bond SET masterName=:masterName WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "masterName" => $arg["name"]]);
+            echo json_encode(["duplicate" => !$validFlag]);
         } else if ($arg["docchi"] == "aux" && isset($arg["name"][0]) && isset($arg["name"][1])) {
+            $arg["name"][0] = filter_var($arg["name"][0], FILTER_SANITIZE_STRING);
+            $arg["name"][1] = filter_var($arg["name"][1], FILTER_SANITIZE_STRING);
             $dbC->runQuery("UPDATE nexusbond SET auxName1=:auxName1, auxName2=:auxName2 WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "auxName1" => $arg["name"][0], "auxName2" => $arg["name"][1]]);
         }
     }
@@ -337,7 +347,7 @@ function changeSetpoint($arg, $dbC)
         $data = $arg["data"];
         $bondKey = $arg["bondKey"];
         if (is_numeric($data) && $data >= 0 && $data <= 100) {
-            $dbC->runQuery("UPDATE nexusbond SET sp='{$data}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+            $dbC->runQuery("UPDATE nexusbond SET sp=:data WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "data" => $data]);
         }
     }
 }
@@ -417,7 +427,9 @@ function submitParameter($arg, $dbC)
             $columnName !== "" &&
             !$failed
         ) {
-            $dbC->runQuery("UPDATE nexusbond SET {$columnName}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+
+            $stringBuffer = filter_var($stringBuffer, FILTER_SANITIZE_STRING);
+            $dbC->runQuery("UPDATE nexusbond SET {$columnName}=:stringBuffer WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "stringBuffer" => $stringBuffer]);
             $callback = $dbC->runQuery("SELECT heaterPar,coolerPar FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
             $callback["heaterPar"] = explode("%", $callback["heaterPar"]);
             for ($m = 0; $m < 2; $m++) {
@@ -483,7 +495,8 @@ function modeSwitch($arg, $dbC)
             $stringBuffer !== "" &&
             $columnName !== ""
         ) {
-            $dbC->runQuery("UPDATE nexusbond SET {$columnName}='{$stringBuffer}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+            $stringBuffer = filter_var($stringBuffer, FILTER_SANITIZE_STRING);
+            $dbC->runQuery("UPDATE nexusbond SET {$columnName}=:data WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "data" => $stringBuffer]);
         }
     }
 }

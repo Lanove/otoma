@@ -13,7 +13,16 @@
 // }
 require "api/DatabaseController.php";
 $dbHandler = new DatabaseController;
-$dbHandler->runQuery("DELETE FROM bond WHERE bondKey='HSVAg7zWFs';", []);
+// $dbHandler->runQuery("DELETE FROM bond WHERE bondKey='HSVAg7zWFs';", []);
+
+$fetchResult = $dbHandler->runQuery("SELECT masterName FROM bond WHERE username = :bondKey;", ["bondKey" => "userid907"], "ALL");
+// print_r($fetchResult);
+foreach ($fetchResult as $k) {
+    echo $k["masterName"];
+    // echo $fetchResult[$k]["masterName"];
+    echo "<br>";
+    // if ($k == $arg["name"]) $validFlag = false;
+}
 // $fetchResult = $dbHandler->runQuery("SELECT thercoInfo,heaterInfo,coolerInfo FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => "6f278959a8"]);
 // $fetchResult["thercoInfo"] = explode("%", $fetchResult["thercoInfo"]);
 // print_r($fetchResult["thercoInfo"]);

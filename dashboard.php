@@ -77,10 +77,10 @@ if ($fetchResult) {
             Home</a>
         </li>
         <li>
-          <a href="#"><i class="fas fa-user-circle"></i> Akun</a>
+          <a href="#" id="goAccount"><i class="fas fa-user-circle"></i> Akun</a>
         </li>
         <li>
-          <a href="#"><i class="fas fa-question-circle"></i> Bantuan</a>
+          <a href="#" id="goHelp"><i class="fas fa-question-circle"></i> Bantuan</a>
         </li>
         <li>
           <a href="#" id="contactUs"><i class="fas fa-paper-plane"></i> Kontak Kami</a>
@@ -155,6 +155,8 @@ if ($fetchResult) {
   <script type="text/javascript" src="js/i18n/anypicker-i18n-id.js"></script>
   <!-- Bootbox -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.4.0/bootbox.min.js" integrity="sha512-8vfyGnaOX2EeMypNMptU+MwwK206Jk1I/tMQV4NkhOz+W8glENoMhGyU6n/6VgQUhQcJH8NqQgHhMtZjJJBv3A==" crossorigin="anonymous"></script>
+  <!-- echarts.js -->
+  <script type="text/javascript" src="js/accordiom.min.js"></script>
 
   <script src="js/dashboard.js?<?php echo date('l jS \of F Y h:i:s A'); ?>"></script>
 </body>

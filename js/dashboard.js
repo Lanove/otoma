@@ -1,5 +1,19 @@
 var deviceBelonging = $("#bigdevicebox");
 
+$.fn.animateRotate = function (start, end, duration, easing, complete) {
+  var args = $.speed(duration, easing, complete);
+  var step = args.step;
+  return this.each(function (i, e) {
+    args.complete = $.proxy(args.complete, e);
+    args.step = function (now) {
+      $.style(e, "transform", "rotate(" + now + "deg)");
+      if (step) return step.apply(e, arguments);
+    };
+
+    $({ deg: start }).animate({ deg: end }, args);
+  });
+};
+
 function requestAJAX(fileName, jsonobject, callback = function () {}) {
   var xhr = new XMLHttpRequest();
   var json = JSON.stringify(jsonobject);
@@ -107,7 +121,6 @@ $(window).on("resize", function () {
 });
 
 $(document).ready(function () {
-  $('[data-toggle="popover"]').popover({ html: true });
   const retractSidebar = function () {
     $(".sidebarCollapse .close").removeClass("active");
     $(".sidebarCollapse .open").addClass("active");
@@ -131,56 +144,205 @@ $(document).ready(function () {
   if (!deviceBelonging.length) {
     $(".absolute-overlay").addClass("loaded");
   }
-  $("#contactUs").click(function () {
+  $("#contactUs, #goHelp, #goAccount").click(function () {
+    const id = this.id;
     $(".absolute-overlay").removeClass("loaded");
     $("#content").html("");
-    $("#content").load("pagecon/contact-us.php", function (
-      responseTxt,
-      statusTxt,
-      xhr
-    ) {
+    var pageCon = "";
+    if (id == "contactUs") pageCon = "pagecon/contact-us.php";
+    else if (id == "goHelp") pageCon = "pagecon/help-page.php";
+    else if (id == "goAccount") pageCon = "pagecon/account-setting.php";
+    $("#content").load(pageCon, function (responseTxt, statusTxt, xhr) {
       if (statusTxt == "success") {
-        $("#submitContact").click(function () {
-          if (
-            $("#nameContact").val() != "" &&
-            $("#phoneContact").val() != "" &&
-            $("#emailContact").val() != "" &&
-            $("#messageContact").val() != ""
-          ) {
+        if (id == "contactUs") {
+          $("#submitContact").click(function () {
+            if (
+              $("#nameContact").val() != "" &&
+              $("#phoneContact").val() != "" &&
+              $("#emailContact").val() != "" &&
+              $("#messageContact").val() != ""
+            ) {
+              requestAJAX(
+                "GlobalService",
+                {
+                  requestType: "submitMessage",
+                  token: getMeta("token"),
+                  name: $("#nameContact").val(),
+                  phone: $("#phoneContact").val(),
+                  email: $("#emailContact").val(),
+                  message: $("#messageContact").val(),
+                },
+                function (response) {
+                  $("#nameContact").val("");
+                  $("#phoneContact").val("");
+                  $("#emailContact").val("");
+                  $("#messageContact").val("");
+                  $("#notifContact").text("Pesan terkirim!");
+                }
+              );
+            } else {
+              $("#notifContact").text(
+                "Gagal mengirim pesan, terdapat form isian yang belum di isi"
+              );
+            }
+            setTimeout(function () {
+              $("#notifContact").text("");
+            }, 15000);
+          });
+          $("#xEr").popover();
+          $("#xeR").popover();
+          $(".absolute-overlay").addClass("loaded");
+        } else if (id == "goAccount") {
+          requestAJAX(
+            "GlobalService",
+            {
+              requestType: "requestEmail",
+              token: getMeta("token"),
+            },
+            function (response) {
+              $("#ACemail").val(response);
+            }
+          );
+          $("#ACpasswordSubmit").click(function () {
+            $("#ACpasswordNotif").removeClass();
+            $("#ACpasswordNotif").text("Memproses permintaan anda...");
             requestAJAX(
               "GlobalService",
               {
-                requestType: "submitMessage",
+                requestType: "passwordChange",
                 token: getMeta("token"),
-                name: $("#nameContact").val(),
-                phone: $("#phoneContact").val(),
-                email: $("#emailContact").val(),
-                message: $("#messageContact").val(),
+                oldPw: $("#ACpasswordLama").val(),
+                newPw: $("#ACpasswordBaru").val(),
+                confPw: $("#ACconfirmBaru").val(),
               },
               function (response) {
-                $("#nameContact").val("");
-                $("#phoneContact").val("");
-                $("#emailContact").val("");
-                $("#messageContact").val("");
-                $("#notifContact").text("Pesan terkirim!");
+                const parseJson = JSON.parse(response);
+                if (parseJson.status == "failure")
+                  $("#ACpasswordNotif").addClass("tfailed");
+                else if (parseJson.status == "success")
+                  $("#ACpasswordNotif").addClass("tsucceed2");
+                $("#ACpasswordNotif").text(parseJson.message);
               }
             );
-          } else {
-            $("#notifContact").text(
-              "Gagal mengirim pesan, terdapat form isian yang belum di isi"
+
+            setTimeout(function () {
+              $("#ACpasswordNotif").text("");
+            }, 15000);
+          });
+
+          $("#ACdelete").click(function () {
+            bootbox.prompt({
+              message: `Aksi ini tidak dapat dipulihkan. Seluruh informasi yang terhubung dengan akun ini akan terhapus seluruhnya. Mohon masukkan password anda dengan benar apabila anda yakin.`,
+              title: "Apakah anda yakin ingin menghapus akun ini?",
+              inputType: "password",
+              buttons: {
+                cancel: {
+                  label: '<i class="fa fa-times"></i> Tidak',
+                  className: "btn-secondary",
+                },
+                confirm: {
+                  label: '<i class="fa fa-check"></i> Ya',
+                  className: "btn-danger",
+                },
+              },
+              callback: function (result) {
+                if (result != null) {
+                  requestAJAX(
+                    "GlobalService",
+                    {
+                      requestType: "deleteAccount",
+                      token: getMeta("token"),
+                      password: result,
+                    },
+                    function (response) {
+                      const parseJson = JSON.parse(response);
+                      bootbox.alert({
+                        size: "large",
+                        title: parseJson.title,
+                        message: parseJson.message,
+                        closeButton: false,
+                        buttons: {
+                          ok: {
+                            label: "Tutup",
+                          },
+                        },
+                      });
+                      if (parseJson.status == "success")
+                        setTimeout(function () {
+                          window.location.replace("logout.php");
+                        }, 3000);
+                    }
+                  );
+                }
+              },
+            });
+          });
+          $("#ACemailSubmit").click(function () {
+            $("#ACemailNotif").removeClass();
+            $("#ACemailNotif").text("Memproses permintaan anda...");
+            requestAJAX(
+              "GlobalService",
+              {
+                requestType: "emailChange",
+                token: getMeta("token"),
+                email: $("#ACemail").val(),
+              },
+              function (response) {
+                const parseJson = JSON.parse(response);
+                if (parseJson.status == "failure")
+                  $("#ACemailNotif").addClass("tfailed");
+                else if (parseJson.status == "success")
+                  $("#ACemailNotif").addClass("tsucceed2");
+                $("#ACemailNotif").text(parseJson.message);
+              }
             );
-          }
-          setTimeout(function () {
-            $("#notifContact").text("");
-          }, 5000);
-        });
+
+            setTimeout(function () {
+              $("#ACemailNotif").text("");
+            }, 15000);
+          });
+
+          $(".absolute-overlay").addClass("loaded");
+        } else if (id == "goHelp") {
+          $("#main-accordion").accordiom({
+            autoClosing: false,
+            showFirstItem: false,
+            onLoad: function (accordionButton) {
+              $(".absolute-overlay").addClass("loaded");
+            },
+
+            beforeChange: function () {
+              const status = $(this).is(".on");
+              $(this)
+                .find(".caret")
+                .animateRotate(status * 180, status * 180 + 180, 500);
+            },
+
+            afterchange: function () {
+              console.log("hoho");
+            },
+          });
+
+          $("#sub-accordion1, #sub-accordion2, #sub-accordion3").accordiom({
+            showFirstItem: false,
+            beforeChange: function () {
+              const status = $(this).is(".on");
+              $(this)
+                .find(".caret")
+                .animateRotate(status * 180, status * 180 + 180, 500);
+            },
+
+            onLoad: function (accordionButton) {
+              console.log("WOW");
+            },
+          });
+        }
         retractSidebar();
-        $(".absolute-overlay").addClass("loaded");
       }
     });
   });
   $("#otomaIcon, #goHome").on("click", function () {
-    if (deviceBelonging) {
+    if (deviceBelonging.length) {
       if (
         deviceBelonging.hasClass("nexusdevice") &&
         !$("#nexus-dashboard").length
@@ -1411,7 +1573,7 @@ if (deviceBelonging) {
           setTimeout(function () {
             $(spanId).removeClass();
             $(spanId).text("");
-          }, 5000);
+          }, 15000);
         }
       );
     }
@@ -1758,7 +1920,7 @@ if (deviceBelonging) {
           buttons: {
             cancel: {
               label: '<i class="fa fa-times"></i> Tidak',
-              className: "bootBoxCancelButton",
+              className: "btn-secondary",
             },
             confirm: {
               label: '<i class="fa fa-check"></i> Ya',
@@ -1817,7 +1979,7 @@ if (deviceBelonging) {
             setTimeout(function () {
               $("#infoAuxName").removeClass();
               $("#infoAuxName").text("");
-            }, 5000);
+            }, 15000);
           }
         );
       });
@@ -1825,26 +1987,41 @@ if (deviceBelonging) {
       $("#submitEdit").unbind().removeData();
       $("#submitEdit").click(function () {
         $("#infoName").removeClass();
-        $("#infoName").text("Mengupdate ke database...");
-        requestAJAX(
-          "NexusService",
-          {
-            requestType: "updateName",
-            docchi: "master",
-            name: $("#deviceNameEdit").val(),
-            bondKey: getBondKey(),
-            token: getMeta("token"),
-          },
-          function (response) {
-            $("#deviceName").text($("#deviceNameEdit").val());
-            $("#infoName").addClass("tsucceed2");
-            $("#infoName").text("Sukses mengupdate");
-            setTimeout(function () {
-              $("#infoName").removeClass();
-              $("#infoName").text("");
-            }, 5000);
-          }
-        );
+        if ($("#deviceNameEdit").val() != $("#deviceName").text()) {
+          $("#infoName").text("Mengupdate ke database...");
+          requestAJAX(
+            "NexusService",
+            {
+              requestType: "updateName",
+              docchi: "master",
+              name: $("#deviceNameEdit").val(),
+              bondKey: getBondKey(),
+              token: getMeta("token"),
+            },
+            function (response) {
+              if (JSON.parse(response).duplicate == false) {
+                $("#deviceName").text($("#deviceNameEdit").val());
+                $("#infoName").addClass("tsucceed2");
+                $("#infoName").text("Sukses mengupdate");
+              } else {
+                $("#infoName").addClass("tfailed");
+                $("#infoName").text(
+                  "Gagal mengubah nama, nama ini sudah terambil oleh kontroller lain yang anda miliki"
+                );
+              }
+            }
+          );
+        } else {
+          $("#infoName").addClass("tfailed");
+          $("#infoName").text(
+            "Gagal mengubah nama, nama yang diupdate sama dengan nama lama"
+          );
+        }
+
+        setTimeout(function () {
+          $("#infoName").removeClass();
+          $("#infoName").text("");
+        }, 15000);
       });
       requestAJAX(
         "NexusService",
@@ -2065,6 +2242,8 @@ if (deviceBelonging) {
           !(this.name == "cmode" || this.name == "hmode")
         );
       });
+
+      $('[data-toggle="popover"]').popover({ html: true });
     }
 
     var prevInput = {};
@@ -2080,7 +2259,6 @@ if (deviceBelonging) {
           xhr
         ) {
           if (statusTxt == "success") {
-            console.log("success");
             $(".absolute-overlay").addClass("loaded");
             nexusSettingLoad();
           }
