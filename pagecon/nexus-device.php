@@ -3,7 +3,7 @@
     <div class="row" id="deviceheader">
         <div class="col-12">
             <div class="row">
-                <div class="col-12 d-inline-flex align-items-center">
+                <div class="col-12 d-inline-flex align-items-center" style="overflow-wrap:anywhere;">
                     <div class="dropdown">
                         <a href="#" data-toggle="dropdown">
                             <p class="text"></p>

@@ -14,10 +14,10 @@ class DatabaseController
         "jG4UbPDhLXh23Lev8vZN"
     );
 
-    private $host = "127.0.0.1";
-    private $name   = "somecooldb";
-    private $user = "root";
-    private $pass = "";
+    private $host = "localhost:3306";
+    private $name   = "otomamyi_otomadatabase";
+    private $user = "otomamyi";
+    private $pass = "H5TQ2G83CFR";
     private $row;
     private $errorCode = "";
 
@@ -36,6 +36,7 @@ class DatabaseController
             $this->database = new PDO("mysql:host=$this->host;dbname=$this->name", $this->user, $this->pass, $this->options);
         } catch (PDOException $e) {
             $error_message = $e->getMessage();
+            print_r($e);
         }
     }
     function runQuery($query, $param_array, $fetchMode = "SINGLE")

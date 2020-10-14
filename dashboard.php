@@ -1,7 +1,5 @@
 <?php
 // https://phpsecurity.readthedocs.io/en/latest/Cross-Site-Scripting-(XSS).html
-require "nocache.php";
-
 // Initialize the session
 require_once "api/authCookieSessionValidate.php";
 
@@ -50,7 +48,7 @@ if ($fetchResult) {
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous" />
 
   <!-- Our Custom CSS -->
-  <link rel="stylesheet" type="text/css" href="style/style.css?<?php echo date('l jS \of F Y h:i:s A'); ?>" />
+  <link rel="stylesheet" type="text/css" href="style/style.css" />
   <!-- Scrollbar Custom CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css" />
 </head>
@@ -149,8 +147,8 @@ if ($fetchResult) {
   <!-- echarts.js -->
   <script type="text/javascript" src="js/echarts.min.js"></script>
   <!-- Anypicker -->
-  <link rel="stylesheet" type="text/css" href="style/anypicker-font.css?<?php echo date('l jS \of F Y h:i:s A'); ?>" />
-  <link rel="stylesheet" type="text/css" href="style/anypicker.css?<?php echo date('l jS \of F Y h:i:s A'); ?>" />
+  <link rel="stylesheet" type="text/css" href="style/anypicker-font.css" />
+  <link rel="stylesheet" type="text/css" href="style/anypicker.css" />
   <script type="text/javascript" src="js/anypicker.js"></script>
   <script type="text/javascript" src="js/i18n/anypicker-i18n-id.js"></script>
   <!-- Bootbox -->
@@ -158,7 +156,7 @@ if ($fetchResult) {
   <!-- echarts.js -->
   <script type="text/javascript" src="js/accordiom.min.js"></script>
 
-  <script src="js/dashboard.js?<?php echo date('l jS \of F Y h:i:s A'); ?>"></script>
+  <script src="js/dashboard.js"></script>
 </body>
 
 </html>

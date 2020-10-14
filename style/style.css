@@ -884,6 +884,7 @@ body {
 }
 
 #dashboard .auxheader {
+  overflow-wrap:anywhere;
   background-color: var(--third-color);
   border-radius: 10px 10px 10px 10px;
   max-width: 100%;

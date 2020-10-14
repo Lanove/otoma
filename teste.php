@@ -1,45 +1,59 @@
 <?php
-// $bruh = null;
-// preg_match_all("/\d+/", "duck", $bruh);
-// if (is_numeric($bruh[0][1])) {
-//     print_r($bruh);
-// }
-// $date = "2020-12-31";
-// $date = explode("-", $date);
-// if (!empty($date[0]) && !empty($date[1]) && !empty($date[2]) && is_numeric($date[0]) && is_numeric($date[1]) && is_numeric($date[2]) && $date[0] > 1970 && $date[0] < 2100 && $date[1] > 0 && $date[1] < 13 && $date[2] > 0 && $date[2] < 33) {
-//   echo "correct date";
-// } else {
-//   echo "invalid date";
-// }
-require "api/DatabaseController.php";
-$dbHandler = new DatabaseController;
-// $dbHandler->runQuery("DELETE FROM bond WHERE bondKey='HSVAg7zWFs';", []);
+$echoBack = "";
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $json = json_decode(file_get_contents('php://input'), true); // Get JSON Input from AJAX and decode it to PHP Array
+    if (isset($json["username"]) && isset($json["password"]) && isset($json["devicetoken"]) && isset($json["softssid"]) && isset($json["softpw"])) {
+        $username = $json["username"];
+        $password = $json["password"];
+        $deviceToken = $json["devicetoken"];
+        $softSSID = $json["softssid"];
+        $softPW = $json["softpw"];
+        require "DatabaseController.php";
+        $dbHandler = new DatabaseController();
 
-$fetchResult = $dbHandler->runQuery("SELECT masterName FROM bond WHERE username = :bondKey;", ["bondKey" => "userid907"], "ALL");
-// print_r($fetchResult);
-foreach ($fetchResult as $k) {
-    echo $k["masterName"];
-    // echo $fetchResult[$k]["masterName"];
-    echo "<br>";
-    // if ($k == $arg["name"]) $validFlag = false;
+        // Identify if the sender token exist in database.
+        $fetchResult = $dbHandler->runQuery("SELECT deviceToken,deviceType FROM device WHERE deviceToken = :deviceToken", ["deviceToken" => $deviceToken]);
+
+        if (!$fetchResult) {
+            $echoBack = "illegal"; // Return as unregistered device
+        } else {
+            $deviceType = $fetchResult["deviceType"];
+            // Check if User credential is valid
+            $fetchResult = $dbHandler->runQuery("SELECT id, username, password FROM users WHERE username = :name", ["name" => $username]);
+            if ($fetchResult) { // If username with passed value exist, then
+                $hashedPassword = $fetchResult["password"];
+                // Verify password entered by user from ESP8266 or device
+                if (password_verify($password, $hashedPassword)) {
+                    // Check for bond relation of user
+                    // Condition 1 : If device already had a bond with other user than applying user, then refuse the connection.
+                    // Condition 2 : If device already had a bond with applyting user, then just connect the device.
+                    // Condition 3 : If device does not have any bond beforehand, then create a new bond with applying user.
+                    $fetchResult = $dbHandler->runQuery("SELECT * FROM bond WHERE deviceToken = :deviceToken", ["deviceToken" => $deviceToken]);
+
+                    if ($fetchResult) { // It seems that applying device already had a bond
+                        if ($fetchResult["username"] != $username) { // Condition 1 : If device already had a bond with other user than applying user, then refuse the connection.
+                            $echoBack = "used"; // Not bond owner, return duplicate error
+                        } else { // Condition 2 : If device already had a bond with applyting user, then just connect the device.
+                            $echoBack = "recon"; // Bond owner, connect device to server.   
+                        }
+                    } else { // Condition 3 : If device does not have any bond beforehand, then create a new bond with applying user.
+                        $echoBack = "success";
+                        $bondKey = bin2hex(random_bytes(5)); // Create a 10 length random string for bondKey
+                        // Initialize bond with user
+                        $dbHandler->runQuery("INSERT INTO bond(username, deviceToken,deviceType, bondKey, masterName,softSSID,softPass) VALUES (:username, :token, :type, :bondKey, :masterName, :softSSID, :softPass)", ["username" => $username, "token" => $deviceToken, "type" => $deviceType, "bondKey" => $bondKey, "masterName" => $bondKey, "softSSID" => $softSSID, "softPass" => $softPW]);
+                        // Device type specific table row insert
+                        if ($deviceType == "nexus") {
+                            $dbHandler->runQuery("INSERT INTO nexusbond(username, bondKey) VALUES (:username, :bondKey)", ["username" => $username, "bondKey" => $bondKey]);
+                        }
+                    }
+                } else { // Wrong password is inserted, oops...
+                    $echoBack = "wrongpw";
+                }
+            } else { // It was unregistered username, oops...
+                $echoBack = "wrongid";
+            }
+        }
+    } else
+        $echoBack = "smwrong";
+    echo $echoBack;
 }
-// $fetchResult = $dbHandler->runQuery("SELECT thercoInfo,heaterInfo,coolerInfo FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => "6f278959a8"]);
-// $fetchResult["thercoInfo"] = explode("%", $fetchResult["thercoInfo"]);
-// print_r($fetchResult["thercoInfo"]);
-// $o = 0;
-// $fetchResult = $dbHandler->runQuery("SELECT table_name AS 'Table',
-// ROUND(((data_length + index_length) / 1024), 2) AS 'Size (KB)'
-// FROM information_schema.TABLES
-// WHERE table_schema = 'somecooldb'
-// ORDER BY (data_length + index_length) DESC;", [], "ALL");
-// foreach ($fetchResult as $i) {
-//   print_r($i);
-//   echo "<br>";
-// }
-// $dbHandler->runQuery("INSERT INTO nexusplot (bondKey, date, timestamp, deviceType, data1, data2, data3, data4, data5, data6, data7, data8) VALUES (:bondKey, :now, :timej, 'nexus', :d1, :d2, :d3, :d4, :d5, :d6, :d7, :d8);", ["bondKey" => "'`'\"`'`'`'`", "now" => "2020-09-25", "timej" => ":00", "d1" => rand(30, 40), "d2" => rand(60, 90), "d3" => rand(20, 40), "d4" => rand(20, 40), "d5" => rand(20, 40), "d6" => rand(20, 40), "d7" => rand(20, 40), "d8" => rand(20, 40)]);
-
-// for ($i = 0; $i < 24; $i++) {
-//     for ($x = 0; $x < 20; $x++) {
-//         $dbHandler->runQuery("INSERT INTO nexusplot (bondKey, date, timestamp, deviceType, data1, data2, data3, data4, data5, data6, data7, data8) VALUES (:bondKey, :now, :timej, 'nexus', :d1, :d2, :d3, :d4, :d5, :d6, :d7, :d8);", ["bondKey" => "6f278959a8", "now" => "2020-09-26", "timej" => $i . ":" . ($x * 3) . ":00", "d1" => rand(30, 40), "d2" => rand(60, 90), "d3" => rand(20, 40), "d4" => rand(20, 40), "d5" => rand(20, 40), "d6" => rand(20, 40), "d7" => rand(20, 40), "d8" => rand(20, 40)]);
-//     }
-// }

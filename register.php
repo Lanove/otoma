@@ -1,6 +1,4 @@
 <?php
-require "nocache.php";
-
 // Include config file
 session_start();
 
@@ -12,13 +10,13 @@ $message = array(
     "userempty" => "Tolong masukkan username",
     "passwordempty" => "Tolong masukkan password",
     "wrongpassword" => "Password salah",
-    "passwordtarinai" => "Panjang password minimal 8 huruf",
-    "usernametaken" => "Username telah terpakai oleh orang lain",
+    "passwordtarinai" => "Panjang password minimal 8 karakter",
+    "usernametaken" => "Username telah terpakai, mohon gunakan username lainnya",
     "confirmpasswordempty" => "Tolong masukkan konfirmasi password",
     "passwordnotmatch" => "Password dengan konfirmasi password tidak sama",
-    "passwordtoolong" => "Password terlalu panjang",
-    "usernametooshort" => "Jumlah karakter username harus lebih dari 3",
-    "usernametoolong" => "Jumlah karakter username harus kurang dari 33",
+    "passwordtoolong" => "Panjang password maksimal 64 karakter",
+    "usernametooshort" => "Panjang username minimal adalah 4 karakter",
+    "usernametoolong" => "Panjang username maksimal 32 karakter",
     "illegalusername" => "Username anda mengandung karakter ilegal",
 );
 
@@ -72,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $password_err = $message["passwordempty"];
             } elseif (strlen($password) < 8) {
                 $password_err = $message["passwordtarinai"];
-            } elseif (strlen($password) > 200) {
+            } elseif (strlen($password) > 65) {
                 $password_err = $message["passwordtoolong"];
             }
 
