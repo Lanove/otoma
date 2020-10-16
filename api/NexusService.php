@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
             } else { // bondKey related request is taken with privilege check.
                 if (isset($json["bondKey"])) {
                     // Check if user actually had a bond with bondKey holder
-                    $privilegeCheck = $dbController->runQuery("SELECT username FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $json["bondKey"]]);
+                    $privilegeCheck = $dbController->runQuery("SELECT username FROM bond WHERE bondKey = :bondkey;", ["bondkey" => $json["bondKey"]]);
                     if ($privilegeCheck["username"] === $json["username"]) {
                         if (($requestType === "loadPlot")) {
                             loadPlot($json, $dbController);

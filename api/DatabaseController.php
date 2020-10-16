@@ -14,10 +14,10 @@ class DatabaseController
         "jG4UbPDhLXh23Lev8vZN"
     );
 
-    private $host = "localhost:3306";
-    private $name   = "otomamyi_otomadatabase";
-    private $user = "otomamyi";
-    private $pass = "H5TQ2G83CFR";
+    private $host = "127.0.0.1";
+    private $name   = "somecooldb";
+    private $user = "root";
+    private $pass = "";
     private $row;
     private $errorCode = "";
 

@@ -712,8 +712,8 @@ if (deviceBelonging) {
         $("#goverlay p").text("");
         var chartData = { humidData: [], tempData: [], label: [] };
         for (c in plotData.data) {
-          chartData.tempData[c] = parseInt(plotData.data[c].data1);
-          chartData.humidData[c] = parseInt(plotData.data[c].data2);
+          chartData.tempData[c] = parseFloat(plotData.data[c].data1);
+          chartData.humidData[c] = parseFloat(plotData.data[c].data2);
           chartData.label[c] = plotData.data[c].timestamp.slice(0, 5);
         }
 
@@ -812,8 +812,8 @@ if (deviceBelonging) {
         components: [
           {
             component: 0,
-            name: "comparator",
-            label: "Comparator",
+            name: "operator",
+            label: "Operator",
             width: "50%",
             textAlign: "center",
           },
@@ -821,7 +821,7 @@ if (deviceBelonging) {
         dataSource: [
           {
             component: 0,
-            data: createTextDataSource(["<", ">", "<=", ">=", "!=", "=="]),
+            data: createTextDataSource(["<", ">", "<=", ">="]),
           },
         ],
       });
@@ -1662,14 +1662,7 @@ if (deviceBelonging) {
         );
       }
     }
-
-    function parameterReload(arg, long = false) {
-      // Self explanation
-      $("#tempnow").text(arg.tempNow + "°C");
-      $("#humidnow").text(arg.humidNow + "%");
-      $("#spvalue").text(arg.sp + "°C");
-      $("#spsetting").val(arg.sp);
-
+    function binarySwitch(arg, long) {
       // Adjust the position of switch based on database value
       $("#aux1Switch").prop("checked", Boolean(Number(arg.auxStatus1)));
       $("#aux2Switch").prop("checked", Boolean(Number(arg.auxStatus2)));
@@ -1679,15 +1672,6 @@ if (deviceBelonging) {
         $(`#thOverlay`).addClass("active");
       $("#heaterSwitch").prop("checked", Boolean(Number(arg.htStatus)));
       $("#coolerSwitch").prop("checked", Boolean(Number(arg.clStatus)));
-
-      // Get each data by splitting/exploding the string
-      arg.thercoInfo = arg.thercoInfo.split("%");
-      arg.heaterPar = arg.heaterPar.split("%");
-      arg.coolerPar = arg.coolerPar.split("%");
-      for (var i = 0; i < 2; i++) {
-        arg.heaterPar[i] = arg.heaterPar[i].split("/");
-        arg.coolerPar[i] = arg.coolerPar[i].split("/");
-      }
       // Adjust thermocontrols radio checked position based on database value
       $("input[name=operation][value='" + arg.thercoInfo[0] + "']").prop(
         "checked",
@@ -1709,6 +1693,29 @@ if (deviceBelonging) {
         "thermmode",
         false
       );
+    }
+
+    var switchUpdateMod = 0;
+    function parameterReload(arg, long = false) {
+      // Get each data by splitting/exploding the string
+      arg.thercoInfo = arg.thercoInfo.split("%");
+      arg.heaterPar = arg.heaterPar.split("%");
+      arg.coolerPar = arg.coolerPar.split("%");
+      for (var i = 0; i < 2; i++) {
+        arg.heaterPar[i] = arg.heaterPar[i].split("/");
+        arg.coolerPar[i] = arg.coolerPar[i].split("/");
+      }
+
+      switchUpdateMod++;
+      if (switchUpdateMod % 20 == 0) {
+        switchUpdateMod = 0;
+        binarySwitch(arg, long);
+      }
+      $("#tempnow").text(arg.tempNow + "°C");
+      $("#humidnow").text(arg.humidNow + "%");
+      $("#spvalue").text(arg.sp + "°C");
+      $("#spsetting").val(arg.sp);
+
       if (long) {
         $("input[name=hmode][value='" + arg.heaterMode + "']").prop(
           "checked",
@@ -1733,6 +1740,7 @@ if (deviceBelonging) {
         $("#hds").val(arg.heaterPar[0][3]);
         $("#hba").val(parseFloat(arg.heaterPar[1][1]).toFixed(2));
         $("#hbb").val(parseFloat(arg.heaterPar[1][0]).toFixed(2));
+        binarySwitch(arg, long);
       }
     }
 
@@ -2284,8 +2292,8 @@ if (deviceBelonging) {
         if (getBondKey() != "" && $("#nexus-dashboard").length) {
           reloadStatus();
         }
-        setTimeout(reload, 3000);
-      }, 3000);
+        setTimeout(reload, 8000);
+      }, 8000);
     });
 
     const check = setInterval(function () {
