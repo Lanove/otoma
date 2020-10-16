@@ -1,5 +1,5 @@
 <?php
-if (isset($_SERVER['HTTP_DEVICE_TOKEN'])) {
+if (isset($_SERVER['HTTP_DEVICE_TOKEN']) && $_SERVER["REQUEST_METHOD"] == "POST") {
     $json = json_decode(file_get_contents('php://input'), true); // Get JSON Input from AJAX and decode it to PHP Array
     if (isset($json["type"])) {
         $deviceToken = $_SERVER['HTTP_DEVICE_TOKEN'];
@@ -20,7 +20,6 @@ function updateTnHnS($bondKey, $json, $dbC)
     $fetchData =  $dbC->runQuery("SELECT * FROM nexusbond WHERE bondKey = ?;", [$bondKey]);
     $stringBuffer = "";
     $date = DateTime::createFromFormat('Y-m-d H:i:s', $fetchData["lastGraphUpdate"], new DateTimeZone('GMT'))->getTimeStamp();
-    echo $json["data"][0];
     if ((time() + 25200) - $date >= 60) {
         $stringBuffer = ", lastGraphUpdate='" . gmdate('Y-m-d H:i:s', (time() + 25200)) . "'";
         $dbC->runQuery("INSERT INTO nexusplot (bondKey,date,timestamp,deviceType,data1,data2) VALUES (?,?,?,?,?,?);", [$bondKey, gmdate("Y-m-d", $json["unix"]), gmdate("H:i:s", $json["unix"]), 'nexus', round($json["data"][0], 2), round($json["data"][1], 2)]);

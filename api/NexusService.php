@@ -133,7 +133,11 @@ function deleteProgram($arg, $dbC)
             $response["success"] = true;
         } else {
             if ($progNum > 0 && $progNum < 31) {
-                $dbC->runQuery("UPDATE nexusautomation SET exist='0', progData1='', progData2='', progData3='', progData4='', progData5='', progData6='', progData7='', progData8='' WHERE bondKey = :bondKey AND progNumber = :progNum;", ["bondKey" => $bondKey, "progNum" => $progNum]);
+                $fetchResult = $dbC->runQuery("SELECT updateBuffer FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                if (!(strpos($fetchResult["updateBuffer"], ("p" . $progNum)) !== false)) {
+                    $fetchResult["updateBuffer"] .= "p" . $progNum . ",";
+                }
+                $dbC->runQuery("UPDATE nexusautomation SET exist='0', progData1='', progData2='', progData3='', progData4='', progData5='', progData6='', progData7='', progData8='', updateAvailable='1', updateBuffer=:updateBuffer WHERE bondKey = :bondKey AND progNumber = :progNum;", ["bondKey" => $bondKey, "progNum" => $progNum, "updateBuffer" => $fetchResult["updateBuffer"]]);
                 $doubleCheck = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondKey AND progNumber = :progNumber;", ["bondKey" => $bondKey, "progNumber" => $progNum]);
                 if (
                     $doubleCheck["progData1"] == '' &&
@@ -197,6 +201,10 @@ function updateProgram($arg, $dbC) // Be careful, within this function there are
             VALUES ${stringBuffer};", []);
         }
         if ($validFlag) {
+            $fetchResult = $dbC->runQuery("SELECT updateBuffer FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+            if (!(strpos($fetchResult["updateBuffer"], ("p" . $progNum)) !== false)) {
+                $fetchResult["updateBuffer"] .= "p" . $progNum . ",";
+            }
             if (
                 $trigger == "Nilai Suhu" ||
                 $trigger == "Nilai Humiditas"
@@ -205,7 +213,7 @@ function updateProgram($arg, $dbC) // Be careful, within this function there are
                     isset($arg["passedData"]["nscmpCd"]) &&
                     isset($arg["passedData"]["nsvalCd"])
                 ) {
-                    $validComparator = array("<", ">", "<=", ">=", "!=", "==");
+                    $validComparator = array("<", ">", "<=", ">=");
                     $nscmp = $arg["passedData"]["nscmpCd"];
                     $nsval = (int)$arg["passedData"]["nsvalCd"];
                     $validFlag = false;
@@ -213,7 +221,8 @@ function updateProgram($arg, $dbC) // Be careful, within this function there are
                         if ($k == $nscmp) $validFlag = true;
                     }
                     if ($nsval >= 0 && $nsval <= 100 && $validFlag) {
-                        $dbC->runQuery("UPDATE nexusautomation SET exist='1',   progData1=:trigger, progData2=:action, progData3=:nscmp, progData4=:nsval, progData5='', progData6='', progData7='', progData8='' WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "nscmp" => $nscmp, "nsval" => $nsval, "bondKey" => $bondKey, "progNum" => $progNum]);
+
+                        $dbC->runQuery("UPDATE nexusautomation SET exist='1',   progData1=:trigger, progData2=:action, progData3=:nscmp, progData4=:nsval, progData5='', progData6='', progData7='', progData8='', updateAvailable='1', updateBuffer=:updateBuffer WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "nscmp" => $nscmp, "nsval" => $nsval, "bondKey" => $bondKey, "progNum" => $progNum, "updateBuffer" => $fetchResult["updateBuffer"]]);
                         $doubleCheck = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondKey AND progNumber = :progNumber;", ["bondKey" => $bondKey, "progNumber" => $progNum]);
                         if (
                             $doubleCheck["progData1"] == $trigger &&
@@ -253,7 +262,7 @@ function updateProgram($arg, $dbC) // Be careful, within this function there are
                             $sTimeTo[2] >= 0 && $sTimeTo[2] <= 59 &&
                             $tTimeFrom < $tTimeTo
                         ) {
-                            $dbC->runQuery("UPDATE nexusautomation SET exist='1',   progData1=:trigger, progData2=:action, progData3=:timeFrom, progData4=:timeTo, progData5='', progData6='', progData7='', progData8='' WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "timeFrom" => $timeFrom, "timeTo" => $timeTo, "bondKey" => $bondKey, "progNum" => $progNum]);
+                            $dbC->runQuery("UPDATE nexusautomation SET exist='1',   progData1=:trigger, progData2=:action, progData3=:timeFrom, progData4=:timeTo, progData5='', progData6='', progData7='', progData8='', updateAvailable='1', updateBuffer=:updateBuffer WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "timeFrom" => $timeFrom, "timeTo" => $timeTo, "bondKey" => $bondKey, "progNum" => $progNum, "updateBuffer" => $fetchResult["updateBuffer"]]);
 
                             $doubleCheck = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondKey AND progNumber = :progNumber;", ["bondKey" => $bondKey, "progNumber" => $progNum]);
 
@@ -285,7 +294,7 @@ function updateProgram($arg, $dbC) // Be careful, within this function there are
                         $nDateFrom >= 1577811600 && $nDateTo >= 1577811600 &&
                         $nDateFrom <= 1767200340 && $nDateTo <= 1767200340
                     ) {
-                        $dbC->runQuery("UPDATE nexusautomation SET exist='1',   progData1=:trigger, progData2=:action, progData3=:dateFrom, progData4=:dateTo, progData5='', progData6='', progData7='', progData8='' WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "dateFrom" => $dateFrom, "dateTo" => $dateTo, "bondKey" => $bondKey, "progNum" => $progNum]);
+                        $dbC->runQuery("UPDATE nexusautomation SET exist='1',   progData1=:trigger, progData2=:action, progData3=:dateFrom, progData4=:dateTo, progData5='', progData6='', progData7='', progData8='', updateAvailable='1', updateBuffer=:updateBuffer WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "dateFrom" => $dateFrom, "dateTo" => $dateTo, "bondKey" => $bondKey, "progNum" => $progNum, "updateBuffer" => $fetchResult["updateBuffer"]]);
 
                         $doubleCheck = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondKey AND progNumber = :progNumber;", ["bondKey" => $bondKey, "progNumber" => $progNum]);
 
@@ -308,7 +317,7 @@ function updateProgram($arg, $dbC) // Be careful, within this function there are
                             $sTimerCd[0][1] <= 23 && $sTimerCd[0][1] >= 0 &&
                             $sTimerCd[0][2] <= 59 && $sTimerCd[0][2] >= 0
                         ) {
-                            $dbC->runQuery("UPDATE nexusautomation SET exist='1',   progData1=:trigger, progData2=:action, progData3=:timerCd, progData4='', progData5='', progData6='', progData7='', progData8='' WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "timerCd" => $timerCd, "bondKey" => $bondKey, "progNum" => $progNum]);
+                            $dbC->runQuery("UPDATE nexusautomation SET exist='1',   progData1=:trigger, progData2=:action, progData3=:timerCd, progData4='', progData5='', progData6='', progData7='', progData8='', updateAvailable='1', updateBuffer=:updateBuffer WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "timerCd" => $timerCd, "bondKey" => $bondKey, "progNum" => $progNum, "updateBuffer" => $fetchResult["updateBuffer"]]);
 
                             $doubleCheck = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondKey AND progNumber = :progNumber;", ["bondKey" => $bondKey, "progNumber" => $progNum]);
 
@@ -327,7 +336,7 @@ function updateProgram($arg, $dbC) // Be careful, within this function there are
                             $component == "Thermocontrol") &&
                         ($condition == "Menyala" || $condition == "Mati")
                     ) {
-                        $dbC->runQuery("UPDATE nexusautomation SET exist='1', progData1=:trigger, progData2=:action, progData3=:component, progData4=:condition, progData5='', progData6='', progData7='', progData8='' WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "component" => $component, "condition" => $condition, "bondKey" => $bondKey, "progNum" => $progNum]);
+                        $dbC->runQuery("UPDATE nexusautomation SET exist='1', progData1=:trigger, progData2=:action, progData3=:component, progData4=:condition, progData5='', progData6='', progData7='', progData8='', updateAvailable='1', updateBuffer=:updateBuffer WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "component" => $component, "condition" => $condition, "bondKey" => $bondKey, "progNum" => $progNum, "updateBuffer" => $fetchResult["updateBuffer"]]);
 
                         $doubleCheck = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondKey AND progNumber = :progNumber;", ["bondKey" => $bondKey, "progNumber" => $progNum]);
 
@@ -347,7 +356,11 @@ function changeSetpoint($arg, $dbC)
         $data = $arg["data"];
         $bondKey = $arg["bondKey"];
         if (is_numeric($data) && $data >= 0 && $data <= 100) {
-            $dbC->runQuery("UPDATE nexusbond SET sp=:data WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "data" => $data]);
+            $fetchResult = $dbC->runQuery("SELECT updateBuffer FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+            if (!(strpos($fetchResult["updateBuffer"], "sp") !== false)) {
+                $fetchResult["updateBuffer"] .= "sp,";
+            }
+            $dbC->runQuery("UPDATE nexusbond SET sp=:data, updateAvailable='1', updateBuffer=:updateBuffer WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "data" => $data, "updateBuffer" => $fetchResult["updateBuffer"]]);
         }
     }
 }
@@ -361,7 +374,7 @@ function submitParameter($arg, $dbC)
         $stringBuffer = "";
         $columnName = "";
         $failed = true;
-        $fetchResult = $dbC->runQuery("SELECT heaterPar,coolerPar FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+        $fetchResult = $dbC->runQuery("SELECT heaterPar,coolerPar,updateBuffer FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
         if (($id === "submitcpid" || $id === "submithpid") &&
             isset($parameter[0]) &&
             isset($parameter[1]) &&
@@ -429,7 +442,11 @@ function submitParameter($arg, $dbC)
         ) {
 
             $stringBuffer = filter_var($stringBuffer, FILTER_SANITIZE_STRING);
-            $dbC->runQuery("UPDATE nexusbond SET {$columnName}=:stringBuffer WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "stringBuffer" => $stringBuffer]);
+            if (!(strpos($fetchResult["updateBuffer"], $columnName) !== false)) {
+                $fetchResult["updateBuffer"] .= $columnName . ",";
+            }
+            $dbC->runQuery("UPDATE nexusbond SET {$columnName}=:stringBuffer, updateAvailable='1', updateBuffer=:updateBuffer WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "stringBuffer" => $stringBuffer, "updateBuffer" => $fetchResult["updateBuffer"]]);
+
             $callback = $dbC->runQuery("SELECT heaterPar,coolerPar FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
             $callback["heaterPar"] = explode("%", $callback["heaterPar"]);
             for ($m = 0; $m < 2; $m++) {
@@ -458,7 +475,7 @@ function modeSwitch($arg, $dbC)
         $mode = $arg["mode"];
         $docchi = $arg["docchi"];
         $bondKey = $arg["bondKey"];
-        $fetchResult = $dbC->runQuery("SELECT thercoInfo FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+        $fetchResult = $dbC->runQuery("SELECT thercoInfo,updateBuffer FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
         $stringBuffer = "";
         $columnName = "";
         if (
@@ -496,7 +513,10 @@ function modeSwitch($arg, $dbC)
             $columnName !== ""
         ) {
             $stringBuffer = filter_var($stringBuffer, FILTER_SANITIZE_STRING);
-            $dbC->runQuery("UPDATE nexusbond SET {$columnName}=:data WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "data" => $stringBuffer]);
+            if (!(strpos($fetchResult["updateBuffer"], $columnName) !== false)) {
+                $fetchResult["updateBuffer"] .= $columnName . ",";
+            }
+            $dbC->runQuery("UPDATE nexusbond SET {$columnName}=:data, updateAvailable='1', updateBuffer=:updateBuffer WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "data" => $stringBuffer, "updateBuffer" => $fetchResult["updateBuffer"]]);
         }
     }
 }
@@ -518,7 +538,11 @@ function toggleSwitch($arg, $dbC)
             $columnData = "clStatus";
         else if ($id === "thSwitch")
             $columnData = "thStatus";
-        $dbC->runQuery("UPDATE nexusbond SET {$columnData}='{$status}' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+        $fetchResult = $dbC->runQuery("SELECT updateBuffer FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+        if (!(strpos($fetchResult["updateBuffer"], $columnData) !== false)) {
+            $fetchResult["updateBuffer"] .= $columnData . ",";
+        }
+        $dbC->runQuery("UPDATE nexusbond SET {$columnData}='{$status}', updateAvailable='1', updateBuffer=:updateBuffer WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "updateBuffer" => $fetchResult["updateBuffer"]]);
     }
 }
 function loadPlot($arg, $dbC)
@@ -576,7 +600,7 @@ function loadDeviceInformation($arg, $dbC)
         // Get every name of masterDevice with fetchAll
         $fetchResult["otherName"] = $dbC->runQuery("SELECT masterName FROM bond WHERE username = :name AND masterName != :exception ORDER BY id ASC;", ["name" => $arg["username"], "exception" => $fetchResult["deviceInfo"]["masterName"]], "ALL");
 
-        $fetchResult["nexusBond"] = $dbC->runQuery("SELECT * FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+        $fetchResult["nexusBond"] = $dbC->runQuery("SELECT bondKey,deviceType,auxName1,auxName2,auxStatus1,auxStatus2,thStatus,htStatus,clStatus,tempNow,humidNow,sp,thercoInfo,heaterMode,coolerMode,heaterPar,coolerPar,lastUpdate FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
         // Get the oldest record from daily plot data.
         $fetchResult["plot"]["oldest"] = $dbC->runQuery("SELECT MIN(date) AS oldestPlot FROM nexusplot WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
         // Get the newest record from daily plot data.

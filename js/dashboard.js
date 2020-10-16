@@ -318,9 +318,7 @@ $(document).ready(function () {
                 .animateRotate(status * 180, status * 180 + 180, 500);
             },
 
-            afterchange: function () {
-              console.log("hoho");
-            },
+            afterchange: function () {},
           });
 
           $("#sub-accordion1, #sub-accordion2, #sub-accordion3").accordiom({
@@ -332,9 +330,7 @@ $(document).ready(function () {
                 .animateRotate(status * 180, status * 180 + 180, 500);
             },
 
-            onLoad: function (accordionButton) {
-              console.log("WOW");
-            },
+            onLoad: function (accordionButton) {},
           });
         }
         retractSidebar();
@@ -588,16 +584,16 @@ if (deviceBelonging) {
                 const title = opt.title[0].text;
                 var table =
                   `
-                    <div style="position: absolute;top: 5px;right: 20px;" class="dropdown">
-                      <button  data-toggle="dropdown" type="button" class="btn btn-primary">
-                        Download <i class = 'fas fa-caret-down'></i>
-                      </button>
-                      <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#0" onclick="exportTableToCSV('dataview','${title}');">CSV</a>
-                        <a class="dropdown-item" href="#0" onclick="exportTableToExcel('dataview','${title}');">Excel</a>
-                      </div>
+                  <div style="position: absolute;top: 5px;right: 20px;" class="dropdown">
+                    <button  data-toggle="dropdown" type="button" class="btn btn-primary">
+                      Download <i class = 'fas fa-caret-down'></i>
+                    </button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item" href="#0" onclick="exportTableToCSV('dataview','${title}');">CSV</a>
+                      <a class="dropdown-item" href="#0" onclick="exportTableToExcel('dataview','${title}');">Excel</a>
                     </div>
-                  ` +
+                  </div>
+                ` +
                   '<table id="dataview" style="width:100%;text-align:center"><tbody><tr>' +
                   "<td></td>" +
                   "<td>Waktu:</td>" +
