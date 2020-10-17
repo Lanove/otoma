@@ -1847,7 +1847,32 @@ if (deviceBelonging) {
 
         // Draw a chart
         redrawChart(parseJson.plot);
-
+        if (
+          new Date().getTime() / 1000 -
+            new Date(parseJson.nexusBond.lastUpdate).getTime() / 1000 >=
+          300
+        ) {
+          parseJson.nexusBond.lastUpdate = parseJson.nexusBond.lastUpdate.split(
+            " "
+          );
+          setTimeout(function () {
+            bootbox.alert({
+              size: "large",
+              title: "Pemberitahuan",
+              message: `Kontroller anda dengan nama ${
+                parseJson.deviceInfo.masterName
+              } sudah tidak mengirim respon ke server selama lebih dari 5 menit, pastikan kontroller anda menyambung ke internet agar anda dapat mengkontrol atau mengupdate kontroller.\n Kontroller anda terakhir online pada ${convertToDateLong(
+                parseJson.nexusBond.lastUpdate[0]
+              )} ${parseJson.nexusBond.lastUpdate[1]}`,
+              closeButton: false,
+              buttons: {
+                ok: {
+                  label: "Tutup",
+                },
+              },
+            });
+          }, 3000);
+        }
         $("#conditional").html("");
         for (index in parseJson.programs) {
           const progNum = parseJson.programs[index].progNumber;
