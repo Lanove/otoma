@@ -655,6 +655,7 @@ if (deviceBelonging) {
           data: ["sampletext"],
         },
         yAxis: {
+          scale: true,
           type: "value",
           axisLabel: {
             fontSize: 14,
@@ -1859,11 +1860,11 @@ if (deviceBelonging) {
             bootbox.alert({
               size: "large",
               title: "Pemberitahuan",
-              message: `Kontroller anda dengan nama ${
+              message: `Kontroller anda dengan nama <b>${
                 parseJson.deviceInfo.masterName
-              } sudah tidak mengirim respon ke server selama lebih dari 5 menit, pastikan kontroller anda menyambung ke internet agar anda dapat mengkontrol atau mengupdate kontroller.\n Kontroller anda terakhir online pada ${convertToDateLong(
+              }</b> sudah tidak mengirim respon ke server selama lebih dari 5 menit, <b>pastikan kontroller anda menyambung ke internet</b> agar anda dapat mengkontrol atau mengupdate kontroller.<br>Kontroller anda terakhir online pada<b> ${convertToDateLong(
                 parseJson.nexusBond.lastUpdate[0]
-              )} ${parseJson.nexusBond.lastUpdate[1]}`,
+              )} ${parseJson.nexusBond.lastUpdate[1]}</b>`,
               closeButton: false,
               buttons: {
                 ok: {
@@ -1871,7 +1872,7 @@ if (deviceBelonging) {
                 },
               },
             });
-          }, 3000);
+          }, 2000);
         }
         $("#conditional").html("");
         for (index in parseJson.programs) {

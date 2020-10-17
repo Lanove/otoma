@@ -2,7 +2,6 @@
 <?php
 require "api/DatabaseController.php";
 $dbHandler = new DatabaseController();
-$lolo = "koko,lolo,asdf,";
-$lolo = rtrim($lolo, ", ");
-echo $lolo;
-print_r(explode(',', $lolo));
+$prog = $dbHandler->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondKey;", ["bondKey" => "6f278959a8"], "ALL");
+$array = array("0" => [1, 2, 3]);
+echo json_encode((object)$array);
