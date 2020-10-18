@@ -56,27 +56,8 @@
 
 <body>
     <h2 id="hd">Masukkan informasi</h2>
-    <div style="width: 100vw; height: 100px; margin-bottom:25px;">
-        <input type="text" placeholder="SSID/Nama WiFi" class="isian" id="ssid" />
-        <input type="text" placeholder="Username Akun" class="isian" id="usrn" />
-        <br /><br />
-        <input type="password" placeholder="Password WiFi" class="isian" id="wfpw" />
-        <input type="password" placeholder="Password akun" class="isian" id="unpw" />
-        <br>
-        <input type="checkbox" id="spw" name="spw" value="show" onclick="showPassword();">
-        <label for="spw"> Tampilkan Password</label>
-        <br>
-        <button class="tombolsubmit" onclick="sendInputInfo();">Submit</button>
-    </div>
-    <br /><br>
-    <span style="color: var(--normalcolor);" id="ds"></span>
-    <br>
-    <br>
-    <button onclick="restart();">Restart Kontroller</button>
-    <br>
-    <h3 style="background-color:red;" id="tm">
-        Belum termuat
-    </h3>
+    <div style="width: 100vw; height: 100px; margin-bottom:25px;"> <input type="text" placeholder="SSID/Nama WiFi" class="isian" id="ssid" /> <input type="text" placeholder="Username Akun" class="isian" id="usrn" /> <br /><br /> <input type="password" placeholder="Password WiFi" class="isian" id="wfpw" /> <input type="password" placeholder="Password akun" class="isian" id="unpw" /> <br><input type="checkbox" id="spw" name="spw" value="show" onclick="showPassword();"> <label for="spw"> Tampilkan Password</label> <br><button class="tombolsubmit" onclick="sendInputInfo();">Submit</button> </div><br /><br><span style="color: var(--normalcolor);" id="ds"></span> <br><br><button onclick="restart();">Restart Kontroller</button> <br>
+    <h3 style="background-color:red;width:100vw;" id="tm"> Belum termuat </h3>
     <script>
         function requestAJAX(url, data, callback = function() {}) {
             var xhr = new XMLHttpRequest();
@@ -97,8 +78,7 @@
 
         function restart() {
             requestAJAX("restart", "", function(response) {
-                if (response == "restart")
-                    document.getElementById("ds").innerHTML = "Merestart perangkat dan akan memutus Access Point...";
+                document.getElementById("ds").innerHTML = "Merestart perangkat dan akan memutus Access Point...";
             });
         }
 
@@ -111,33 +91,24 @@
                 document.getElementById("wfpw").type = "password";
             }
         }
-
         window.onload = function() {
             requestAJAX("reqStatus", "", function(response) {
                 response = JSON.parse(response);
                 document.getElementById("ssid").value = response.ssid;
                 document.getElementById("wfpw").value = response.wfpw;
                 document.getElementById("usrn").value = response.usrn;
+                document.getElementById("unpw").value = response.unpw;
                 document.getElementById("tm").style.backgroundColor = "green";
                 document.getElementById("tm").innerHTML = "Berhasil termuat";
-                if (response.message == "success")
-                    document.getElementById("ds").innerHTML = "Berhasil menghubungkan akun anda dengan kontroller<br>restart kontroller dengan tombol yang tersedia, lalu kontroller akan dapat dioperasikan secara online di otomaiot.com";
-                else if (response.message == "wrongid")
-                    document.getElementById("ds").innerHTML = "Username yang anda masukkan tidak terdaftar";
-                else if (response.message == "wrongpw")
-                    document.getElementById("ds").innerHTML = "Password yang anda masukkan salah";
-                else if (response.message == "illegal")
-                    document.getElementById("ds").innerHTML = "Kontroller anda ILLEGAL, apabila anda tidak yakin tolong hubungi kami di otomaiot.com";
-                else if (response.message == "nocon")
-                    document.getElementById("ds").innerHTML = "Tidak didapatkan respon dari server, tolong coba lagi sesaat kemudian serta pastikan WiFi anda dapat terkoneksi dengan internet";
-                else if (response.message == "recon")
-                    document.getElementById("ds").innerHTML = "Berhasil menghubungkan kembali kontroller dengan akun anda, restart kontroller dengan tombol yang tersedia, lalu kontroller akan dapat dioperasikan secara online di otomaiot.com";
-                else if (response.message == "used")
-                    document.getElementById("ds").innerHTML = "Gagal menyambung. Perangkat anda sudah tersambung ke akun lain, mohon hubungkan kontroller ini dengan akun yang terhubung dengan kontroller ini. Apabila anda tidak yakin tolong kontak kami di otomaiot.com";
-                else if (response.message == "invwifi")
-                    document.getElementById("ds").innerHTML = "Gagal menyambung ke WiFi, pastikan SSID dan Password WiFi anda benar lalu coba lagi";
-                else if (response.message == "smwrong")
-                    document.getElementById("ds").innerHTML = "Terjadi kesalahan saat mengirim data ke server, mohon coba lagi sesaat kemudian";
+                if (response.message == "success") document.getElementById("ds").innerHTML = "Berhasil menghubungkan akun anda dengan kontroller<br>restart kontroller dengan tombol yang tersedia, lalu kontroller akan dapat dioperasikan secara online di otoma.my.id";
+                else if (response.message == "wrongid") document.getElementById("ds").innerHTML = "Username akun otoma yang anda masukkan tidak terdaftar";
+                else if (response.message == "wrongpw") document.getElementById("ds").innerHTML = "Password akun otoma yang anda masukkan salah";
+                else if (response.message == "illegal") document.getElementById("ds").innerHTML = "Kontroller anda ILLEGAL, apabila anda tidak yakin tolong hubungi kami di otoma.my.id";
+                else if (response.message == "nocon") document.getElementById("ds").innerHTML = "Tidak didapatkan respon dari server, tolong coba lagi sesaat kemudian serta pastikan WiFi anda dapat terkoneksi dengan internet";
+                else if (response.message == "recon") document.getElementById("ds").innerHTML = "Berhasil menghubungkan kembali kontroller dengan akun anda, restart kontroller dengan tombol yang tersedia, lalu kontroller akan dapat dioperasikan secara online di otoma.my.id";
+                else if (response.message == "used") document.getElementById("ds").innerHTML = "Gagal menyambung. Perangkat anda sudah tersambung ke akun lain, mohon hubungkan kontroller ini dengan akun yang terhubung dengan kontroller ini. Apabila anda tidak yakin tolong kontak kami di otoma.my.id";
+                else if (response.message == "invwifi") document.getElementById("ds").innerHTML = "Gagal menyambung ke WiFi, pastikan SSID dan Password WiFi anda benar lalu coba lagi";
+                else if (response.message == "smwrong") document.getElementById("ds").innerHTML = "Terjadi kesalahan saat mengirim data ke server, mohon coba lagi sesaat kemudian";
             });
         };
     </script>

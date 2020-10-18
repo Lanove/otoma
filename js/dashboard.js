@@ -2103,11 +2103,11 @@ if (deviceBelonging) {
               this.id === "cbb" ||
               this.id === "cba"
             ) {
-              if (v > 30) v = 30;
+              if (v > 100) v = 100;
               else if (v < 0) v = 0;
             } else {
-              if (v > 100) v = 100;
-              else if (v < -100) v = -100;
+              if (v > 10000) v = 10000;
+              else if (v < -10000) v = -10000;
             }
             if (this.value.split(".").length > 1) this.value = v.toFixed(2);
             else this.value = v.toFixed(0);

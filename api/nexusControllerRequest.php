@@ -1,4 +1,5 @@
 <?php
+// http_response_code(403);
 if (isset($_SERVER['HTTP_DEVICE_TOKEN']) && $_SERVER["REQUEST_METHOD"] == "POST") {
     $json = json_decode(file_get_contents('php://input'), true); // Get JSON Input from AJAX and decode it to PHP Array
     if (isset($json["type"])) {
@@ -45,7 +46,7 @@ function updateTnHnS($bondKey, $json, $dbC)
         $prog = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondKey;", ["bondKey" => $bondKey], "ALL");
         foreach ($updateBuffer as $key) {
             if ($key == "sp") {
-                $buffer["setpoint"] = $fetchData["sp"];
+                $buffer["setpoint"] = floatval($fetchData["sp"]);
                 $fetchData["updateBuffer"] = str_replace($key . ",", "", $fetchData["updateBuffer"]);
                 $someKey = false;
             } else if ($key == "coolerMode") {
@@ -96,7 +97,8 @@ function updateTnHnS($bondKey, $json, $dbC)
                 $fetchData["updateBuffer"] = str_replace($key . ",", "", $fetchData["updateBuffer"]);
                 $someKey = false;
             } else if ($key == "auxStatus1" || $key == "auxStatus2" || $key == "thStatus" || $key == "clStatus" || $key == "htStatus") {
-                $buffer["status"][$key] = $fetchData[$key];
+                $buffer["st"] = "st";
+                $buffer[$key] = ($fetchData[$key] == "1") ? 1 : 0;
                 $fetchData["updateBuffer"] = str_replace($key . ",", "", $fetchData["updateBuffer"]);
                 $someKey = false;
             } else if (substr($key, 0, 1) == "p") {

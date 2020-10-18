@@ -393,12 +393,12 @@ function submitParameter($arg, $dbC)
                 is_numeric($parameter[3])
             ) {
                 for ($k = 0; $k < 3; $k++) {
-                    if ($parameter[$k] > 100) $parameter[$k] = 100;
-                    else if ($parameter[$k] < -100) $parameter[$k] = -100;
+                    if ($parameter[$k] > 10000) $parameter[$k] = 10000;
+                    else if ($parameter[$k] < -10000) $parameter[$k] = -10000;
                     $parameter[$k] = round($parameter[$k], 2);
                 }
                 if ($parameter[3] > 1000000) $parameter[3] = 1000000;
-                else if ($parameter[3] < 100) $parameter[3] = 100;
+                else if ($parameter[3] < 1000) $parameter[3] = 1000;
                 $parameter[3] = round($parameter[3], 0);
                 $split = "";
                 if ($id === "submitcpid") {
@@ -421,7 +421,7 @@ function submitParameter($arg, $dbC)
             ) {
 
                 for ($k = 0; $k < 2; $k++) {
-                    if ($parameter[$k] > 30) $parameter[$k] = 30;
+                    if ($parameter[$k] > 100) $parameter[$k] = 100;
                     else if ($parameter[$k] < 0) $parameter[$k] = 0;
                     $parameter[$k] = round($parameter[$k], 2);
                 }
