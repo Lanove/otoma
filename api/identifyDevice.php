@@ -8,6 +8,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $deviceToken = $json["devicetoken"];
         $softSSID = $json["softssid"];
         $softPW = $json["softpw"];
+        $macAddr = $json["mac"];
+        $buildVersion = $json["semver"];
         require "DatabaseController.php";
         $dbHandler = new DatabaseController();
 
@@ -40,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $echoBack = "success";
                         $bondKey = bin2hex(random_bytes(5)); // Create a 10 length random string for bondKey
                         // Initialize bond with user
-                        $dbHandler->runQuery("INSERT INTO bond(username, deviceToken,deviceType, bondKey, masterName,softSSID,softPass) VALUES (:username, :token, :type, :bondKey, :masterName, :softSSID, :softPass)", ["username" => $username, "token" => $deviceToken, "type" => $deviceType, "bondKey" => $bondKey, "masterName" => $bondKey, "softSSID" => $softSSID, "softPass" => $softPW]);
+                        $dbHandler->runQuery("INSERT INTO bond(username, deviceToken,deviceType, bondKey, masterName,softSSID,softPass,MAC,softwareVersion) VALUES (:username, :token, :type, :bondKey, :masterName, :softSSID, :softPass, :MAC, :buildVersion)", ["username" => $username, "token" => $deviceToken, "type" => $deviceType, "bondKey" => $bondKey, "masterName" => $bondKey, "softSSID" => $softSSID, "softPass" => $softPW, "MAC" => $macAddr, "buildVersion" => $buildVersion]);
                         // Device type specific table row insert
                         if ($deviceType == "nexus") {
                             $dbHandler->runQuery("INSERT INTO nexusbond(username, bondKey) VALUES (:username, :bondKey)", ["username" => $username, "bondKey" => $bondKey]);
@@ -56,4 +58,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else
         $echoBack = "smwrong";
     echo $echoBack;
-}
+} else
+    header('HTTP/1.1 403 Forbidden');

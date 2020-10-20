@@ -1,8 +1,9 @@
 <?php
-// http_response_code(403);
 if (isset($_SERVER['HTTP_DEVICE_TOKEN']) && $_SERVER["REQUEST_METHOD"] == "POST") {
     $json = json_decode(file_get_contents('php://input'), true); // Get JSON Input from AJAX and decode it to PHP Array
     if (isset($json["type"])) {
+        $macAddr = $_SERVER['HTTP_ESP8266_MAC'];
+        $buildVersion = $_SERVER['HTTP_ESP8266_BUILD_VERSION'];
         $deviceToken = $_SERVER['HTTP_DEVICE_TOKEN'];
         $requestType = $json["type"];
         require "DatabaseController.php";
@@ -12,14 +13,18 @@ if (isset($_SERVER['HTTP_DEVICE_TOKEN']) && $_SERVER["REQUEST_METHOD"] == "POST"
             $bondKey = $privilegeCheck["bondKey"];
             if ($requestType == "tnhns")
                 updateTnHnS($bondKey, $json, $dbController);
+        } else {
+            echo json_encode(["fallback" => true]);
         }
     }
-}
+} else
+    header('HTTP/1.1 403 Forbidden');
 
 function updateTnHnS($bondKey, $json, $dbC)
 {
     $fetchData =  $dbC->runQuery("SELECT * FROM nexusbond WHERE bondKey = ?;", [$bondKey]);
     $stringBuffer = "";
+    $updateBuffer = explode(',', rtrim($fetchData["updateBuffer"], ", "));
     //For some reason stored DS1307 and NTP time use GMT Time Zone
     $date = DateTime::createFromFormat('Y-m-d H:i:s', $fetchData["lastGraphUpdate"], new DateTimeZone('GMT'))->getTimeStamp();
     if ((time() + 25200) - $date >= 60) { // Update graph if 60 second has passed since last graph update
@@ -28,18 +33,27 @@ function updateTnHnS($bondKey, $json, $dbC)
     }
     // If ESP are not updating the output status then, just update the passed temperature and humidity
     if (
-        $json["data"][2] != $fetchData["auxStatus1"] &&
-        $json["data"][3] != $fetchData["auxStatus2"] &&
-        $json["data"][4] != $fetchData["thStatus"] &&
-        $json["data"][5] != $fetchData["htStatus"] &&
-        $json["data"][6] != $fetchData["clStatus"]
-    )
-        $dbC->runQuery("UPDATE nexusbond SET auxStatus1=?, auxStatus2=?, thStatus=?, htStatus=?, clStatus=?, tempNow=?, humidNow=?, lastUpdate=?{$stringBuffer} WHERE bondKey = ?;", [$json["data"][2], $json["data"][3], $json["data"][4], $json["data"][5], $json["data"][6], round($json["data"][0], 2), round($json["data"][1], 2), gmdate("Y-m-d H:i:s", $json["unix"]), $bondKey]);
-    else
+        $json["a1"] != $fetchData["auxStatus1"] ||
+        $json["a2"] != $fetchData["auxStatus2"] ||
+        $json["tc"] != $fetchData["thStatus"] ||
+        $json["ht"] != $fetchData["htStatus"] ||
+        $json["cl"] != $fetchData["clStatus"]
+    ) {
+        $dbC->runQuery("UPDATE nexusbond SET espStatusUpdateAvailable='1', auxStatus1=?, auxStatus2=?, thStatus=?, htStatus=?, clStatus=?, tempNow=?, humidNow=?, lastUpdate=?{$stringBuffer} WHERE bondKey = ?;", [
+            (!in_array("auxStatus1", $updateBuffer)) ? $json["a1"] : $fetchData["auxStatus1"],
+            (!in_array("auxStatus2", $updateBuffer)) ? $json["a2"] : $fetchData["auxStatus2"],
+            (!in_array("thStatus", $updateBuffer)) ? $json["tc"] : $fetchData["thStatus"],
+            (!in_array("htStatus", $updateBuffer)) ? $json["ht"] : $fetchData["htStatus"],
+            (!in_array("clStatus", $updateBuffer)) ? $json["cl"] : $fetchData["clStatus"],
+            round($json["data"][0], 2),
+            round($json["data"][1], 2),
+            gmdate("Y-m-d H:i:s", $json["unix"]),
+            $bondKey
+        ]);
+    } else
         $dbC->runQuery("UPDATE nexusbond SET tempNow=?, humidNow=?, lastUpdate=?{$stringBuffer} WHERE bondKey = ?;", [round($json["data"][0], 2), round($json["data"][1], 2), gmdate("Y-m-d H:i:s", $json["unix"]), $bondKey]);
     // Send update response if there are updateAvailable from server
     if ($fetchData["updateAvailable"] == "1") {
-        $updateBuffer = explode(',', rtrim($fetchData["updateBuffer"], ", "));
         $someKey = true;
         $buffer = array();
         $buffer["order"] = "setParam";
@@ -137,14 +151,15 @@ function rephraseProgram($prog)
 
     if ($data[0] == 1 || $data[0] == 2) {
         if ($prog["progData3"] == "<")
-            $data[1] = 1;
+            $data[1] = 0;
         else if ($prog["progData3"] == ">")
-            $data[1] = 2;
+            $data[1] = 1;
         else if ($prog["progData3"] == "<=")
-            $data[1] = 3;
+            $data[1] = 2;
         else if ($prog["progData3"] == ">=")
-            $data[1] = 4;
-        $data[2] = $prog["progData4"] + 0; // Convert to INT
+            $data[1] = 3;
+        $ar = unpack("L*", pack("f", (float)$prog["progData4"]));
+        $data[2] =  $ar[1]; // Get binary of float and convert the binary into int
     } else if ($data[0] == 3) {
         $from = explode(":", $prog["progData3"]);
         $to = explode(":", $prog["progData4"]);

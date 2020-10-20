@@ -12,7 +12,52 @@
         </div>
     </div>
     <div class="row">
+
         <div class="col-sm-6">
+
+            <div class="setting-box">
+                <div class="header">
+                    <div class="row">
+                        <div class="col-12">
+                            <span>Informasi Kontroller</span>
+                        </div>
+                    </div>
+                    <div class="line"></div>
+                </div>
+                <div class="content">
+                    <div class="row">
+                        <div class="col-12">
+                            <span>Versi Firmware :</span>
+                            <input type="text" class="form-control" id="firmware" disabled readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <span>MAC Address :</span>
+                            <input type="text" class="form-control" id="macaddr" disabled readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <span>SoftAP SSID :</span>
+                            <input type="text" class="form-control" id="softSSID" disabled readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <span>SoftAP Password :</span>
+                            <input type="text" class="form-control" id="softPW" disabled readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <span>SoftAP IP Address :</span>
+                            <input type="text" class="form-control" id="softIP" disabled readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="setting-box">
                 <div class="header">
                     <div class="row">
@@ -75,11 +120,15 @@
                     <div class="row">
                         <div class="col-12">
                             <button type="button" class="btn btn-danger mr-2 mt-2" id="delDevice">Hapus Kontroler</button>
-                            <button type="button" class="btn   btn-info mt-2" id="conCheck">Cek Koneksi</button>
+                            <button type="button" class="btn   btn-info mr-2 mt-2" id="restartDev">Restart Kontroller</button>
+                            <button type="button" class="btn   btn-warning mr-2 mt-2" id="conCheck">Putuskan Koneksi</button>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
+
+
     </div>
 </div>

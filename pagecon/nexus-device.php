@@ -246,7 +246,7 @@
                                             <label for="autoop">Auto</label>
                                         </div>
                                     </div>
-                                    <a href="#0" data-toggle="popover" title="Informasi" data-trigger="focus" data-placement="left" data-content="Operasi yang digunakan oleh kontroller.<br> Jika <b>Manual</b> maka keadaan nyala dan mati dari pemanas dan pendingin dapat dikontrol dengan saklar dari web.<br> Jika <b>Auto</b> maka kontroller akan menstabilkan suhu secara otomatis sesuai setpoint.">
+                                    <a href="#0" data-toggle="popover" title="Informasi" data-trigger="focus" data-placement="left" data-content="Operasi yang digunakan oleh kontroller.<br> Jika <b>Manual</b> maka keadaan nyala dan mati dari pemanas dan pendingin dapat dikontrol dengan saklar dari web.<br> Jika <b>Auto</b> maka kontroller akan menstabilkan suhu secara otomatis sesuai setpoin yang anda pilih.">
                                         <i class="fas fa-info-circle infocon"></i>
                                     </a>
                                 </div>
@@ -294,10 +294,10 @@
                                                             <input type="radio" id="hpidmd" name="hmode" value="pid" />
                                                             <label for="hpidmd">PID</label>
                                                             <input type="radio" id="hhysteresismd" name="hmode" value="hys" />
-                                                            <label for="hhysteresismd">Hysteresis</label>
+                                                            <label for="hhysteresismd">Histeresis</label>
                                                         </div>
                                                     </div>
-                                                    <a href="#0" data-toggle="popover" title="Informasi" data-trigger="focus" data-placement="left" data-content="Mode algoritma yang digunakan untuk pemanas. Cari tau informasi perbedaan antara mode PID dengan Hysteresis klik <a href='#0'class='infolink'>disini</a>.">
+                                                    <a href="#0" data-toggle="popover" title="Informasi" data-trigger="focus" data-placement="left" data-content="Mode algoritma yang digunakan untuk pemanas. Cari tau informasi perbedaan antara mode PID dengan Histeresis klik <a href='#0'class='infolink'>disini</a>.">
                                                         <i class="fas fa-info-circle infocon"></i>
                                                     </a>
                                                 </div>
@@ -344,13 +344,13 @@
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
                                                         <p>Batas Atas :</p>
-                                                        <input id="hba" type="text" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="<u>Batas atas</u> dari setpoint, hanya dapat diisi <b>angka positif</b>. Jika suhu sekarang naik dari <u>setpoint</u> ditambah <u>batas atas</u> maka pemanas akan mati. Untuk informasi lengkap cara mengatur Hysteresis klik <a href='#0'class='infolink'>disini</a>.">
+                                                        <input id="hba" type="text" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="<u>Batas atas</u> dari setpoin, hanya dapat diisi <b>angka positif</b>. Jika suhu sekarang naik dari <u>setpoin</u> ditambah <u>batas atas</u> maka pemanas akan mati. Untuk informasi lengkap cara mengatur Histeresis klik <a href='#0'class='infolink'>disini</a>.">
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
                                                         <p>Batas Bawah :</p>
-                                                        <input id="hbb" type="text" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="<u>Batas bawah</u> dari setpoint, hanya dapat diisi <b>angka positif</b>. Jika suhu sekarang turun dari <u>setpoint</u> dikurang <u>batas bawah</u> maka pemanas akan nyala. Untuk informasi lengkap cara mengatur Hysteresis klik <a href='#0'class='infolink'>disini</a>.">
+                                                        <input id="hbb" type="text" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="<u>Batas bawah</u> dari setpoin, hanya dapat diisi <b>angka positif</b>. Jika suhu sekarang turun dari <u>setpoin</u> dikurang <u>batas bawah</u> maka pemanas akan nyala. Untuk informasi lengkap cara mengatur Histeresis klik <a href='#0'class='infolink'>disini</a>.">
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -395,10 +395,10 @@
                                                             <input type="radio" id="cpidmd" name="cmode" value="pid" />
                                                             <label for="cpidmd">PID</label>
                                                             <input type="radio" id="chysteresismd" name="cmode" value="hys" />
-                                                            <label for="chysteresismd">Hysteresis</label>
+                                                            <label for="chysteresismd">Histeresis</label>
                                                         </div>
                                                     </div>
-                                                    <a href="#0" data-toggle="popover" title="Informasi" data-trigger="focus" data-placement="left" data-content="Mode algoritma yang digunakan untuk pendingin. Cari tau informasi perbedaan antara mode PID dengan Hysteresis klik <a href='#0'class='infolink'>disini</a>.">
+                                                    <a href="#0" data-toggle="popover" title="Informasi" data-trigger="focus" data-placement="left" data-content="Mode algoritma yang digunakan untuk pendingin. Cari tau informasi perbedaan antara mode PID dengan Histeresis klik <a href='#0'class='infolink'>disini</a>.">
                                                         <i class="fas fa-info-circle infocon"></i>
                                                     </a>
                                                 </div>
@@ -444,13 +444,13 @@
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
                                                         <p>Batas Atas :</p>
-                                                        <input id="cba" type="text" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="<u>Batas atas</u> dari setpoint, hanya dapat diisi <b>angka positif</b>. Jika suhu sekarang naik dari <u>setpoint</u> ditambah <u>batas atas</u> maka pendingin akan menyala. Untuk informasi lengkap cara mengatur Hysteresis klik <a href='#0'class='infolink'>disini</a>.">
+                                                        <input id="cba" type="text" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="<u>Batas atas</u> dari setpoin, hanya dapat diisi <b>angka positif</b>. Jika suhu sekarang naik dari <u>setpoin</u> ditambah <u>batas atas</u> maka pendingin akan menyala. Untuk informasi lengkap cara mengatur Histeresis klik <a href='#0'class='infolink'>disini</a>.">
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
                                                         <p>Batas Bawah :</p>
-                                                        <input id="cbb" type="text" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="<u>Batas bawah</u> dari setpoint, hanya dapat diisi <b>angka positif</b>. Jika suhu sekarang turun dari <u>setpoint</u> dikurang <u>batas bawah</u> maka pendingin akan mati. Untuk informasi lengkap cara mengatur Hysteresis klik <a href='#0'class='infolink'>disini</a>.">
+                                                        <input id="cbb" type="text" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="<u>Batas bawah</u> dari setpoin, hanya dapat diisi <b>angka positif</b>. Jika suhu sekarang turun dari <u>setpoin</u> dikurang <u>batas bawah</u> maka pendingin akan mati. Untuk informasi lengkap cara mengatur Histeresis klik <a href='#0'class='infolink'>disini</a>.">
                                                     </div>
                                                 </div>
 

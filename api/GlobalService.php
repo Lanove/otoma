@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
     }
     $dbController->close();
     $dbController = null;
-}
+} else header('HTTP/1.1 403 Forbidden');
 
 function deleteAccount($arg, $dbC)
 {

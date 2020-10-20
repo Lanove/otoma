@@ -644,7 +644,7 @@ if (deviceBelonging) {
           },
           boundaryGap: false,
           axisLabel: {
-            fontSize: 14,
+            fontSize: 12,
             fontFamily: '"Poppins", sans-serif',
           },
           axisLine: {
@@ -658,7 +658,7 @@ if (deviceBelonging) {
           scale: true,
           type: "value",
           axisLabel: {
-            fontSize: 14,
+            fontSize: 12,
             fontFamily: '"Poppins", sans-serif',
           },
           axisLine: {
@@ -1062,10 +1062,10 @@ if (deviceBelonging) {
           <span>Aksi</span>
           <input style="max-width:220px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
       </div>`);
-
       $("#dfaCd" + spaceNum)
         .unbind()
         .removeData();
+
       $(`#dfaCd${spaceNum}`).AnyPicker({
         mode: "datetime",
         lang: "id",
@@ -1242,33 +1242,17 @@ if (deviceBelonging) {
             ) {
               var dateFrom = $(`#dfaCd${spaceNum}`).val().split(" ");
               var dateTo = $(`#dfeCd${spaceNum}`).val().split(" ");
-              dateFrom[0] = dateFrom[0].split("-");
-              dateTo[0] = dateTo[0].split("-");
-              dateFrom[1] = dateFrom[1].split(":");
-              dateTo[1] = dateTo[1].split(":");
-              const dDateFrom = new Date(
-                dateFrom[0][0],
-                dateFrom[0][1] - 1,
-                dateFrom[0][2],
-                dateFrom[1][0],
-                dateFrom[0][1]
-              );
-              const dDateTo = new Date(
-                dateTo[0][0],
-                dateTo[0][1] - 1,
-                dateTo[0][2],
-                dateTo[1][0],
-                dateTo[0][1]
-              );
+              const unixFrom = Date.parse(dateFrom);
+              const unixTo = Date.parse(dateTo);
               const dateNow = new Date();
               // 0 is tanggal, 1 is month str, 2 year, 3 jam:menit
-              if (dDateFrom.getTime() > dDateTo.getTime()) {
+              if (unixFrom > unixTo) {
                 span.append(
                   `<span class="tfailed" style="display:block;">Tanggal Waktu(Dari) tidak boleh melebihi Tanggal Waktu(Hingga)<span>`
                 );
                 success = false;
               }
-              if (dDateTo.getTime() < dateNow.getTime()) {
+              if (unixTo < dateNow.getTime()) {
                 span.append(
                   `<span class="tfailed" style="display:block;">Tidak dapat memilih Tanggal Waktu(Hingga) yang telah berlalu dari waktu sekarang<span>`
                 );
@@ -1692,7 +1676,6 @@ if (deviceBelonging) {
       );
     }
 
-    var switchUpdateMod = 0;
     function parameterReload(arg, long = false) {
       // Get each data by splitting/exploding the string
       arg.thercoInfo = arg.thercoInfo.split("%");
@@ -1703,9 +1686,8 @@ if (deviceBelonging) {
         arg.coolerPar[i] = arg.coolerPar[i].split("/");
       }
 
-      switchUpdateMod++;
-      if (switchUpdateMod % 20 == 0) {
-        switchUpdateMod = 0;
+      if (arg.espStatusUpdateAvailable == 1) {
+        console.log("updateSwtichStatus!");
         binarySwitch(arg, long);
       }
       $("#tempnow").text(arg.tempNow + "°C");
@@ -2063,6 +2045,11 @@ if (deviceBelonging) {
         function (response) {
           const json = JSON.parse(response);
           $("#deviceName").text(json.masterName);
+          $("#firmware").val(json.softwareVersion);
+          $("#macaddr").val(json.MAC);
+          $("#softSSID").val(json.softSSID);
+          $("#softPW").val(json.softPass);
+          $("#softIP").val(json.softIP);
           $("#aux1Name").val(json.auxName1);
           $("#aux2Name").val(json.auxName2);
           $("#deviceNameEdit").val(json.masterName);
@@ -2314,8 +2301,8 @@ if (deviceBelonging) {
         if (getBondKey() != "" && $("#nexus-dashboard").length) {
           reloadStatus();
         }
-        setTimeout(reload, 8000);
-      }, 8000);
+        setTimeout(reload, 3000);
+      }, 3000);
     });
 
     const check = setInterval(function () {

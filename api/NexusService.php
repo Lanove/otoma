@@ -66,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
     }
     $dbController->close();
     $dbController = null;
-}
+} else header('HTTP/1.1 403 Forbidden');
 
 function deleteController($arg, $dbC)
 {
@@ -105,13 +105,16 @@ function updateName($arg, $dbC)
 function loadSetting($arg, $dbC)
 {
     $bondKey = $arg["bondKey"];
-    echo json_encode(array_merge($dbC->runQuery("SELECT masterName FROM bond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]), $dbC->runQuery("SELECT auxName1, auxName2 FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey])));
+    echo json_encode(array_merge($dbC->runQuery("SELECT masterName,softSSID,softPass,softIP,MAC,softwareVersion FROM bond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]), $dbC->runQuery("SELECT auxName1, auxName2 FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey])));
 }
 
 function requestStatus($arg, $dbC)
 {
     $bondKey = $arg["bondKey"];
-    $fetchResult["status"] = $dbC->runQuery("SELECT auxStatus1, auxStatus2, thStatus, htStatus, clStatus, tempNow, humidNow, sp, thercoInfo, heaterMode, coolerMode, heaterPar, coolerPar FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
+    $fetchResult["status"] = $dbC->runQuery("SELECT auxStatus1, auxStatus2, thStatus, htStatus, clStatus, tempNow, humidNow, sp, thercoInfo, heaterMode, coolerMode, heaterPar, coolerPar, espStatusUpdateAvailable FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
+    if ($fetchResult["status"]["espStatusUpdateAvailable"] == 1) {
+        $dbC->runQuery("UPDATE nexusbond SET espStatusUpdateAvailable='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+    }
     echo json_encode($fetchResult);
 }
 
@@ -588,7 +591,7 @@ function loadPlot($arg, $dbC)
 function loadDeviceInformation($arg, $dbC)
 {
     if (isset($arg["master"]) || isset($arg["bondKey"])) {
-
+        $todayDate = new DateTime("now", new DateTimeZone('Asia/Jakarta'));
         $username = $arg["username"];
         if (isset($arg["master"])) {
             $master = $arg["master"];
@@ -612,12 +615,12 @@ function loadDeviceInformation($arg, $dbC)
         $fetchResult["plot"]["newest"] = $dbC->runQuery("SELECT MAX(date) AS newestPlot FROM nexusplot WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
         // If the newest record from daily plot data is not current date, then create the frame of the current date.
         // Get current date plot data.
-        $fetchResult["plot"]["available"] = $dbC->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date LIMIT 1;", ["bondkey" => $bondKey, "date" => date("Y-m-d")]);
-        $fetchResult["plot"]["plotDate"] = date("Y-m-d"); // Refer to availability of plot of current date
+        $fetchResult["plot"]["available"] = $dbC->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date LIMIT 1;", ["bondkey" => $bondKey, "date" => $todayDate->format("Y-m-d")]);
+        $fetchResult["plot"]["plotDate"] = $todayDate->format("Y-m-d"); // Refer to availability of plot of current date
         if ($fetchResult["plot"]["available"]) {
             $fetchResult["plot"]["available"] = true;
-            $fetchResult["plot"]["data"] = $dbC->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $bondKey, "date" => date("Y-m-d")], "ALL"); // Fetch all data from date
-            if ($fetchResult["plot"]["newest"]["newestPlot"] !== date("Y-m-d")) {
+            $fetchResult["plot"]["data"] = $dbC->runQuery("SELECT * FROM nexusplot WHERE bondKey = :bondkey AND date = :date;", ["bondkey" => $bondKey, "date" => $todayDate->format("Y-m-d")], "ALL"); // Fetch all data from date
+            if ($fetchResult["plot"]["newest"]["newestPlot"] !== $todayDate->format("Y-m-d")) {
                 // Refresh the newest record
                 $fetchResult["plot"]["newest"] = $dbC->runQuery("SELECT MAX(date) AS newestPlot FROM nexusplot WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
             }
