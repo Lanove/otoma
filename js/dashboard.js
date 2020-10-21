@@ -14,9 +14,19 @@ $.fn.animateRotate = function (start, end, duration, easing, complete) {
   });
 };
 
-function requestAJAX(fileName, jsonobject, callback = function () {}) {
+function requestAJAX(
+  fileName,
+  jsonobject,
+  callback = function () {},
+  timeOut = 0,
+  timeOutHandler = function () {}
+) {
   var xhr = new XMLHttpRequest();
   var json = JSON.stringify(jsonobject);
+  if (timeOut != 0) {
+    xhr.timeout = timeOut;
+    timeOutHandler(xhr.status);
+  }
   xhr.open("POST", "api/" + fileName + ".php");
   xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
   xhr.send(json);
@@ -162,6 +172,7 @@ $(document).ready(function () {
               $("#emailContact").val() != "" &&
               $("#messageContact").val() != ""
             ) {
+              $("#notifContact").text("Mengirimkan pesan anda...");
               requestAJAX(
                 "GlobalService",
                 {
@@ -178,6 +189,20 @@ $(document).ready(function () {
                   $("#emailContact").val("");
                   $("#messageContact").val("");
                   $("#notifContact").text("Pesan terkirim!");
+                },
+                5000,
+                function (status) {
+                  bootbox.alert({
+                    size: "large",
+                    title: "Gagal mengirim pesan",
+                    message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                    closeButton: false,
+                    buttons: {
+                      ok: {
+                        label: "Tutup",
+                      },
+                    },
+                  });
                 }
               );
             } else {
@@ -201,6 +226,20 @@ $(document).ready(function () {
             },
             function (response) {
               $("#ACemail").val(response);
+            },
+            8000,
+            function (status) {
+              bootbox.alert({
+                size: "large",
+                title: "Gagal memuat laman",
+                message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                closeButton: false,
+                buttons: {
+                  ok: {
+                    label: "Tutup",
+                  },
+                },
+              });
             }
           );
           $("#ACpasswordSubmit").click(function () {
@@ -222,6 +261,20 @@ $(document).ready(function () {
                 else if (parseJson.status == "success")
                   $("#ACpasswordNotif").addClass("tsucceed2");
                 $("#ACpasswordNotif").text(parseJson.message);
+              },
+              4000,
+              function (status) {
+                bootbox.alert({
+                  size: "large",
+                  title: "Gagal mengganti password",
+                  message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                  closeButton: false,
+                  buttons: {
+                    ok: {
+                      label: "Tutup",
+                    },
+                  },
+                });
               }
             );
 
@@ -271,6 +324,20 @@ $(document).ready(function () {
                         setTimeout(function () {
                           window.location.replace("logout.php");
                         }, 3000);
+                    },
+                    4000,
+                    function (status) {
+                      bootbox.alert({
+                        size: "large",
+                        title: "Terjadi kesalahan",
+                        message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                        closeButton: false,
+                        buttons: {
+                          ok: {
+                            label: "Tutup",
+                          },
+                        },
+                      });
                     }
                   );
                 }
@@ -294,6 +361,20 @@ $(document).ready(function () {
                 else if (parseJson.status == "success")
                   $("#ACemailNotif").addClass("tsucceed2");
                 $("#ACemailNotif").text(parseJson.message);
+              },
+              4000,
+              function (status) {
+                bootbox.alert({
+                  size: "large",
+                  title: "Gagal mengganti email",
+                  message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                  closeButton: false,
+                  buttons: {
+                    ok: {
+                      label: "Tutup",
+                    },
+                  },
+                });
               }
             );
 
@@ -820,12 +901,30 @@ if (deviceBelonging) {
       console.log(this);
       if (this.elem.id == "spsetting") {
         $("#spvalue").text(String(stringBuffer) + "°C");
-        requestAJAX("NexusService", {
-          token: getMeta("token"),
-          bondKey: getBondKey(),
-          requestType: "changeSetpoint",
-          data: stringBuffer,
-        });
+        requestAJAX(
+          "NexusService",
+          {
+            token: getMeta("token"),
+            bondKey: getBondKey(),
+            requestType: "changeSetpoint",
+            data: stringBuffer,
+          },
+          function (response) {},
+          3000,
+          function (status) {
+            bootbox.alert({
+              size: "large",
+              title: "Gagal mengganti setpoin suhu",
+              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+              closeButton: false,
+              buttons: {
+                ok: {
+                  label: "Tutup",
+                },
+              },
+            });
+          }
+        );
       }
       return stringBuffer;
     }
@@ -1482,6 +1581,20 @@ if (deviceBelonging) {
                 setTimeout(function () {
                   span.html("");
                 }, 30000);
+              },
+              4000,
+              function (status) {
+                bootbox.alert({
+                  size: "large",
+                  title: `Gagal mengupdate program ${spaceNum}`,
+                  message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                  closeButton: false,
+                  buttons: {
+                    ok: {
+                      label: "Tutup",
+                    },
+                  },
+                });
               }
             );
           }
@@ -1510,6 +1623,20 @@ if (deviceBelonging) {
               setTimeout(function () {
                 span.html("");
               }, 30000);
+            },
+            5000,
+            function (status) {
+              bootbox.alert({
+                size: "large",
+                title: `Gagal menghapus program ${spaceNum}`,
+                message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                closeButton: false,
+                buttons: {
+                  ok: {
+                    label: "Tutup",
+                  },
+                },
+              });
             }
           );
         }
@@ -1618,6 +1745,21 @@ if (deviceBelonging) {
           function (response) {
             redrawChart(JSON.parse(response).plot);
             $("#graphoverlay").removeClass("active");
+          },
+          8000,
+          function (status) {
+            $("#graphoverlay").removeClass("active");
+            bootbox.alert({
+              size: "large",
+              title: "Gagal memuat grafik",
+              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+              closeButton: false,
+              buttons: {
+                ok: {
+                  label: "Tutup",
+                },
+              },
+            });
           }
         );
       }
@@ -1719,6 +1861,24 @@ if (deviceBelonging) {
               $("#cbb").val(parseJson[0].coolerPar[1][0].toFixed(2));
               $("#cba").val(parseJson[0].coolerPar[1][1].toFixed(2));
             }
+          },
+          5000,
+          function (status) {
+            bootbox.alert({
+              size: "large",
+              title: `Gagal mengupdate parameter ${
+                id == "submithpid" || id == "submithhys"
+                  ? "pemanas"
+                  : "pendingin"
+              }`,
+              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+              closeButton: false,
+              buttons: {
+                ok: {
+                  label: "Tutup",
+                },
+              },
+            });
           }
         );
       }
@@ -1808,6 +1968,30 @@ if (deviceBelonging) {
               $("#heaterSwitch").prop("checked", false);
               $("#coolerSwitch").prop("checked", false);
             }
+          },
+          3000,
+          function (status) {
+            bootbox.alert({
+              size: "large",
+              title: `Gagal mengubah ${
+                docchi == "cmode"
+                  ? "mode pendingin"
+                  : docchi == "hmode"
+                  ? "mode pemanas"
+                  : docchi == "thermmode"
+                  ? "mode thermocontrol"
+                  : docchi == "operation"
+                  ? "operasi thermocontrol"
+                  : "kondisi"
+              }`,
+              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+              closeButton: false,
+              buttons: {
+                ok: {
+                  label: "Tutup",
+                },
+              },
+            });
           }
         );
       }
@@ -1907,187 +2091,209 @@ if (deviceBelonging) {
 
     ///////////////////////////////
     function loadDeviceInformation(master) {
-      requestAJAX("NexusService", master, function callback(response) {
-        var parseJson = JSON.parse(response);
+      requestAJAX(
+        "NexusService",
+        master,
+        function callback(response) {
+          var parseJson = JSON.parse(response);
 
-        // Add device bondKey information
-        setBondKey(parseJson["deviceInfo"]["bondKey"]);
+          // Add device bondKey information
+          setBondKey(parseJson["deviceInfo"]["bondKey"]);
 
-        if (parseJson.otherName) {
-          // If user had more than one device
-          // Add text and icon to the title of the main header
-          $("#deviceheader .text").text(parseJson["deviceInfo"]["masterName"]);
-          $("#deviceheader .text").append(
-            "<i class = 'fas fa-caret-down'></i>"
-          );
-          //Add submasters name that user had to dropdown
-          $("#deviceheader .dropdown-menu").html("");
-          for (x in parseJson.otherName) {
-            $("#deviceheader .dropdown-menu").append(
-              '<a href="#" class="dropdown-item ' +
-                "subMasterName" +
-                String(x) +
-                '">' +
-                parseJson.otherName[x]["masterName"] +
-                "</a>"
+          if (parseJson.otherName) {
+            // If user had more than one device
+            // Add text and icon to the title of the main header
+            $("#deviceheader .text").text(
+              parseJson["deviceInfo"]["masterName"]
             );
+            $("#deviceheader .text").append(
+              "<i class = 'fas fa-caret-down'></i>"
+            );
+            //Add submasters name that user had to dropdown
+            $("#deviceheader .dropdown-menu").html("");
+            for (x in parseJson.otherName) {
+              $("#deviceheader .dropdown-menu").append(
+                '<a href="#" class="dropdown-item ' +
+                  "subMasterName" +
+                  String(x) +
+                  '">' +
+                  parseJson.otherName[x]["masterName"] +
+                  "</a>"
+              );
 
-            $(".subMasterName" + String(x))
-              .unbind()
-              .removeData();
-            $(".subMasterName" + String(x)).on("click", function () {
-              setBondKey("");
-              $(".absolute-overlay").removeClass("loaded");
-              loadDeviceInformation({
-                requestType: "loadDeviceInformation",
-                master: $("." + $(this).attr("class").split(/\s+/)[1]).text(),
-                token: getMeta("token"),
+              $(".subMasterName" + String(x))
+                .unbind()
+                .removeData();
+              $(".subMasterName" + String(x)).on("click", function () {
+                setBondKey("");
+                $(".absolute-overlay").removeClass("loaded");
+                loadDeviceInformation({
+                  requestType: "loadDeviceInformation",
+                  master: $("." + $(this).attr("class").split(/\s+/)[1]).text(),
+                  token: getMeta("token"),
+                });
+                const check = setInterval(function () {
+                  // Function to check every 0.1s if bondKey is available, then execute reloadStatus() and destroy itself.
+                  if (getBondKey() != "") {
+                    $(".absolute-overlay").addClass("loaded");
+                    clearInterval(check); // kill after executed
+                  }
+                }, 100);
               });
-              const check = setInterval(function () {
-                // Function to check every 0.1s if bondKey is available, then execute reloadStatus() and destroy itself.
-                if (getBondKey() != "") {
-                  $(".absolute-overlay").addClass("loaded");
-                  clearInterval(check); // kill after executed
-                }
-              }, 100);
-            });
-          }
-        } else {
-          // If user had just only one device then
-          $("#deviceheader .dropdown").html(""); // remove dropdown menu
-          $("#deviceheader .dropdown").prepend(
-            "<p class='text'>" + parseJson["deviceInfo"]["masterName"] + "</p>"
-          ); // Add name but without caret or dropdown
-        }
-
-        $("#auxname1").text(parseJson.nexusBond.auxName1 + " (1)");
-        $("#auxname2").text(parseJson.nexusBond.auxName2 + " (2)");
-
-        parameterReload(parseJson.nexusBond, true);
-
-        // Initialize anypicker with correct date limit based on database
-
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, "0");
-        var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
-        var yyyy = today.getFullYear();
-        today = yyyy + "-" + mm + "-" + dd;
-        if (parseJson.plot.oldest.oldestPlot == null)
-          parseJson.plot.oldest.oldestPlot = today;
-        if (parseJson.plot.oldest.newestPlot == null)
-          parseJson.plot.newest.newestPlot = today;
-        var oldest = parseJson.plot.oldest.oldestPlot.split("-");
-        var newest = parseJson.plot.newest.newestPlot.split("-");
-        for (index in newest) {
-          // Convert every string array that is splitted into integer array
-          newest[index] = parseInt(newest[index]);
-          oldest[index] = parseInt(oldest[index]);
-        }
-        oldest[1]--; // Dk what is this, but keep it.
-        $("#dateselector").unbind().removeData(); // Remove any anypicker instance to make sure it's not duplicating.
-        $("#dateselector").AnyPicker({
-          // Create anypicker instance
-          showComponentLabel: true,
-          mode: "datetime",
-          dateTimeFormat: "yyyy-MM-dd",
-          lang: "id",
-          formatOutput: setTrigger,
-          minValue: new Date(oldest[0], oldest[1], 01),
-          maxValue: new Date(newest[0], newest[1], 00),
-        });
-
-        // Draw a chart
-        redrawChart(parseJson.plot);
-        if (
-          new Date().getTime() / 1000 -
-            new Date(parseJson.nexusBond.lastUpdate).getTime() / 1000 >=
-          300
-        ) {
-          parseJson.nexusBond.lastUpdate = parseJson.nexusBond.lastUpdate.split(
-            " "
-          );
-          setTimeout(function () {
-            bootbox.alert({
-              size: "large",
-              title: "Pemberitahuan",
-              message: `Kontroller anda dengan nama <b>${
-                parseJson.deviceInfo.masterName
-              }</b> sudah tidak mengirim respon ke server selama lebih dari 5 menit, <b>pastikan kontroller anda menyambung ke internet</b> agar anda dapat mengkontrol atau mengupdate kontroller.<br>Kontroller anda terakhir online pada<b> ${convertToDateLong(
-                parseJson.nexusBond.lastUpdate[0]
-              )} ${parseJson.nexusBond.lastUpdate[1]}</b>`,
-              closeButton: false,
-              buttons: {
-                ok: {
-                  label: "Tutup",
-                },
-              },
-            });
-          }, 2000);
-        }
-        $("#conditional").html("");
-        for (index in parseJson.programs) {
-          const progNum = parseJson.programs[index].progNumber;
-          const trigger = parseJson.programs[index].progData1;
-          const action = parseJson.programs[index].progData2;
-          appendConditionalChild(progNum, [
-            "Nilai Suhu",
-            "Nilai Humiditas",
-            "Jadwal Harian",
-            "Tanggal Waktu",
-            //"Timer",
-            "Keadaan",
-          ]);
-          // buildTempOrHum(spaceNum), buildTimer(spaceNum), buildDailyPicker(spaceNum), buildDateTimePicker(spaceNum), buildActionPicker(spaceNum, acContent)
-          $(`#ifCd${progNum}`).val(trigger);
-          if (trigger == "Nilai Suhu" || trigger == "Nilai Humiditas") {
-            buildTempOrHum(progNum, trigger);
-            $(`#nscmpCd${progNum}`).val(parseJson.programs[index].progData3);
-            $(`#nsvalCd${progNum}`).val(parseJson.programs[index].progData4);
-          } else if (trigger == "Jadwal Harian") {
-            buildDailyPicker(progNum);
-            $(`#faCd${progNum}`).val(parseJson.programs[index].progData3);
-            $(`#feCd${progNum}`).val(parseJson.programs[index].progData4);
-          } else if (trigger == "Tanggal Waktu") {
-            buildDateTimePicker(progNum);
-            $(`#dfaCd${progNum}`).val(parseJson.programs[index].progData3);
-            $(`#dfeCd${progNum}`).val(parseJson.programs[index].progData4);
-          } else if (trigger == "Timer") {
-            buildTimer(progNum);
-            $(`#timerCd${progNum}`).val(parseJson.programs[index].progData3);
-          } else if (trigger == "Keadaan") {
-            buildConditionalPicker(progNum);
-            $(`#cndCd${progNum}`).val(parseJson.programs[index].progData3);
-            $(`#cnddCd${progNum}`).val(parseJson.programs[index].progData4);
-          }
-          var acContent = [];
-          if (trigger != "timer") {
-            acContent = [
-              "Nyalakan Output 1",
-              "Nyalakan Output 2",
-              "Nyalakan Pemanas",
-              "Nyalakan Pendingin",
-              "Nyalakan Thermocontrol",
-              "Matikan Output 1",
-              "Matikan Output 2",
-              "Matikan Pemanas",
-              "Matikan Pendingin",
-              "Matikan Thermocontrol",
-            ];
+            }
           } else {
-            acContent = [
-              "Nyalakan Output 1",
-              "Nyalakan Output 2",
-              "Nyalakan Pemanas",
-              "Nyalakan Pendingin",
-              "Matikan Pemanas",
-              "Matikan Pendingin",
-              "Nyalakan Thermocontrol",
-            ];
+            // If user had just only one device then
+            $("#deviceheader .dropdown").html(""); // remove dropdown menu
+            $("#deviceheader .dropdown").prepend(
+              "<p class='text'>" +
+                parseJson["deviceInfo"]["masterName"] +
+                "</p>"
+            ); // Add name but without caret or dropdown
           }
-          buildActionPicker(progNum, acContent);
-          $(`#acCd${progNum}`).val(action);
+
+          $("#auxname1").text(parseJson.nexusBond.auxName1 + " (1)");
+          $("#auxname2").text(parseJson.nexusBond.auxName2 + " (2)");
+
+          parameterReload(parseJson.nexusBond, true);
+
+          // Initialize anypicker with correct date limit based on database
+
+          var today = new Date();
+          var dd = String(today.getDate()).padStart(2, "0");
+          var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+          var yyyy = today.getFullYear();
+          today = yyyy + "-" + mm + "-" + dd;
+          if (parseJson.plot.oldest.oldestPlot == null)
+            parseJson.plot.oldest.oldestPlot = today;
+          if (parseJson.plot.oldest.newestPlot == null)
+            parseJson.plot.newest.newestPlot = today;
+          var oldest = parseJson.plot.oldest.oldestPlot.split("-");
+          var newest = parseJson.plot.newest.newestPlot.split("-");
+          for (index in newest) {
+            // Convert every string array that is splitted into integer array
+            newest[index] = parseInt(newest[index]);
+            oldest[index] = parseInt(oldest[index]);
+          }
+          oldest[1]--; // Dk what is this, but keep it.
+          $("#dateselector").unbind().removeData(); // Remove any anypicker instance to make sure it's not duplicating.
+          $("#dateselector").AnyPicker({
+            // Create anypicker instance
+            showComponentLabel: true,
+            mode: "datetime",
+            dateTimeFormat: "yyyy-MM-dd",
+            lang: "id",
+            formatOutput: setTrigger,
+            minValue: new Date(oldest[0], oldest[1], 01),
+            maxValue: new Date(newest[0], newest[1], 00),
+          });
+
+          // Draw a chart
+          redrawChart(parseJson.plot);
+          if (
+            new Date().getTime() / 1000 -
+              new Date(parseJson.nexusBond.lastUpdate).getTime() / 1000 >=
+            300
+          ) {
+            parseJson.nexusBond.lastUpdate = parseJson.nexusBond.lastUpdate.split(
+              " "
+            );
+            setTimeout(function () {
+              bootbox.alert({
+                size: "large",
+                title: "Pemberitahuan",
+                message: `Kontroller anda dengan nama <b>${
+                  parseJson.deviceInfo.masterName
+                }</b> sudah tidak mengirim respon ke server selama lebih dari 5 menit, <b>pastikan kontroller anda menyambung ke internet</b> agar anda dapat mengkontrol atau mengupdate kontroller.<br>Kontroller anda terakhir online pada<b> ${convertToDateLong(
+                  parseJson.nexusBond.lastUpdate[0]
+                )} ${parseJson.nexusBond.lastUpdate[1]}</b>`,
+                closeButton: false,
+                buttons: {
+                  ok: {
+                    label: "Tutup",
+                  },
+                },
+              });
+            }, 2000);
+          }
+          $("#conditional").html("");
+          for (index in parseJson.programs) {
+            const progNum = parseJson.programs[index].progNumber;
+            const trigger = parseJson.programs[index].progData1;
+            const action = parseJson.programs[index].progData2;
+            appendConditionalChild(progNum, [
+              "Nilai Suhu",
+              "Nilai Humiditas",
+              "Jadwal Harian",
+              "Tanggal Waktu",
+              //"Timer",
+              "Keadaan",
+            ]);
+            // buildTempOrHum(spaceNum), buildTimer(spaceNum), buildDailyPicker(spaceNum), buildDateTimePicker(spaceNum), buildActionPicker(spaceNum, acContent)
+            $(`#ifCd${progNum}`).val(trigger);
+            if (trigger == "Nilai Suhu" || trigger == "Nilai Humiditas") {
+              buildTempOrHum(progNum, trigger);
+              $(`#nscmpCd${progNum}`).val(parseJson.programs[index].progData3);
+              $(`#nsvalCd${progNum}`).val(parseJson.programs[index].progData4);
+            } else if (trigger == "Jadwal Harian") {
+              buildDailyPicker(progNum);
+              $(`#faCd${progNum}`).val(parseJson.programs[index].progData3);
+              $(`#feCd${progNum}`).val(parseJson.programs[index].progData4);
+            } else if (trigger == "Tanggal Waktu") {
+              buildDateTimePicker(progNum);
+              $(`#dfaCd${progNum}`).val(parseJson.programs[index].progData3);
+              $(`#dfeCd${progNum}`).val(parseJson.programs[index].progData4);
+            } else if (trigger == "Timer") {
+              buildTimer(progNum);
+              $(`#timerCd${progNum}`).val(parseJson.programs[index].progData3);
+            } else if (trigger == "Keadaan") {
+              buildConditionalPicker(progNum);
+              $(`#cndCd${progNum}`).val(parseJson.programs[index].progData3);
+              $(`#cnddCd${progNum}`).val(parseJson.programs[index].progData4);
+            }
+            var acContent = [];
+            if (trigger != "timer") {
+              acContent = [
+                "Nyalakan Output 1",
+                "Nyalakan Output 2",
+                "Nyalakan Pemanas",
+                "Nyalakan Pendingin",
+                "Nyalakan Thermocontrol",
+                "Matikan Output 1",
+                "Matikan Output 2",
+                "Matikan Pemanas",
+                "Matikan Pendingin",
+                "Matikan Thermocontrol",
+              ];
+            } else {
+              acContent = [
+                "Nyalakan Output 1",
+                "Nyalakan Output 2",
+                "Nyalakan Pemanas",
+                "Nyalakan Pendingin",
+                "Matikan Pemanas",
+                "Matikan Pendingin",
+                "Nyalakan Thermocontrol",
+              ];
+            }
+            buildActionPicker(progNum, acContent);
+            $(`#acCd${progNum}`).val(action);
+          }
+        },
+        10000,
+        function (status) {
+          bootbox.alert({
+            size: "large",
+            title: "Gagal memuat laman",
+            message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+            closeButton: false,
+            buttons: {
+              ok: {
+                label: "Tutup",
+              },
+            },
+          });
         }
-      });
+      );
     }
 
     function nexusSettingLoad() {
@@ -2133,6 +2339,20 @@ if (deviceBelonging) {
                       location.reload();
                     }, 3000);
                   }
+                },
+                5000,
+                function (status) {
+                  bootbox.alert({
+                    size: "large",
+                    title: "Terjadi kesalahan",
+                    message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                    closeButton: false,
+                    buttons: {
+                      ok: {
+                        label: "Tutup",
+                      },
+                    },
+                  });
                 }
               );
             }
@@ -2160,6 +2380,20 @@ if (deviceBelonging) {
               $("#infoAuxName").removeClass();
               $("#infoAuxName").text("");
             }, 15000);
+          },
+          4000,
+          function (status) {
+            bootbox.alert({
+              size: "large",
+              title: "Terjadi kesalahan",
+              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+              closeButton: false,
+              buttons: {
+                ok: {
+                  label: "Tutup",
+                },
+              },
+            });
           }
         );
       });
@@ -2189,6 +2423,20 @@ if (deviceBelonging) {
                   "Gagal mengubah nama, nama ini sudah terambil oleh kontroller lain yang anda miliki"
                 );
               }
+            },
+            4000,
+            function (status) {
+              bootbox.alert({
+                size: "large",
+                title: "Terjadi kesalahan",
+                message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                closeButton: false,
+                buttons: {
+                  ok: {
+                    label: "Tutup",
+                  },
+                },
+              });
             }
           );
         } else {
@@ -2308,6 +2556,7 @@ if (deviceBelonging) {
       $(
         "#coolerSwitch, #heaterSwitch, #aux1Switch, #aux2Switch, #thSwitch"
       ).click(function () {
+        var check = $(this).prop("checked");
         const switchToggle = function (arg) {
           requestAJAX(
             "NexusService",
@@ -2320,11 +2569,37 @@ if (deviceBelonging) {
             },
             function (response) {
               // DO SOMETHING IF THERE ARE SOME EXCEPTION SUCH AS CONDITIONAL
+            },
+            3000,
+            function (status) {
+              $(this).prop("checked", !check);
+              bootbox.alert({
+                size: "large",
+                title: `Gagal mengubah kondisi saklar ${
+                  arg.id == "coolerSwitch"
+                    ? "pendingin"
+                    : arg.id == "heaterSwitch"
+                    ? "pemanas"
+                    : arg.id == "aux1Switch"
+                    ? $("#auxname1").text()
+                    : arg.id == "aux2Switch"
+                    ? $("#auxname2").text()
+                    : arg.id == "thSwitch"
+                    ? "thermocontrol"
+                    : ""
+                }`,
+                message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                closeButton: false,
+                buttons: {
+                  ok: {
+                    label: "Tutup",
+                  },
+                },
+              });
             }
           );
         };
 
-        var check = $(this).prop("checked");
         if (this.id == "coolerSwitch" || this.id == "heaterSwitch") {
           if ($("input[name='operation']:checked").val() === "auto") {
             $(this).prop("checked", !check);

@@ -219,7 +219,7 @@ function updateProgram($arg, $dbC) // Be careful, within this function there are
                 ) {
                     $validComparator = array("<", ">", "<=", ">=");
                     $nscmp = $arg["passedData"]["nscmpCd"];
-                    $nsval = (int)$arg["passedData"]["nsvalCd"];
+                    $nsval = (float)$arg["passedData"]["nsvalCd"];
                     $validFlag = false;
                     foreach ($validComparator as $k) {
                         if ($k == $nscmp) $validFlag = true;
