@@ -21,20 +21,34 @@ function requestAJAX(
   timeOut = 0,
   timeOutHandler = function () {}
 ) {
-  var xhr = new XMLHttpRequest();
   var json = JSON.stringify(jsonobject);
-  if (timeOut != 0) {
-    xhr.timeout = timeOut;
-    timeOutHandler(xhr.status);
-  }
-  xhr.open("POST", "api/" + fileName + ".php");
-  xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
-  xhr.send(json);
-  xhr.onload = function () {
-    if (xhr.status == 200 && xhr.readyState == 4) {
-      callback(xhr.responseText);
-    }
-  };
+  $.ajax({
+    type: "POST",
+    url: "api/" + fileName + ".php",
+    contentType: "application/json; charset=utf-8",
+    data: json,
+    timeout: timeOut,
+    success: function (msg) {
+      callback(msg);
+    },
+    error: function (xhr, textStatus, errorThrown) {
+      if (timeOut != 0) {
+        if (textStatus == "timeout") timeOutHandler(textStatus);
+        else
+          bootbox.alert({
+            size: "large",
+            title: "Gagal terhubung ke server!",
+            message: `Sepertinya anda tidak mempunyai koneksi ke internet<br>${errorThrown}`,
+            closeButton: false,
+            buttons: {
+              ok: {
+                label: "Tutup",
+              },
+            },
+          });
+      }
+    },
+  });
 }
 
 function getMeta(metaName) {
@@ -195,7 +209,7 @@ $(document).ready(function () {
                   bootbox.alert({
                     size: "large",
                     title: "Gagal mengirim pesan",
-                    message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                    message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
                     closeButton: false,
                     buttons: {
                       ok: {
@@ -232,7 +246,7 @@ $(document).ready(function () {
               bootbox.alert({
                 size: "large",
                 title: "Gagal memuat laman",
-                message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
                 closeButton: false,
                 buttons: {
                   ok: {
@@ -267,7 +281,7 @@ $(document).ready(function () {
                 bootbox.alert({
                   size: "large",
                   title: "Gagal mengganti password",
-                  message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                  message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
                   closeButton: false,
                   buttons: {
                     ok: {
@@ -330,7 +344,7 @@ $(document).ready(function () {
                       bootbox.alert({
                         size: "large",
                         title: "Terjadi kesalahan",
-                        message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                        message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
                         closeButton: false,
                         buttons: {
                           ok: {
@@ -367,7 +381,7 @@ $(document).ready(function () {
                 bootbox.alert({
                   size: "large",
                   title: "Gagal mengganti email",
-                  message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                  message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
                   closeButton: false,
                   buttons: {
                     ok: {
@@ -416,6 +430,19 @@ $(document).ready(function () {
         }
         retractSidebar();
       }
+      if (status == "error") {
+        bootbox.alert({
+          size: "large",
+          title: "Gagal memuat laman",
+          message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian.`,
+          closeButton: false,
+          buttons: {
+            ok: {
+              label: "Tutup",
+            },
+          },
+        });
+      }
     });
   });
   $("#otomaIcon, #goHome").on("click", function () {
@@ -435,6 +462,19 @@ $(document).ready(function () {
           if (statusTxt == "success") {
             nexusFirstLoad(getBondKey());
             $(".absolute-overlay").addClass("loaded");
+          }
+          if (status == "error") {
+            bootbox.alert({
+              size: "large",
+              title: "Gagal memuat laman",
+              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian`,
+              closeButton: false,
+              buttons: {
+                ok: {
+                  label: "Tutup",
+                },
+              },
+            });
           }
         });
       } else {
@@ -915,7 +955,7 @@ if (deviceBelonging) {
             bootbox.alert({
               size: "large",
               title: "Gagal mengganti setpoin suhu",
-              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
               closeButton: false,
               buttons: {
                 ok: {
@@ -1587,7 +1627,7 @@ if (deviceBelonging) {
                 bootbox.alert({
                   size: "large",
                   title: `Gagal mengupdate program ${spaceNum}`,
-                  message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                  message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
                   closeButton: false,
                   buttons: {
                     ok: {
@@ -1629,7 +1669,7 @@ if (deviceBelonging) {
               bootbox.alert({
                 size: "large",
                 title: `Gagal menghapus program ${spaceNum}`,
-                message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
                 closeButton: false,
                 buttons: {
                   ok: {
@@ -1752,7 +1792,7 @@ if (deviceBelonging) {
             bootbox.alert({
               size: "large",
               title: "Gagal memuat grafik",
-              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
               closeButton: false,
               buttons: {
                 ok: {
@@ -1871,7 +1911,7 @@ if (deviceBelonging) {
                   ? "pemanas"
                   : "pendingin"
               }`,
-              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
               closeButton: false,
               buttons: {
                 ok: {
@@ -1984,7 +2024,7 @@ if (deviceBelonging) {
                   ? "operasi thermocontrol"
                   : "kondisi"
               }`,
-              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
               closeButton: false,
               buttons: {
                 ok: {
@@ -2284,7 +2324,7 @@ if (deviceBelonging) {
           bootbox.alert({
             size: "large",
             title: "Gagal memuat laman",
-            message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+            message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
             closeButton: false,
             buttons: {
               ok: {
@@ -2345,7 +2385,7 @@ if (deviceBelonging) {
                   bootbox.alert({
                     size: "large",
                     title: "Terjadi kesalahan",
-                    message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                    message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
                     closeButton: false,
                     buttons: {
                       ok: {
@@ -2386,7 +2426,7 @@ if (deviceBelonging) {
             bootbox.alert({
               size: "large",
               title: "Terjadi kesalahan",
-              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
               closeButton: false,
               buttons: {
                 ok: {
@@ -2429,7 +2469,7 @@ if (deviceBelonging) {
               bootbox.alert({
                 size: "large",
                 title: "Terjadi kesalahan",
-                message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
                 closeButton: false,
                 buttons: {
                   ok: {
@@ -2469,6 +2509,20 @@ if (deviceBelonging) {
           $("#aux1Name").val(json.auxName1);
           $("#aux2Name").val(json.auxName2);
           $("#deviceNameEdit").val(json.masterName);
+        },
+        8000,
+        function (status) {
+          bootbox.alert({
+            size: "large",
+            title: "Terjadi kesalahan",
+            message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+            closeButton: false,
+            buttons: {
+              ok: {
+                label: "Tutup",
+              },
+            },
+          });
         }
       );
     }
@@ -2556,7 +2610,8 @@ if (deviceBelonging) {
       $(
         "#coolerSwitch, #heaterSwitch, #aux1Switch, #aux2Switch, #thSwitch"
       ).click(function () {
-        var check = $(this).prop("checked");
+        const elem = $(this);
+        var check = elem.prop("checked");
         const switchToggle = function (arg) {
           requestAJAX(
             "NexusService",
@@ -2572,7 +2627,7 @@ if (deviceBelonging) {
             },
             3000,
             function (status) {
-              $(this).prop("checked", !check);
+              elem.prop("checked", !check);
               bootbox.alert({
                 size: "large",
                 title: `Gagal mengubah kondisi saklar ${
@@ -2588,7 +2643,7 @@ if (deviceBelonging) {
                     ? "thermocontrol"
                     : ""
                 }`,
-                message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Kode Error <b>${status}</b>`,
+                message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
                 closeButton: false,
                 buttons: {
                   ok: {
@@ -2709,6 +2764,19 @@ if (deviceBelonging) {
             $(".absolute-overlay").addClass("loaded");
             nexusSettingLoad();
           }
+          if (status == "error") {
+            bootbox.alert({
+              size: "large",
+              title: "Gagal memuat laman",
+              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian`,
+              closeButton: false,
+              buttons: {
+                ok: {
+                  label: "Tutup",
+                },
+              },
+            });
+          }
         });
       });
 
@@ -2723,6 +2791,20 @@ if (deviceBelonging) {
           if (statusTxt == "success") {
             nexusFirstLoad(getBondKey());
             $(".absolute-overlay").addClass("loaded");
+          }
+
+          if (status == "error") {
+            bootbox.alert({
+              size: "large",
+              title: "Gagal memuat laman",
+              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian`,
+              closeButton: false,
+              buttons: {
+                ok: {
+                  label: "Tutup",
+                },
+              },
+            });
           }
         });
       });
