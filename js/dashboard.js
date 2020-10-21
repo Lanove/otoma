@@ -992,6 +992,35 @@ if (deviceBelonging) {
     }
     var oAP1 = [],
       oAP2 = [];
+    function formatJadwalInput(sElemValue) {
+      var matches = sElemValue.match(/\d+/g);
+      for (i in matches) {
+        if (
+          matches[i] === null ||
+          matches[i] === undefined ||
+          matches[i] === "" ||
+          matches[i] === "0"
+        )
+          matches[i] = "0";
+      }
+      return matches;
+    }
+    function formatJadwalOutput(oSelectedValues) {
+      var stringBuffer = "",
+        numberPal = [":", ":", ""];
+      for (i in oSelectedValues.values) {
+        if (
+          oSelectedValues.values[i].val === null ||
+          oSelectedValues.values[i].val === undefined ||
+          oSelectedValues.values[i].val === "" ||
+          oSelectedValues.values[i].val === "0"
+        )
+          stringBuffer += "0" + numberPal[i];
+        else stringBuffer += oSelectedValues.values[i].val + numberPal[i];
+      }
+      return stringBuffer;
+    }
+    
     function buildDailyPicker(spaceNum) {
       $(`#condition${spaceNum} .content`).append(`
       <div class="item ctCd">
@@ -1006,45 +1035,102 @@ if (deviceBelonging) {
           <span>Aksi</span>
           <input style="max-width:220px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
       </div>`);
-
+      var jadwalDataSource = [];
+      createDataSource(jadwalDataSource, [23, 59, 59]);
       $("#faCd" + spaceNum)
         .unbind()
         .removeData();
       $(`#faCd${spaceNum}`).AnyPicker({
-        mode: "datetime",
+        mode: "select",
         lang: "id",
-        inputDateTimeFormat: "HH:mm:ss",
-        dateTimeFormat: "HH:mm:ss",
         showComponentLabel: true,
-        onInit: function () {
-          oAP1[spaceNum] = this;
-        },
-        onSetOutput: function (sOutput, oSelectedValues) {
-          sStartD = sOutput;
-          if ($(`#feCd${spaceNum}`).val() == "")
-            $(`#feCd${spaceNum}`).val(sStartD);
-          oAP2[spaceNum].setMinimumDate(sStartD);
-        },
+        components: [
+          {
+            component: 0,
+            name: "j",
+            label: "Jam",
+            width: "33%",
+            textAlign: "center",
+          },
+          {
+            component: 1,
+            name: "m",
+            label: "Menit",
+            width: "33%",
+            textAlign: "center",
+          },
+          {
+            component: 2,
+            name: "d",
+            label: "Detik",
+            width: "33%",
+            textAlign: "center",
+          },
+        ],
+        dataSource: [
+          {
+            component: 0,
+            data: jadwalDataSource[0],
+          },
+          {
+            component: 1,
+            data: jadwalDataSource[1],
+          },
+          {
+            component: 2,
+            data: jadwalDataSource[2],
+          },
+        ],
+        parseInput: formatJadwalInput,
+        formatOutput: formatJadwalOutput,
       });
 
       $("#feCd" + spaceNum)
         .unbind()
         .removeData();
       $(`#feCd${spaceNum}`).AnyPicker({
-        mode: "datetime",
+        mode: "select",
         lang: "id",
-        inputDateTimeFormat: "HH:mm:ss",
-        dateTimeFormat: "HH:mm:ss",
         showComponentLabel: true,
-        onInit: function () {
-          oAP2[spaceNum] = this;
-        },
-        onSetOutput: function (sOutput, oSelectedValues) {
-          sEndD = sOutput;
-          if ($(`#faCd${spaceNum}`).val() == "")
-            $(`#faCd${spaceNum}`).val(sEndD);
-          oAP1[spaceNum].setMaximumDate(sEndD);
-        },
+        components: [
+          {
+            component: 0,
+            name: "j",
+            label: "Jam",
+            width: "33%",
+            textAlign: "center",
+          },
+          {
+            component: 1,
+            name: "m",
+            label: "Menit",
+            width: "33%",
+            textAlign: "center",
+          },
+          {
+            component: 2,
+            name: "d",
+            label: "Detik",
+            width: "33%",
+            textAlign: "center",
+          },
+        ],
+        dataSource: [
+          {
+            component: 0,
+            data: jadwalDataSource[0],
+          },
+          {
+            component: 1,
+            data: jadwalDataSource[1],
+          },
+          {
+            component: 2,
+            data: jadwalDataSource[2],
+          },
+        ],
+        parseInput: formatJadwalInput,
+        formatOutput: formatJadwalOutput,
       });
     }
 
@@ -1212,6 +1298,25 @@ if (deviceBelonging) {
                 `<span class="tfailed" style="display:block;">Input Jam (Hingga) tidak boleh kosong<span>`
               );
               success = false;
+            }
+            if (passedData.feCd != "" && passedData.faCd != "") {
+              const comparator = [
+                passedData.faCd.split(":"),
+                passedData.feCd.split(":"),
+              ];
+              if (
+                comparator[0][0] * 3600 +
+                  comparator[0][1] * 60 +
+                  comparator[0][2] >
+                comparator[1][0] * 3600 +
+                  comparator[1][1] * 60 +
+                  comparator[1][2]
+              ) {
+                span.append(
+                  `<span class="tfailed" style="display:block;">Input Jam (Dari) tidak boleh melebihi dari Input Jam (Hingga)<span>`
+                );
+                success = false;
+              }
             }
             if ($(`#acCd${spaceNum}`).val() == "") {
               span.append(
@@ -1491,72 +1596,104 @@ if (deviceBelonging) {
 
     // UI API
     function submitPar(id) {
-      var par = [];
-      if (id === "submitcpid") {
-        par = [
-          $("#ckp").val(),
-          $("#cki").val(),
-          $("#ckd").val(),
-          $("#cds").val(),
-        ];
-        modeCallback($("input[name='cmode']:checked").val(), "cmode");
-      } else if (id === "submitchys") {
-        par = [$("#cbb").val(), $("#cba").val()];
-        modeCallback($("input[name='cmode']:checked").val(), "cmode");
-      } else if (id === "submithpid") {
-        par = [
-          $("#hkp").val(),
-          $("#hki").val(),
-          $("#hkd").val(),
-          $("#hds").val(),
-        ];
-        modeCallback($("input[name='hmode']:checked").val(), "hmode");
-      } else if (id === "submithhys") {
-        par = [$("#hbb").val(), $("#hba").val()];
-        modeCallback($("input[name='hmode']:checked").val(), "hmode");
-      }
-      requestAJAX(
-        "NexusService",
-        {
-          requestType: "submitParameter",
-          bondKey: getBondKey(),
-          id: id,
-          par: par,
-          token: getMeta("token"),
-        },
-        function (response) {
-          var parseJson = JSON.parse(response);
-          var spanId = "";
-          spanId = id.replace("submit", "#span");
-          if (parseJson.failed && spanId !== "") {
-            $(spanId).removeClass();
-            $(spanId).addClass("tfailed");
-            $(spanId).text(
-              "Gagal mengupdate ke database, silahkan coba lagi sesaat kemudian"
-            );
-          } else {
-            $(spanId).removeClass();
-            $(spanId).addClass("tsucceed");
-            $(spanId).text("Sukses mengupdate ke database");
-            $("#hkp").val(parseJson[0].heaterPar[0][0].toFixed(2));
-            $("#hki").val(parseJson[0].heaterPar[0][1].toFixed(2));
-            $("#hkd").val(parseJson[0].heaterPar[0][2].toFixed(2));
-            $("#hds").val(parseJson[0].heaterPar[0][3]);
-            $("#hbb").val(parseJson[0].heaterPar[1][0].toFixed(2));
-            $("#hba").val(parseJson[0].heaterPar[1][1].toFixed(2));
-            $("#ckp").val(parseJson[0].coolerPar[0][0].toFixed(2));
-            $("#cki").val(parseJson[0].coolerPar[0][1].toFixed(2));
-            $("#ckd").val(parseJson[0].coolerPar[0][2].toFixed(2));
-            $("#cds").val(parseJson[0].coolerPar[0][3]);
-            $("#cbb").val(parseJson[0].coolerPar[1][0].toFixed(2));
-            $("#cba").val(parseJson[0].coolerPar[1][1].toFixed(2));
-          }
-          setTimeout(function () {
-            $(spanId).removeClass();
-            $(spanId).text("");
-          }, 15000);
+      var par = [],
+        flag = 0,
+        spanId = "";
+      spanId = id.replace("submit", "#span");
+      const ckp = $("#ckp").val(),
+        cki = $("#cki").val(),
+        ckd = $("#ckd").val(),
+        cds = $("#cds").val(),
+        hkp = $("#hkp").val(),
+        hki = $("#hki").val(),
+        hkd = $("#hkd").val(),
+        hds = $("#hds").val(),
+        cba = $("#cba").val(),
+        cbb = $("#cbb").val(),
+        hba = $("#hba").val(),
+        hbb = $("#hbb").val();
+      if (
+        isNaN(parseFloat(ckp)) ||
+        isNaN(parseFloat(cki)) ||
+        isNaN(parseFloat(ckd)) ||
+        isNaN(parseFloat(cds)) ||
+        isNaN(parseFloat(cba)) ||
+        isNaN(parseFloat(cbb)) ||
+        isNaN(parseFloat(hkp)) ||
+        isNaN(parseFloat(hki)) ||
+        isNaN(parseFloat(hkd)) ||
+        isNaN(parseFloat(hds)) ||
+        isNaN(parseFloat(hba)) ||
+        isNaN(parseFloat(hbb))
+      ) {
+        $(spanId).removeClass();
+        $(spanId).addClass("tfailed");
+        $(spanId).text("Terdapat kesalahan dalam input isian yang dimasukkan");
+      } else {
+        if (id === "submitcpid") {
+          par = [
+            parseFloat(ckp),
+            parseFloat(cki),
+            parseFloat(ckd),
+            parseFloat(cds),
+          ];
+          modeCallback($("input[name='cmode']:checked").val(), "cmode");
+        } else if (id === "submitchys") {
+          par = [parseFloat(cbb), parseFloat(cba)];
+          modeCallback($("input[name='cmode']:checked").val(), "cmode");
+        } else if (id === "submithpid") {
+          par = [
+            parseFloat(hkp),
+            parseFloat(hki),
+            parseFloat(hkd),
+            parseFloat(hds),
+          ];
+          modeCallback($("input[name='hmode']:checked").val(), "hmode");
+        } else if (id === "submithhys") {
+          par = [parseFloat(hbb), parseFloat(hba)];
+          modeCallback($("input[name='hmode']:checked").val(), "hmode");
         }
-      );
+        requestAJAX(
+          "NexusService",
+          {
+            requestType: "submitParameter",
+            bondKey: getBondKey(),
+            id: id,
+            par: par,
+            token: getMeta("token"),
+          },
+          function (response) {
+            var parseJson = JSON.parse(response);
+            if (parseJson.failed && spanId !== "") {
+              $(spanId).removeClass();
+              $(spanId).addClass("tfailed");
+              $(spanId).text(
+                "Gagal mengupdate ke database, silahkan coba lagi sesaat kemudian"
+              );
+            } else {
+              $(spanId).removeClass();
+              $(spanId).addClass("tsucceed");
+              $(spanId).text("Sukses mengupdate ke database");
+              $("#hkp").val(parseJson[0].heaterPar[0][0].toFixed(2));
+              $("#hki").val(parseJson[0].heaterPar[0][1].toFixed(2));
+              $("#hkd").val(parseJson[0].heaterPar[0][2].toFixed(2));
+              $("#hds").val(parseJson[0].heaterPar[0][3]);
+              $("#hbb").val(parseJson[0].heaterPar[1][0].toFixed(2));
+              $("#hba").val(parseJson[0].heaterPar[1][1].toFixed(2));
+              $("#ckp").val(parseJson[0].coolerPar[0][0].toFixed(2));
+              $("#cki").val(parseJson[0].coolerPar[0][1].toFixed(2));
+              $("#ckd").val(parseJson[0].coolerPar[0][2].toFixed(2));
+              $("#cds").val(parseJson[0].coolerPar[0][3]);
+              $("#cbb").val(parseJson[0].coolerPar[1][0].toFixed(2));
+              $("#cba").val(parseJson[0].coolerPar[1][1].toFixed(2));
+            }
+          }
+        );
+      }
+      setTimeout(function () {
+        $(spanId).removeClass();
+        $(spanId).text("");
+      }, 15000);
     }
     function modeCallback(mode, docchi, request = true) {
       if (docchi === "cmode") {
@@ -1687,7 +1824,6 @@ if (deviceBelonging) {
       }
 
       if (arg.espStatusUpdateAvailable == 1) {
-        console.log("updateSwtichStatus!");
         binarySwitch(arg, long);
       }
       $("#tempnow").text(arg.tempNow + "°C");
@@ -2076,31 +2212,6 @@ if (deviceBelonging) {
         .unbind()
         .removeData();
       // Client side filter (that is kinda suck) for parameter of therco
-      $("#ckp, #cki, #ckd, #hkp, #hki, #hkd, #cba, #cbb, #hba, #hbb").on(
-        "input",
-        function () {
-          var v = parseFloat(this.value);
-          if (isNaN(v)) {
-            if (this.value.charAt(0) != "-") this.value = "";
-            else this.value = "-";
-          } else {
-            if (
-              this.id === "hbb" ||
-              this.id === "hba" ||
-              this.id === "cbb" ||
-              this.id === "cba"
-            ) {
-              if (v > 100) v = 100;
-              else if (v < 0) v = 0;
-            } else {
-              if (v > 10000) v = 10000;
-              else if (v < -10000) v = -10000;
-            }
-            if (this.value.split(".").length > 1) this.value = v.toFixed(2);
-            else this.value = v.toFixed(0);
-          }
-        }
-      );
       $("#hds, #cds").unbind().removeData();
       // Client side filter (that is kinda suck) for duration of pid
       $("#hds, #cds").on("input", function () {

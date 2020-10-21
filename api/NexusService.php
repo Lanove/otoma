@@ -396,11 +396,11 @@ function submitParameter($arg, $dbC)
                 is_numeric($parameter[3])
             ) {
                 for ($k = 0; $k < 3; $k++) {
-                    if ($parameter[$k] > 10000) $parameter[$k] = 10000;
-                    else if ($parameter[$k] < -10000) $parameter[$k] = -10000;
+                    if ($parameter[$k] > 100000) $parameter[$k] = 100000;
+                    else if ($parameter[$k] < -100000) $parameter[$k] = -100000;
                     $parameter[$k] = round($parameter[$k], 2);
                 }
-                if ($parameter[3] > 1000000) $parameter[3] = 1000000;
+                if ($parameter[3] > 10000000) $parameter[3] = 10000000;
                 else if ($parameter[3] < 1000) $parameter[3] = 1000;
                 $parameter[3] = round($parameter[3], 0);
                 $split = "";
