@@ -774,6 +774,62 @@ if (deviceBelonging) {
       return stringBuffer;
     }
 
+    function formatJadwalInput(sElemValue) {
+      var matches = sElemValue.match(/\d+/g);
+      for (i in matches) {
+        if (
+          matches[i] === null ||
+          matches[i] === undefined ||
+          matches[i] === "" ||
+          matches[i] === "0"
+        )
+          matches[i] = "0";
+      }
+      return matches;
+    }
+
+    function formatJadwalOutput(oSelectedValues) {
+      var stringBuffer = "",
+        numberPal = [":", ":", ""];
+      for (i in oSelectedValues.values) {
+        if (
+          oSelectedValues.values[i].val === null ||
+          oSelectedValues.values[i].val === undefined ||
+          oSelectedValues.values[i].val === "" ||
+          oSelectedValues.values[i].val === "0"
+        )
+          stringBuffer += "0" + numberPal[i];
+        else stringBuffer += oSelectedValues.values[i].val + numberPal[i];
+      }
+      return stringBuffer;
+    }
+
+    function spsetOut(oSelectedValues) {
+      var stringBuffer = "",
+        numberPal = [".", ""];
+      for (i in oSelectedValues.values) {
+        if (
+          oSelectedValues.values[i].val === null ||
+          oSelectedValues.values[i].val === undefined ||
+          oSelectedValues.values[i].val === "" ||
+          oSelectedValues.values[i].val === "0"
+        )
+          stringBuffer += "0" + numberPal[i];
+        else stringBuffer += oSelectedValues.values[i].val + numberPal[i];
+      }
+      console.log(this);
+      if (this.elem.id == "spsetting") {
+        $("#spvalue").text(String(stringBuffer) + "°C");
+        requestAJAX("NexusService", {
+          token: getMeta("token"),
+          bondKey: getBondKey(),
+          requestType: "changeSetpoint",
+          data: stringBuffer,
+        });
+      }
+      return stringBuffer;
+    }
+
     function createTextDataSource(content) {
       var data = [];
       for (var iTempIndex = 0; iTempIndex < content.length; iTempIndex++) {
@@ -791,7 +847,7 @@ if (deviceBelonging) {
         <input style="max-width:50px;text-align:center;" type="text" class="form-control" id="nscmpCd${spaceNum}" value=">" readonly>
       </div>    
       <div class="item ctCd">
-        <input style="max-width:60px;text-align:center;" type="text" class="form-control" id="nsvalCd${spaceNum}" value="0" readonly>
+        <input style="max-width:70px;text-align:center;" type="text" class="form-control" id="nsvalCd${spaceNum}" value="0" readonly>
       </div>
       <div class="item ctCd">
           <span>Aksi</span>
@@ -823,7 +879,7 @@ if (deviceBelonging) {
         ],
       });
       var oArrData = [];
-      createDataSource(oArrData, [100]);
+      createDataSource(oArrData, [100, 9]);
 
       $("#nsvalCd" + spaceNum)
         .unbind()
@@ -838,7 +894,14 @@ if (deviceBelonging) {
             component: 0,
             name: "c",
             label: val == "Nilai Suhu" ? "Suhu (°C)" : "Humiditas (%)",
-            width: "50%",
+            width: "30%",
+            textAlign: "center",
+          },
+          {
+            component: 1,
+            name: "d",
+            label: "Koma",
+            width: "30%",
             textAlign: "center",
           },
         ],
@@ -847,7 +910,13 @@ if (deviceBelonging) {
             component: 0,
             data: oArrData[0],
           },
+          {
+            component: 1,
+            data: oArrData[1],
+          },
         ],
+        parseInput: formatJadwalInput,
+        formatOutput: spsetOut,
       });
     }
 
@@ -992,35 +1061,7 @@ if (deviceBelonging) {
     }
     var oAP1 = [],
       oAP2 = [];
-    function formatJadwalInput(sElemValue) {
-      var matches = sElemValue.match(/\d+/g);
-      for (i in matches) {
-        if (
-          matches[i] === null ||
-          matches[i] === undefined ||
-          matches[i] === "" ||
-          matches[i] === "0"
-        )
-          matches[i] = "0";
-      }
-      return matches;
-    }
-    function formatJadwalOutput(oSelectedValues) {
-      var stringBuffer = "",
-        numberPal = [":", ":", ""];
-      for (i in oSelectedValues.values) {
-        if (
-          oSelectedValues.values[i].val === null ||
-          oSelectedValues.values[i].val === undefined ||
-          oSelectedValues.values[i].val === "" ||
-          oSelectedValues.values[i].val === "0"
-        )
-          stringBuffer += "0" + numberPal[i];
-        else stringBuffer += oSelectedValues.values[i].val + numberPal[i];
-      }
-      return stringBuffer;
-    }
-    
+
     function buildDailyPicker(spaceNum) {
       $(`#condition${spaceNum} .content`).append(`
       <div class="item ctCd">
@@ -1555,16 +1596,7 @@ if (deviceBelonging) {
 
       return val;
     }
-    function spsetOut(oSelectedValues) {
-      $("#spvalue").text(String(oSelectedValues.values[0].label) + "°C");
-      requestAJAX("NexusService", {
-        token: getMeta("token"),
-        bondKey: getBondKey(),
-        requestType: "changeSetpoint",
-        data: oSelectedValues.values[0].label,
-      });
-      return oSelectedValues.values[0].label;
-    }
+
     function setTrigger(sOutput) {
       const requestedDate =
         sOutput.values[0].label +
@@ -2233,7 +2265,7 @@ if (deviceBelonging) {
       $("#dateselector,#datebuffer").val(today); // set today as default value of datepicker
       // Enable anypicker on setpoint setting
       var oArrData = [];
-      createDataSource(oArrData, [100]);
+      createDataSource(oArrData, [100, 9]);
       $("#spsetting").unbind().removeData();
       $("#spsetting").AnyPicker({
         mode: "select",
@@ -2244,7 +2276,14 @@ if (deviceBelonging) {
             component: 0,
             name: "c",
             label: "Suhu (°C)",
-            width: "50%",
+            width: "30%",
+            textAlign: "center",
+          },
+          {
+            component: 1,
+            name: "d",
+            label: "Koma",
+            width: "30%",
             textAlign: "center",
           },
         ],
@@ -2253,7 +2292,12 @@ if (deviceBelonging) {
             component: 0,
             data: oArrData[0],
           },
+          {
+            component: 1,
+            data: oArrData[1],
+          },
         ],
+        parseInput: formatJadwalInput,
         formatOutput: spsetOut,
       });
 
