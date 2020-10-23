@@ -2,14 +2,14 @@
 $echoBack = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $json = json_decode(file_get_contents('php://input'), true); // Get JSON Input from AJAX and decode it to PHP Array
-    if (isset($json["username"]) && isset($json["password"]) && isset($json["devicetoken"]) && isset($json["softssid"]) && isset($json["softpw"])) {
+    if (isset($json["username"]) && isset($json["password"]) && isset($_SERVER['HTTP_DEVICE_TOKEN']) && isset($json["softssid"]) && isset($json["softpswd"])) {
         $username = $json["username"];
         $password = $json["password"];
-        $deviceToken = $json["devicetoken"];
+        $deviceToken = $_SERVER['HTTP_DEVICE_TOKEN'];
         $softSSID = $json["softssid"];
-        $softPW = $json["softpw"];
-        $macAddr = $json["mac"];
-        $buildVersion = $json["semver"];
+        $softPW = $json["softpswd"];
+        $macAddr = $_SERVER['HTTP_ESP8266_MAC'];
+        $buildVersion = $_SERVER['HTTP_ESP8266_BUILD_VERSION'];
         require "DatabaseController.php";
         $dbHandler = new DatabaseController();
 

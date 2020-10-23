@@ -1,6 +1,19 @@
 <?php
 if (isset($_SERVER['HTTP_DEVICE_TOKEN']) && $_SERVER["REQUEST_METHOD"] == "POST") {
     $json = json_decode(file_get_contents('php://input'), true); // Get JSON Input from AJAX and decode it to PHP Array
+    /*
+    [CONTENT_TYPE] => application/json
+    [HTTP_DEVICE_TOKEN] => te9Dz1MfFK
+    [HTTP_ESP8266_BUILD_VERSION] => 1.0.0
+    [HTTP_ESP8266_SDK_VERSION] => 2.2.2-dev(38a443e)
+    [HTTP_ESP8266_CORE_VERSION] => 2_7_4
+    [HTTP_ESP8266_MAC] => 40:F5:20:25:49:D6
+    [HTTP_ESP8266_SKETCH_MD5] => 5aba035a3d003f533221c573d06565fc
+    [HTTP_ESP8266_SKETCH_FREE_SPACE] => 2797568
+    [HTTP_ESP8266_SKETCH_SIZE] => 344368
+    [HTTP_ESP8266_CHIP_SIZE] => 4194304
+    */
+    // print_r($_SERVER);
     if (isset($json["type"])) {
         $macAddr = $_SERVER['HTTP_ESP8266_MAC'];
         $buildVersion = $_SERVER['HTTP_ESP8266_BUILD_VERSION'];
