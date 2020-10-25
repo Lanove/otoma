@@ -58,6 +58,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                             updateName($json, $dbController);
                         } else if ($requestType == "deleteController") {
                             deleteController($json, $dbController);
+                        } else if ($requestType == "controllerCommand") {
+                            controllerCommand($json, $dbController);
                         }
                     }
                 }
@@ -67,6 +69,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
     $dbController->close();
     $dbController = null;
 } else header('HTTP/1.1 403 Forbidden');
+
+function controllerCommand($arg, $dbC)
+{
+    $bondKey =  $arg["bondKey"];
+    $cmd = $arg["command"];
+    $fetchResult = $dbC->runQuery("SELECT updateBuffer FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+    $fetchResult["updateBuffer"] .= $cmd . ",";
+    $dbC->runQuery("UPDATE nexusbond SET updateAvailable='1',updateBuffer=:updateBuffer WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "updateBuffer" => $fetchResult["updateBuffer"]]);
+}
 
 function deleteController($arg, $dbC)
 {

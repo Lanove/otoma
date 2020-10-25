@@ -23,7 +23,6 @@ function sendFile($path)
 
 if (!check_header('HTTP_USER_AGENT', 'ESP8266-http-Update')) {
     header($_SERVER["SERVER_PROTOCOL"] . ' 403 Forbidden', true, 403);
-    echo "only for ESP8266 updater!\n";
     exit();
 }
 
@@ -37,13 +36,12 @@ if (
     !check_header('HTTP_X_ESP8266_SDK_VERSION')
 ) {
     header($_SERVER["SERVER_PROTOCOL"] . ' 403 Forbidden', true, 403);
-    echo "only for ESP8266 updater! (header)\n";
     exit();
 }
 
 $db = array(
     "18:FE:AA:AA:AA:AA" => "DOOR-7-g14f53a19",
-    "40:F5:20:25:49:D6" => "9.0.0"
+    "40:F5:20:25:49:D6" => "1.0.0"
 );
 
 if (!isset($db[$_SERVER['HTTP_X_ESP8266_STA_MAC']])) {

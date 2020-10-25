@@ -2339,10 +2339,103 @@ if (deviceBelonging) {
     function nexusSettingLoad() {
       $("#delDevice").unbind().removeData();
       $("#delDevice").click(function () {
+        bootbox.prompt({
+          message: `Aksi ini tidak dapat dipulihkan. Seluruh informasi kontroller yang terhubung dengan akun ini akan terhapus seluruhnya.<br> Tolong ketikkkan nama kontroller anda (<b>${$(
+            "#deviceName"
+          ).text()}</b>) apabila anda yakin.`,
+          title: "Apakah anda yakin ingin menghapus kontroller ini?",
+          inputType: "text",
+          buttons: {
+            cancel: {
+              label: '<i class="fa fa-times"></i> Tidak',
+              className: "btn-secondary",
+            },
+            confirm: {
+              label: '<i class="fa fa-check"></i> Ya',
+              className: "btn-danger",
+            },
+          },
+          callback: function (result) {
+            if (result != null) {
+              if (result == $("#deviceName").text()) {
+                  requestAJAX(
+                    "NexusService",
+                    {
+                      requestType: "deleteController",
+                      bondKey: getBondKey(),
+                      token: getMeta("token"),
+                    },
+                    function (response) {
+                      if (response) {
+                        bootbox.alert({
+                          size: "large",
+                          title: "Berhasil menghapus",
+                          message: `Kontroller sudah terhapus dari akun ini, merefresh halaman dalam 3 detik...`,
+                          closeButton: false,
+                          buttons: {
+                            ok: {
+                              label: "Tutup",
+                            },
+                          },
+                        });
+                        setTimeout(function () {
+                          location.reload();
+                        }, 3000);
+                      }
+                    },
+                    5000,
+                    function (status) {
+                      bootbox.alert({
+                        size: "large",
+                        title: "Terjadi kesalahan",
+                        message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+                        closeButton: false,
+                        buttons: {
+                          ok: {
+                            label: "Tutup",
+                          },
+                        },
+                      });
+                    }
+                  );
+              } else {
+                bootbox.alert({
+                  size: "large",
+                  title: "Gagal menghapus kontroller",
+                  message: `Isian yang anda isi tidak sama dengan nama kontroller anda (<b>${$(
+                    "#deviceName"
+                  ).text()}</b>).`,
+                  closeButton: false,
+                  buttons: {
+                    ok: {
+                      label: "Tutup",
+                    },
+                  },
+                });
+              }
+            }
+          },
+        });
+      });
+
+      
+      $("#restartDev, #conCheck").unbind().removeData();
+      $("#restartDev, #conCheck").click(function () {
+        var message,title,command;
+        if(this.id == "restartDev"){
+          title = "Restart kontroller?";
+          message = "Apabila anda yakin ingin merestart kontroller maka klik tombol \"Ya\"";
+          command = "restart";
+        }else if(this.id == "conCheck"){
+          title = "Putuskan koneksi internet kontroller?";
+          message = "Apabila anda yakin ingin memutus koneksi internet kontroller maka klik tombol \"Ya\"";
+          command = "fallback";
+        }
+
         bootbox.confirm({
-          title: "Apakah anda yakin ingin menghapus kontroller?",
+          title: title,
           className: "bootBoxPop",
-          message: `Aksi ini tidak dapat dipulihkan. Seluruh informasi kontroller yang terhubung dengan akun ini akan terhapus seluruhnya`,
+          message: message,
           buttons: {
             cancel: {
               label: '<i class="fa fa-times"></i> Tidak',
@@ -2358,27 +2451,12 @@ if (deviceBelonging) {
               requestAJAX(
                 "NexusService",
                 {
-                  requestType: "deleteController",
+                  requestType: "controllerCommand",
+                  command: command,
                   bondKey: getBondKey(),
                   token: getMeta("token"),
                 },
                 function (response) {
-                  if (response) {
-                    bootbox.alert({
-                      size: "large",
-                      title: "Berhasil menghapus",
-                      message: `Kontroller sudah terhapus dari akun ini, merefresh halaman dalam 3 detik...`,
-                      closeButton: false,
-                      buttons: {
-                        ok: {
-                          label: "Tutup",
-                        },
-                      },
-                    });
-                    setTimeout(function () {
-                      location.reload();
-                    }, 3000);
-                  }
                 },
                 5000,
                 function (status) {
@@ -2398,7 +2476,9 @@ if (deviceBelonging) {
             }
           },
         });
+      
       });
+
 
       $("#auxNameSubmit").unbind().removeData();
       $("#auxNameSubmit").click(function () {
@@ -2525,6 +2605,7 @@ if (deviceBelonging) {
           });
         }
       );
+    
     }
 
     function nexusFirstLoad(bondKey = null) {
