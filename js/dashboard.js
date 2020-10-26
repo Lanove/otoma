@@ -895,8 +895,8 @@ if (deviceBelonging) {
       return stringBuffer;
     }
 
-    function formatJadwalInput(sElemValue) {
-      var matches = sElemValue.match(/\d+/g);
+    function formatSHInput(sElemValue) {
+      matches = sElemValue.match(/\d+/g);
       for (i in matches) {
         if (
           matches[i] === null ||
@@ -905,6 +905,32 @@ if (deviceBelonging) {
           matches[i] === "0"
         )
           matches[i] = "0";
+      }
+      return matches;
+    }
+
+    function formatJadwalInput(sElemValue) {
+      var matches = [];
+      if (
+        sElemValue === null ||
+        sElemValue === undefined ||
+        sElemValue === "" ||
+        sElemValue === "0"
+      ) {
+        matches[0] = "0";
+        matches[1] = "0";
+        matches[2] = "0";
+      } else {
+        matches = sElemValue.match(/\d+/g);
+        for (i in matches) {
+          if (
+            matches[i] === null ||
+            matches[i] === undefined ||
+            matches[i] === "" ||
+            matches[i] === "0"
+          )
+            matches[i] = "0";
+        }
       }
       return matches;
     }
@@ -938,7 +964,6 @@ if (deviceBelonging) {
           stringBuffer += "0" + numberPal[i];
         else stringBuffer += oSelectedValues.values[i].val + numberPal[i];
       }
-      console.log(this);
       if (this.elem.id == "spsetting") {
         $("#spvalue").text(String(stringBuffer) + "°C");
         requestAJAX(
@@ -1054,7 +1079,7 @@ if (deviceBelonging) {
             data: oArrData[1],
           },
         ],
-        parseInput: formatJadwalInput,
+        parseInput: formatSHInput,
         formatOutput: spsetOut,
       });
     }
@@ -2358,37 +2383,19 @@ if (deviceBelonging) {
           callback: function (result) {
             if (result != null) {
               if (result == $("#deviceName").text()) {
-                  requestAJAX(
-                    "NexusService",
-                    {
-                      requestType: "deleteController",
-                      bondKey: getBondKey(),
-                      token: getMeta("token"),
-                    },
-                    function (response) {
-                      if (response) {
-                        bootbox.alert({
-                          size: "large",
-                          title: "Berhasil menghapus",
-                          message: `Kontroller sudah terhapus dari akun ini, merefresh halaman dalam 3 detik...`,
-                          closeButton: false,
-                          buttons: {
-                            ok: {
-                              label: "Tutup",
-                            },
-                          },
-                        });
-                        setTimeout(function () {
-                          location.reload();
-                        }, 3000);
-                      }
-                    },
-                    5000,
-                    function (status) {
+                requestAJAX(
+                  "NexusService",
+                  {
+                    requestType: "deleteController",
+                    bondKey: getBondKey(),
+                    token: getMeta("token"),
+                  },
+                  function (response) {
+                    if (response) {
                       bootbox.alert({
                         size: "large",
-                        title: "Terjadi kesalahan",
-                        message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+                        title: "Berhasil menghapus",
+                        message: `Kontroller sudah terhapus dari akun ini, merefresh halaman dalam 3 detik...`,
                         closeButton: false,
                         buttons: {
                           ok: {
@@ -2396,8 +2403,26 @@ if (deviceBelonging) {
                           },
                         },
                       });
+                      setTimeout(function () {
+                        location.reload();
+                      }, 3000);
                     }
-                  );
+                  },
+                  5000,
+                  function (status) {
+                    bootbox.alert({
+                      size: "large",
+                      title: "Terjadi kesalahan",
+                      message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+                      closeButton: false,
+                      buttons: {
+                        ok: {
+                          label: "Tutup",
+                        },
+                      },
+                    });
+                  }
+                );
               } else {
                 bootbox.alert({
                   size: "large",
@@ -2418,17 +2443,18 @@ if (deviceBelonging) {
         });
       });
 
-      
       $("#restartDev, #conCheck").unbind().removeData();
       $("#restartDev, #conCheck").click(function () {
-        var message,title,command;
-        if(this.id == "restartDev"){
+        var message, title, command;
+        if (this.id == "restartDev") {
           title = "Restart kontroller?";
-          message = "Apabila anda yakin ingin merestart kontroller maka klik tombol \"Ya\"";
+          message =
+            'Apabila anda yakin ingin merestart kontroller maka klik tombol "Ya"';
           command = "restart";
-        }else if(this.id == "conCheck"){
+        } else if (this.id == "conCheck") {
           title = "Putuskan koneksi internet kontroller?";
-          message = "Apabila anda yakin ingin memutus koneksi internet kontroller maka klik tombol \"Ya\"";
+          message =
+            'Apabila anda yakin ingin memutus koneksi internet kontroller maka klik tombol "Ya"';
           command = "fallback";
         }
 
@@ -2456,8 +2482,7 @@ if (deviceBelonging) {
                   bondKey: getBondKey(),
                   token: getMeta("token"),
                 },
-                function (response) {
-                },
+                function (response) {},
                 5000,
                 function (status) {
                   bootbox.alert({
@@ -2476,9 +2501,7 @@ if (deviceBelonging) {
             }
           },
         });
-      
       });
-
 
       $("#auxNameSubmit").unbind().removeData();
       $("#auxNameSubmit").click(function () {
@@ -2605,7 +2628,6 @@ if (deviceBelonging) {
           });
         }
       );
-    
     }
 
     function nexusFirstLoad(bondKey = null) {
@@ -2680,7 +2702,7 @@ if (deviceBelonging) {
             data: oArrData[1],
           },
         ],
-        parseInput: formatJadwalInput,
+        parseInput: formatSHInput,
         formatOutput: spsetOut,
       });
 
