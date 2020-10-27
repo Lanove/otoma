@@ -17,9 +17,9 @@
                     </div>
                     <div class="error-actions">
                         <a href="#">
-                            <button class="btn btn-info mt-2"><i class="fa fa-question-circle"></i> Panduan</button></a>
+                            <button class="btn btn-info mt-2" id="goHelp"><i class="fa fa-question-circle"></i> Panduan</button></a>
                         <a href="#">
-                            <button class="btn btn-info mt-2"><i class="fas fa-paper-plane"></i> Kontak Kami</button></a>
+                            <button class="btn btn-info mt-2" id="contactUs"><i class="fas fa-paper-plane"></i> Kontak Kami</button></a>
                     </div>
                 </div>
             </div>
