@@ -148,13 +148,13 @@ if ($fetchResult) {
   <!-- Anypicker -->
   <link rel="stylesheet" type="text/css" href="style/anypicker-font.css" />
   <link rel="stylesheet" type="text/css" href="style/anypicker.css" />
-  <script type="text/javascript" src="js/anypicker.js"></script>
+  <script type="text/javascript" src="js/anypicker.min.js"></script>
   <script type="text/javascript" src="js/i18n/anypicker-i18n-id.js"></script>
   <!-- Bootbox -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.4.0/bootbox.min.js" integrity="sha512-8vfyGnaOX2EeMypNMptU+MwwK206Jk1I/tMQV4NkhOz+W8glENoMhGyU6n/6VgQUhQcJH8NqQgHhMtZjJJBv3A==" crossorigin="anonymous"></script>
   <!-- accordiom.js -->
   <script type="text/javascript" src="js/accordiom.min.js"></script>
-  <script src="js/dashboard.js"></script>
+  <script src="js/index.min.js"></script>
 </body>
 
 </html>
