@@ -297,9 +297,6 @@
                                                             <label for="hhysteresismd">Histeresis</label>
                                                         </div>
                                                     </div>
-                                                    <a href="#0" data-toggle="popover" title="Informasi" data-trigger="focus" data-placement="left" data-content="Mode algoritma yang digunakan untuk pemanas. Cari tau informasi perbedaan antara mode PID dengan Histeresis klik <a href='#0'class='infolink'>disini</a>.">
-                                                        <i class="fas fa-info-circle infocon"></i>
-                                                    </a>
                                                 </div>
                                             </div>
 
@@ -307,25 +304,25 @@
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
                                                         <p>Kp :</p>
-                                                        <input id="hkp" type="number" min="0" max="100000" step="0.01" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="Konstanta Proporsional dari algoritma PID, hanya dapat berupa <b>angka positif atau angka negatif</b>, untuk informasi lengkap cara mengatur PID klik <a href='#0'class='infolink'>disini</a>.">
+                                                        <input id="hkp" tabindex="0" type="number" min="0" max="100000" step="0.01" class="form-control ml-auto numin">
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
                                                         <p>Ki :</p>
-                                                        <input id="hki" type="number" min="0" max="100000" step="0.01" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="Konstanta Derivatif dari algoritma PID, hanya dapat berupa <b>angka positif atau angka negatif</b>, untuk informasi lengkap cara mengatur PID klik <a href='#0'class='infolink'>disini</a>.">
+                                                        <input id="hki" tabindex="0" type="number" min="0" max="100000" step="0.01" class="form-control ml-auto numin">
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
                                                         <p>Kd :</p>
-                                                        <input id="hkd" type="number" min="0" max="100000" step="0.01" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="Konstanta Integral dari algoritma PID, hanya dapat berupa <b>angka positif atau angka negatif</b>, untuk informasi lengkap cara mengatur PID klik <a href='#0'class='infolink'>disini</a>.">
+                                                        <input id="hkd" tabindex="0" type="number" min="0" max="100000" step="0.01" class="form-control ml-auto numin">
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
                                                         <p>Durasi Siklus :</p>
-                                                        <input id="hds" type="number" min="1000" max="10000000" step="1" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="Durasi dari siklus algoritma PID dalam satuan milidetik (1 detik = 1000 milidetik), untuk informasi lengkap cara mengatur PID klik <a href='#0'class='infolink'>disini</a>.">
+                                                        <input id="hds" tabindex="0" type="number" min="1000" max="10000000" step="1" class="form-control ml-auto numin">
                                                     </div>
                                                 </div>
 
@@ -344,13 +341,13 @@
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
                                                         <p>Batas Atas :</p>
-                                                        <input id="hba" type="number" min="0.01" max="30" step="0.01" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="<u>Batas atas</u> dari setpoin, hanya dapat diisi <b>angka positif</b>. Jika suhu sekarang naik dari <u>setpoin</u> ditambah <u>batas atas</u> maka pemanas akan mati. Untuk informasi lengkap cara mengatur Histeresis klik <a href='#0'class='infolink'>disini</a>.">
+                                                        <input id="hba" tabindex="0" type="number" min="0.01" max="30" step="0.01" class="form-control ml-auto numin">
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
                                                         <p>Batas Bawah :</p>
-                                                        <input id="hbb" type="number" min="0.01" max="30" step="0.01" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="<u>Batas bawah</u> dari setpoin, hanya dapat diisi <b>angka positif</b>. Jika suhu sekarang turun dari <u>setpoin</u> dikurang <u>batas bawah</u> maka pemanas akan nyala. Untuk informasi lengkap cara mengatur Histeresis klik <a href='#0'class='infolink'>disini</a>.">
+                                                        <input id="hbb" tabindex="0" type="number" min="0.01" max="30" step="0.01" class="form-control ml-auto numin">
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -398,9 +395,6 @@
                                                             <label for="chysteresismd">Histeresis</label>
                                                         </div>
                                                     </div>
-                                                    <a href="#0" data-toggle="popover" title="Informasi" data-trigger="focus" data-placement="left" data-content="Mode algoritma yang digunakan untuk pendingin. Cari tau informasi perbedaan antara mode PID dengan Histeresis klik <a href='#0'class='infolink'>disini</a>.">
-                                                        <i class="fas fa-info-circle infocon"></i>
-                                                    </a>
                                                 </div>
                                             </div>
 
@@ -408,25 +402,25 @@
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
                                                         <p>Kp :</p>
-                                                        <input id="ckp" type="number" min="0" max="100000" step="0.01" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="Konstanta Proporsional dari algoritma PID, hanya dapat berupa <b>angka positif atau angka negatif</b>, untuk informasi lengkap cara mengatur PID klik <a href='#0'class='infolink'>disini</a>.">
+                                                        <input id="ckp" tabindex="0" type="number" min="0" max="100000" step="0.01" class="form-control ml-auto numin">
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
                                                         <p>Ki :</p>
-                                                        <input id="cki" type="number" min="0" max="100000" step="0.01" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="Konstanta Derivatif dari algoritma PID, hanya dapat berupa <b>angka positif atau angka negatif</b>, untuk informasi lengkap cara mengatur PID klik <a href='#0'class='infolink'>disini</a>.">
+                                                        <input id="cki" tabindex="0" type="number" min="0" max="100000" step="0.01" class="form-control ml-auto numin">
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
                                                         <p>Kd :</p>
-                                                        <input id="ckd" type="number" min="0" max="100000" step="0.01" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="Konstanta Integral dari algoritma PID, hanya dapat berupa <b>angka positif atau angka negatif</b>, untuk informasi lengkap cara mengatur PID klik <a href='#0'class='infolink'>disini</a>.">
+                                                        <input id="ckd" tabindex="0" type="number" min="0" max="100000" step="0.01" class="form-control ml-auto numin">
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
                                                         <p>Durasi Siklus :</p>
-                                                        <input id="cds" type="number" min="1000" max="10000000" step="1" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="Durasi dari siklus algoritma PID dalam satuan milidetik (1 detik = 1000 milidetik), untuk informasi lengkap cara mengatur PID klik <a href='#0'class='infolink'>disini</a>.">
+                                                        <input id="cds" tabindex="0" type="number" min="1000" max="10000000" step="1" class="form-control ml-auto numin">
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -444,13 +438,13 @@
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
                                                         <p>Batas Atas :</p>
-                                                        <input id="cba" type="number" min="0.01" max="30" step="0.01" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="<u>Batas atas</u> dari setpoin, hanya dapat diisi <b>angka positif</b>. Jika suhu sekarang naik dari <u>setpoin</u> ditambah <u>batas atas</u> maka pendingin akan menyala. Untuk informasi lengkap cara mengatur Histeresis klik <a href='#0'class='infolink'>disini</a>.">
+                                                        <input id="cba" tabindex="0" type="number" min="0.01" max="30" step="0.01" class="form-control ml-auto numin">
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-12 d-inline-flex">
                                                         <p>Batas Bawah :</p>
-                                                        <input id="cbb" type="number" min="0.01" max="30" step="0.01" class="form-control ml-auto numin" data-container="body" data-toggle="popover" data-placement="top" data-trigger="focus" title="Informasi" data-content="<u>Batas bawah</u> dari setpoin, hanya dapat diisi <b>angka positif</b>. Jika suhu sekarang turun dari <u>setpoin</u> dikurang <u>batas bawah</u> maka pendingin akan mati. Untuk informasi lengkap cara mengatur Histeresis klik <a href='#0'class='infolink'>disini</a>.">
+                                                        <input id="cbb" tabindex="0" type="number" min="0.01" max="30" step="0.01" class="form-control ml-auto numin">
                                                     </div>
                                                 </div>
 
@@ -479,7 +473,7 @@
             <div class="row" style="margin-top:10px;">
                 <div class="col-12 d-inline-flex">
                     <button class="btn btn-primary" id="addCond"><i class="fas fa-plus"></i></button>
-                    <a href="#0" class="ml-auto btn btn-primary helpBtn">Bantuan<i style="position:relative;top:3px;" class="fas fa-info-circle infocon"></i></a>
+                    <a href="#0" class="ml-auto btn btn-primary helpBtn" id="progHelp">Bantuan<i style="position:relative;top:3px;" class="fas fa-info-circle infocon"></i></a>
                 </div>
             </div>
         </div>

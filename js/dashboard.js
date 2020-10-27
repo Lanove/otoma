@@ -13,7 +13,12 @@ $.fn.animateRotate = function (start, end, duration, easing, complete) {
     $({ deg: start }).animate({ deg: end }, args);
   });
 };
-
+function retractSidebar() {
+  $(".sidebarCollapse .close").removeClass("active");
+  $(".sidebarCollapse .open").addClass("active");
+  $("#sidebar").removeClass("active");
+  $(".overlay").removeClass("active");
+}
 function requestAJAX(
   fileName,
   jsonobject,
@@ -144,14 +149,317 @@ $(window).on("resize", function () {
   }
 });
 
-$(document).ready(function () {
-  const retractSidebar = function () {
-    $(".sidebarCollapse .close").removeClass("active");
-    $(".sidebarCollapse .open").addClass("active");
-    $("#sidebar").removeClass("active");
-    $(".overlay").removeClass("active");
-  };
+function pageChanger() {
+  var id = this.id;
+  var helppick = null;
+  $(".absolute-overlay").removeClass("loaded");
+  $("#content").html("");
+  var pageCon = "";
+  if (id == "contactUs") pageCon = "pagecon/contact-us.php";
+  else if (id == "goHelp") pageCon = "pagecon/help-page.php";
+  else if (id == "goAccount") pageCon = "pagecon/account-setting.php";
+  else if (
+    $(this).hasClass("popidvshys") ||
+    $(this).hasClass("popidinfo") ||
+    $(this).hasClass("pohysinfo")
+  ) {
+    id = "goHelp";
+    pageCon = "pagecon/help-page.php";
+    helppick = $(this).hasClass("popidvshys")
+      ? "popidvshys"
+      : $(this).hasClass("popidinfo")
+      ? "popidinfo"
+      : $(this).hasClass("pohysinfo")
+      ? "pohysinfo"
+      : null;
+  } else if (id == "progHelp") {
+    helppick = "progHelp";
+    id = "goHelp";
+    pageCon = "pagecon/help-page.php";
+  }
+  $("#content").load(pageCon, function (responseTxt, statusTxt, xhr) {
+    if (statusTxt == "success") {
+      if (id == "contactUs") {
+        $("#submitContact").click(function () {
+          if (
+            $("#nameContact").val() != "" &&
+            $("#phoneContact").val() != "" &&
+            $("#emailContact").val() != "" &&
+            $("#messageContact").val() != ""
+          ) {
+            $("#notifContact").text("Mengirimkan pesan anda...");
+            requestAJAX(
+              "GlobalService",
+              {
+                requestType: "submitMessage",
+                token: getMeta("token"),
+                name: $("#nameContact").val(),
+                phone: $("#phoneContact").val(),
+                email: $("#emailContact").val(),
+                message: $("#messageContact").val(),
+              },
+              function (response) {
+                $("#nameContact").val("");
+                $("#phoneContact").val("");
+                $("#emailContact").val("");
+                $("#messageContact").val("");
+                $("#notifContact").text("Pesan terkirim!");
+              },
+              5000,
+              function (status) {
+                bootbox.alert({
+                  size: "large",
+                  title: "Gagal mengirim pesan",
+                  message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+                  closeButton: false,
+                  buttons: {
+                    ok: {
+                      label: "Tutup",
+                    },
+                  },
+                });
+              }
+            );
+          } else {
+            $("#notifContact").text(
+              "Gagal mengirim pesan, terdapat form isian yang belum di isi"
+            );
+          }
+          setTimeout(function () {
+            $("#notifContact").text("");
+          }, 15000);
+        });
+        $("#xEr").popover();
+        $("#xeR").popover();
+        $(".absolute-overlay").addClass("loaded");
+      } else if (id == "goAccount") {
+        requestAJAX(
+          "GlobalService",
+          {
+            requestType: "requestEmail",
+            token: getMeta("token"),
+          },
+          function (response) {
+            $("#ACemail").val(response);
+          },
+          8000,
+          function (status) {
+            bootbox.alert({
+              size: "large",
+              title: "Gagal memuat laman",
+              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+              closeButton: false,
+              buttons: {
+                ok: {
+                  label: "Tutup",
+                },
+              },
+            });
+          }
+        );
+        $("#ACpasswordSubmit").click(function () {
+          $("#ACpasswordNotif").removeClass();
+          $("#ACpasswordNotif").text("Memproses permintaan anda...");
+          requestAJAX(
+            "GlobalService",
+            {
+              requestType: "passwordChange",
+              token: getMeta("token"),
+              oldPw: $("#ACpasswordLama").val(),
+              newPw: $("#ACpasswordBaru").val(),
+              confPw: $("#ACconfirmBaru").val(),
+            },
+            function (response) {
+              const parseJson = JSON.parse(response);
+              if (parseJson.status == "failure")
+                $("#ACpasswordNotif").addClass("tfailed");
+              else if (parseJson.status == "success")
+                $("#ACpasswordNotif").addClass("tsucceed2");
+              $("#ACpasswordNotif").text(parseJson.message);
+            },
+            4000,
+            function (status) {
+              bootbox.alert({
+                size: "large",
+                title: "Gagal mengganti password",
+                message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+                closeButton: false,
+                buttons: {
+                  ok: {
+                    label: "Tutup",
+                  },
+                },
+              });
+            }
+          );
 
+          setTimeout(function () {
+            $("#ACpasswordNotif").text("");
+          }, 15000);
+        });
+
+        $("#ACdelete").click(function () {
+          bootbox.prompt({
+            message: `Aksi ini tidak dapat dipulihkan. Seluruh informasi yang terhubung dengan akun ini akan terhapus seluruhnya. Mohon masukkan password anda dengan benar apabila anda yakin.`,
+            title: "Apakah anda yakin ingin menghapus akun ini?",
+            inputType: "password",
+            buttons: {
+              cancel: {
+                label: '<i class="fa fa-times"></i> Tidak',
+                className: "btn-secondary",
+              },
+              confirm: {
+                label: '<i class="fa fa-check"></i> Ya',
+                className: "btn-danger",
+              },
+            },
+            callback: function (result) {
+              if (result != null) {
+                requestAJAX(
+                  "GlobalService",
+                  {
+                    requestType: "deleteAccount",
+                    token: getMeta("token"),
+                    password: result,
+                  },
+                  function (response) {
+                    const parseJson = JSON.parse(response);
+                    bootbox.alert({
+                      size: "large",
+                      title: parseJson.title,
+                      message: parseJson.message,
+                      closeButton: false,
+                      buttons: {
+                        ok: {
+                          label: "Tutup",
+                        },
+                      },
+                    });
+                    if (parseJson.status == "success")
+                      setTimeout(function () {
+                        window.location.replace("logout.php");
+                      }, 3000);
+                  },
+                  4000,
+                  function (status) {
+                    bootbox.alert({
+                      size: "large",
+                      title: "Terjadi kesalahan",
+                      message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+                      closeButton: false,
+                      buttons: {
+                        ok: {
+                          label: "Tutup",
+                        },
+                      },
+                    });
+                  }
+                );
+              }
+            },
+          });
+        });
+        $("#ACemailSubmit").click(function () {
+          $("#ACemailNotif").removeClass();
+          $("#ACemailNotif").text("Memproses permintaan anda...");
+          requestAJAX(
+            "GlobalService",
+            {
+              requestType: "emailChange",
+              token: getMeta("token"),
+              email: $("#ACemail").val(),
+            },
+            function (response) {
+              const parseJson = JSON.parse(response);
+              if (parseJson.status == "failure")
+                $("#ACemailNotif").addClass("tfailed");
+              else if (parseJson.status == "success")
+                $("#ACemailNotif").addClass("tsucceed2");
+              $("#ACemailNotif").text(parseJson.message);
+            },
+            4000,
+            function (status) {
+              bootbox.alert({
+                size: "large",
+                title: "Gagal mengganti email",
+                message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+                closeButton: false,
+                buttons: {
+                  ok: {
+                    label: "Tutup",
+                  },
+                },
+              });
+            }
+          );
+
+          setTimeout(function () {
+            $("#ACemailNotif").text("");
+          }, 15000);
+        });
+
+        $(".absolute-overlay").addClass("loaded");
+      } else if (id == "goHelp") {
+        $("#main-accordion").accordiom({
+          autoClosing: false,
+          showFirstItem: false,
+          onLoad: function (accordionButton) {
+            $(".absolute-overlay").addClass("loaded");
+          },
+          beforeChange: function () {
+            const status = $(this).is(".on");
+            $(this)
+              .find(".caret")
+              .animateRotate(status * 180, status * 180 + 180, 500);
+          },
+          afterchange: function () {},
+        });
+
+        $("#sub-accordion1, #sub-accordion2, #sub-accordion3").accordiom({
+          showFirstItem: false,
+          beforeChange: function () {
+            const status = $(this).is(".on");
+            $(this)
+              .find(".caret")
+              .animateRotate(status * 180, status * 180 + 180, 500);
+          },
+
+          onLoad: function (accordionButton) {},
+        });
+      }
+      if (helppick != null) {
+        if (helppick == "popidvshys") {
+          $().accordiom.openItem("#main-accordion", 1);
+          $().accordiom.openItem("#sub-accordion2", 0);
+        } else if (helppick == "popidinfo") {
+          $().accordiom.openItem("#main-accordion", 1);
+          $().accordiom.openItem("#sub-accordion2", 1);
+        } else if (helppick == "pohysinfo") {
+          $().accordiom.openItem("#main-accordion", 1);
+          $().accordiom.openItem("#sub-accordion2", 2);
+        } else if (helppick == "progHelp") {
+          $().accordiom.openItem("#main-accordion", 2);
+        }
+      }
+      retractSidebar();
+    }
+    if (status == "error") {
+      bootbox.alert({
+        size: "large",
+        title: "Gagal memuat laman",
+        message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian.`,
+        closeButton: false,
+        buttons: {
+          ok: {
+            label: "Tutup",
+          },
+        },
+      });
+    }
+  });
+}
+
+$(document).ready(function () {
   // Add event listener for device size
   const checkUltraMobile = window.matchMedia("screen and (max-width: 380px)");
   const checkMobile = window.matchMedia(
@@ -168,283 +476,11 @@ $(document).ready(function () {
   if (!deviceBelonging.length) {
     $(".absolute-overlay").addClass("loaded");
   }
-  $("#contactUs, #goHelp, #goAccount").click(function () {
-    const id = this.id;
-    $(".absolute-overlay").removeClass("loaded");
-    $("#content").html("");
-    var pageCon = "";
-    if (id == "contactUs") pageCon = "pagecon/contact-us.php";
-    else if (id == "goHelp") pageCon = "pagecon/help-page.php";
-    else if (id == "goAccount") pageCon = "pagecon/account-setting.php";
-    $("#content").load(pageCon, function (responseTxt, statusTxt, xhr) {
-      if (statusTxt == "success") {
-        if (id == "contactUs") {
-          $("#submitContact").click(function () {
-            if (
-              $("#nameContact").val() != "" &&
-              $("#phoneContact").val() != "" &&
-              $("#emailContact").val() != "" &&
-              $("#messageContact").val() != ""
-            ) {
-              $("#notifContact").text("Mengirimkan pesan anda...");
-              requestAJAX(
-                "GlobalService",
-                {
-                  requestType: "submitMessage",
-                  token: getMeta("token"),
-                  name: $("#nameContact").val(),
-                  phone: $("#phoneContact").val(),
-                  email: $("#emailContact").val(),
-                  message: $("#messageContact").val(),
-                },
-                function (response) {
-                  $("#nameContact").val("");
-                  $("#phoneContact").val("");
-                  $("#emailContact").val("");
-                  $("#messageContact").val("");
-                  $("#notifContact").text("Pesan terkirim!");
-                },
-                5000,
-                function (status) {
-                  bootbox.alert({
-                    size: "large",
-                    title: "Gagal mengirim pesan",
-                    message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
-                    closeButton: false,
-                    buttons: {
-                      ok: {
-                        label: "Tutup",
-                      },
-                    },
-                  });
-                }
-              );
-            } else {
-              $("#notifContact").text(
-                "Gagal mengirim pesan, terdapat form isian yang belum di isi"
-              );
-            }
-            setTimeout(function () {
-              $("#notifContact").text("");
-            }, 15000);
-          });
-          $("#xEr").popover();
-          $("#xeR").popover();
-          $(".absolute-overlay").addClass("loaded");
-        } else if (id == "goAccount") {
-          requestAJAX(
-            "GlobalService",
-            {
-              requestType: "requestEmail",
-              token: getMeta("token"),
-            },
-            function (response) {
-              $("#ACemail").val(response);
-            },
-            8000,
-            function (status) {
-              bootbox.alert({
-                size: "large",
-                title: "Gagal memuat laman",
-                message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
-                closeButton: false,
-                buttons: {
-                  ok: {
-                    label: "Tutup",
-                  },
-                },
-              });
-            }
-          );
-          $("#ACpasswordSubmit").click(function () {
-            $("#ACpasswordNotif").removeClass();
-            $("#ACpasswordNotif").text("Memproses permintaan anda...");
-            requestAJAX(
-              "GlobalService",
-              {
-                requestType: "passwordChange",
-                token: getMeta("token"),
-                oldPw: $("#ACpasswordLama").val(),
-                newPw: $("#ACpasswordBaru").val(),
-                confPw: $("#ACconfirmBaru").val(),
-              },
-              function (response) {
-                const parseJson = JSON.parse(response);
-                if (parseJson.status == "failure")
-                  $("#ACpasswordNotif").addClass("tfailed");
-                else if (parseJson.status == "success")
-                  $("#ACpasswordNotif").addClass("tsucceed2");
-                $("#ACpasswordNotif").text(parseJson.message);
-              },
-              4000,
-              function (status) {
-                bootbox.alert({
-                  size: "large",
-                  title: "Gagal mengganti password",
-                  message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
-                  closeButton: false,
-                  buttons: {
-                    ok: {
-                      label: "Tutup",
-                    },
-                  },
-                });
-              }
-            );
-
-            setTimeout(function () {
-              $("#ACpasswordNotif").text("");
-            }, 15000);
-          });
-
-          $("#ACdelete").click(function () {
-            bootbox.prompt({
-              message: `Aksi ini tidak dapat dipulihkan. Seluruh informasi yang terhubung dengan akun ini akan terhapus seluruhnya. Mohon masukkan password anda dengan benar apabila anda yakin.`,
-              title: "Apakah anda yakin ingin menghapus akun ini?",
-              inputType: "password",
-              buttons: {
-                cancel: {
-                  label: '<i class="fa fa-times"></i> Tidak',
-                  className: "btn-secondary",
-                },
-                confirm: {
-                  label: '<i class="fa fa-check"></i> Ya',
-                  className: "btn-danger",
-                },
-              },
-              callback: function (result) {
-                if (result != null) {
-                  requestAJAX(
-                    "GlobalService",
-                    {
-                      requestType: "deleteAccount",
-                      token: getMeta("token"),
-                      password: result,
-                    },
-                    function (response) {
-                      const parseJson = JSON.parse(response);
-                      bootbox.alert({
-                        size: "large",
-                        title: parseJson.title,
-                        message: parseJson.message,
-                        closeButton: false,
-                        buttons: {
-                          ok: {
-                            label: "Tutup",
-                          },
-                        },
-                      });
-                      if (parseJson.status == "success")
-                        setTimeout(function () {
-                          window.location.replace("logout.php");
-                        }, 3000);
-                    },
-                    4000,
-                    function (status) {
-                      bootbox.alert({
-                        size: "large",
-                        title: "Terjadi kesalahan",
-                        message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
-                        closeButton: false,
-                        buttons: {
-                          ok: {
-                            label: "Tutup",
-                          },
-                        },
-                      });
-                    }
-                  );
-                }
-              },
-            });
-          });
-          $("#ACemailSubmit").click(function () {
-            $("#ACemailNotif").removeClass();
-            $("#ACemailNotif").text("Memproses permintaan anda...");
-            requestAJAX(
-              "GlobalService",
-              {
-                requestType: "emailChange",
-                token: getMeta("token"),
-                email: $("#ACemail").val(),
-              },
-              function (response) {
-                const parseJson = JSON.parse(response);
-                if (parseJson.status == "failure")
-                  $("#ACemailNotif").addClass("tfailed");
-                else if (parseJson.status == "success")
-                  $("#ACemailNotif").addClass("tsucceed2");
-                $("#ACemailNotif").text(parseJson.message);
-              },
-              4000,
-              function (status) {
-                bootbox.alert({
-                  size: "large",
-                  title: "Gagal mengganti email",
-                  message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
-                  closeButton: false,
-                  buttons: {
-                    ok: {
-                      label: "Tutup",
-                    },
-                  },
-                });
-              }
-            );
-
-            setTimeout(function () {
-              $("#ACemailNotif").text("");
-            }, 15000);
-          });
-
-          $(".absolute-overlay").addClass("loaded");
-        } else if (id == "goHelp") {
-          $("#main-accordion").accordiom({
-            autoClosing: false,
-            showFirstItem: false,
-            onLoad: function (accordionButton) {
-              $(".absolute-overlay").addClass("loaded");
-            },
-
-            beforeChange: function () {
-              const status = $(this).is(".on");
-              $(this)
-                .find(".caret")
-                .animateRotate(status * 180, status * 180 + 180, 500);
-            },
-
-            afterchange: function () {},
-          });
-
-          $("#sub-accordion1, #sub-accordion2, #sub-accordion3").accordiom({
-            showFirstItem: false,
-            beforeChange: function () {
-              const status = $(this).is(".on");
-              $(this)
-                .find(".caret")
-                .animateRotate(status * 180, status * 180 + 180, 500);
-            },
-
-            onLoad: function (accordionButton) {},
-          });
-        }
-        retractSidebar();
-      }
-      if (status == "error") {
-        bootbox.alert({
-          size: "large",
-          title: "Gagal memuat laman",
-          message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian.`,
-          closeButton: false,
-          buttons: {
-            ok: {
-              label: "Tutup",
-            },
-          },
-        });
-      }
-    });
-  });
+  $(document).on(
+    "click",
+    "#contactUs, #goHelp, #goAccount, #progHelp",
+    pageChanger
+  );
   $("#otomaIcon, #goHome").on("click", function () {
     if (deviceBelonging.length) {
       if (

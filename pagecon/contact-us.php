@@ -156,7 +156,7 @@ box-shadow: 0px 0px 53px 4px rgba(0,0,0,0.36);border-radius:0.5rem;">
                         Atau hubungi kami di
                         <a href="#0" id="xeR" data-toggle="popover" data-trigger="focus" data-placement="left" data-content="Tersalin ke clipboard!" onclick="copyToClipboard(this);">085843503354</a>
                         atau
-                        <a href="#0" id="xEr" data-toggle="popover" data-trigger="focus" data-placement="left" data-content="Tersalin ke clipboard!" onclick="copyToClipboard(this);">figoarzaki123@gmail.com</a>
+                        <a href="#0" id="xEr" data-toggle="popover" data-trigger="focus" data-placement="left" data-content="Tersalin ke clipboard!" onclick="copyToClipboard(this);">arzaki@otoma.my.id</a>
                     </span>
                 </div>
             </div>
