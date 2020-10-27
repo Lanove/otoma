@@ -14,10 +14,10 @@ class DatabaseController
         "jG4UbPDhLXh23Lev8vZN"
     );
 
-    private $host = "127.0.0.1";
-    private $name   = "somecooldb";
-    private $user = "root";
-    private $pass = "";
+    private $host = "localhost";
+    private $name   = "otomamyi_otomadatabase";
+    private $user = "otomamyi";
+    private $pass = "H5TQ2G83CFR";
     private $row;
     private $errorCode = "";
 
@@ -47,13 +47,15 @@ class DatabaseController
             return;
         }
         if ($stmt->execute($param_array)) {
-            $this->row = $stmt->rowCount();
-            if ($fetchMode == "SINGLE")
-                $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            else
-                $result = $stmt->fetchAll();
-            if (!empty($result)) {
-                return $result;
+            if (stripos($query, "SELECT") !== false) {
+                $this->row = $stmt->rowCount();
+                if ($fetchMode == "SINGLE")
+                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                else
+                    $result = $stmt->fetchAll();
+                if (!empty($result)) {
+                    return $result;
+                }
             }
         } else {
             $this->errorCode = "nxqsdO2IUqTevovYP1ab";

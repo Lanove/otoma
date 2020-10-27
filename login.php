@@ -1,7 +1,4 @@
 <?php
-
-require "nocache.php";
-
 // Initialize the session
 require_once "api/authCookieSessionValidate.php";
 
@@ -12,7 +9,7 @@ $auth = new Auth();
 $util = new Util();
 
 if ($isLoggedIn) {
-    $util->redirect("dashboard.php");
+    $util->redirect("index.php");
 }
 
 if (empty($_SESSION['logtoken'])) {
@@ -105,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $util->clearAuthCookie();
                         }
                         // Redirect user to welcome page
-                        header("location: dashboard.php");
+                        header("location: index.php");
                     } else {
                         // Display an error message if password is not valid
                         $password_err = $message["wrongpassword"];

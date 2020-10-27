@@ -1,15 +1,5 @@
-<?php require "originandreferer.php";
+<?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is POST
-    if (isset($_SERVER['HTTP_ORIGIN'])) { // Check if HTTP Origin is set.
-        $address = 'http://' . $origin;
-        if (strpos($address, $_SERVER['HTTP_ORIGIN']) !== 0) { // Check if HTTP Origin is valid
-            exit();
-        }
-    } else {
-        if ($_SERVER['HTTP_REFERER'] !== $dashboardReferer) { // If Origin is not set, then check the referer
-            exit();
-        }
-    }
     require "DatabaseController.php";
     $dbController = new DatabaseController();
 
