@@ -40,7 +40,7 @@ function deleteAccount($arg, $dbC)
     if (isset($arg["password"])) {
         $fetchResult = $dbC->runQuery("SELECT * FROM users WHERE username = :username;", ["username" => $arg["username"]]);
         if (password_verify($arg["password"], $fetchResult["password"])) {
-            $dbC->runQuery("DELETE FROM users WHERE username = :username;", ["username" => $arg["username"]]);
+            $dbC->execute("DELETE FROM users WHERE username = :username;", ["username" => $arg["username"]]);
             echo json_encode(["status" => "success", "title" => "Berhasil", "message" => "Akun anda sudah terhapus, akan keluar dalam 3 detik..."]);
         } else
             echo json_encode(["status" => "failure", "title" => "Terjadi kesalahan", "message" => "Password yang anda masukkan salah."]);
@@ -56,7 +56,7 @@ function emailChange($arg, $dbC)
         $fetchResult = $dbC->runQuery("SELECT * FROM users WHERE username = :username;", ["username" => $arg["username"]]);
         if ($original_email == $clean_email && filter_var($original_email, FILTER_VALIDATE_EMAIL)) {
             if ($clean_email != $fetchResult["email"]) {
-                $dbC->runQuery("UPDATE users SET email=:email WHERE username = :username;", ["email" => $clean_email, "username" => $arg["username"]]);
+                $dbC->execute("UPDATE users SET email=:email WHERE username = :username;", ["email" => $clean_email, "username" => $arg["username"]]);
                 echo json_encode(["status" => "success", "message" => "Berhasil mengganti email!"]);
             } else
                 echo json_encode(["status" => "failure", "message" => "Email lama dengan email baru tidak boleh sama"]);
@@ -83,7 +83,7 @@ function passwordChange($arg, $dbC)
                     } else {
                         $hashedPassword = password_hash($newPw, PASSWORD_DEFAULT);
                         // Insert into database!
-                        $dbC->runQuery("UPDATE users SET password=:hpw WHERE username = :username;", ["hpw" => $hashedPassword, "username" => $arg["username"]]);
+                        $dbC->execute("UPDATE users SET password=:hpw WHERE username = :username;", ["hpw" => $hashedPassword, "username" => $arg["username"]]);
                         echo json_encode(["status" => "success", "message" => "Password berhasil diganti"]);
                     }
                 }
@@ -99,6 +99,6 @@ function submitMessage($arg, $dbC)
 {
     if (isset($arg["name"]) && isset($arg["email"]) && isset($arg["message"]) && isset($arg["phone"])) {
         if ($arg["name"] != "" && $arg["email"] != "" && $arg["message"] != "" && $arg["phone"] != "")
-            $dbC->runQuery("INSERT INTO contact_us (username,nama,nomor,email,pesan) VALUES (:username,:name,:phone,:email,:message);", ["username" => $arg["username"], "name" => $arg["name"], "phone" => $arg["phone"], "email" => $arg["email"], "message" => $arg["message"]]);
+            $dbC->execute("INSERT INTO contact_us (username,nama,nomor,email,pesan) VALUES (:username,:name,:phone,:email,:message);", ["username" => $arg["username"], "name" => $arg["name"], "phone" => $arg["phone"], "email" => $arg["email"], "message" => $arg["message"]]);
     }
 }

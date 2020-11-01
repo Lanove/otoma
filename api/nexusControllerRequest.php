@@ -26,7 +26,7 @@ if (isset($_SERVER['HTTP_DEVICE_TOKEN']) && $_SERVER["REQUEST_METHOD"] == "POST"
             $bondKey = $privilegeCheck["bondKey"];
             // If the ESP Version is different than on database, we change the database to be matched on the ESP one
             if ($privilegeCheck["softwareVersion"] != $_SERVER['HTTP_ESP8266_BUILD_VERSION']) {
-                $dbController->runQuery("UPDATE bond SET softwareVersion=:vers WHERE bondKey = :bondKey;", ["vers" => $_SERVER['HTTP_ESP8266_BUILD_VERSION'], "bondKey" => $bondKey]);
+                $dbController->execute("UPDATE bond SET softwareVersion=:vers WHERE bondKey = :bondKey;", ["vers" => $_SERVER['HTTP_ESP8266_BUILD_VERSION'], "bondKey" => $bondKey]);
             }
             if ($requestType == "tnhns")
                 updateTnHnS($bondKey, $json, $dbController);
@@ -46,7 +46,7 @@ function updateTnHnS($bondKey, $json, $dbC)
     $date = DateTime::createFromFormat('Y-m-d H:i:s', $fetchData["lastGraphUpdate"], new DateTimeZone('GMT'))->getTimeStamp();
     if ((time() + 25200) - $date >= 60) { // Update graph if 60 second has passed since last graph update
         $stringBuffer = ", lastGraphUpdate='" . gmdate('Y-m-d H:i:s', (time() + 25200)) . "'";
-        $dbC->runQuery("INSERT INTO nexusplot (bondKey,date,timestamp,deviceType,data1,data2) VALUES (?,?,?,?,?,?);", [$bondKey, gmdate("Y-m-d", $json["unix"]), gmdate("H:i:s", $json["unix"]), 'nexus', round($json["data"][0], 2), round($json["data"][1], 2)]);
+        $dbC->execute("INSERT INTO nexusplot (bondKey,date,timestamp,deviceType,data1,data2) VALUES (?,?,?,?,?,?);", [$bondKey, gmdate("Y-m-d", $json["unix"]), gmdate("H:i:s", $json["unix"]), 'nexus', round($json["data"][0], 2), round($json["data"][1], 2)]);
     }
     // If ESP are not updating the output status then, just update the passed temperature and humidity
     if (
@@ -56,7 +56,7 @@ function updateTnHnS($bondKey, $json, $dbC)
         $json["ht"] != $fetchData["htStatus"] ||
         $json["cl"] != $fetchData["clStatus"]
     ) {
-        $dbC->runQuery("UPDATE nexusbond SET espStatusUpdateAvailable='1', auxStatus1=?, auxStatus2=?, thStatus=?, htStatus=?, clStatus=?, tempNow=?, humidNow=?, lastUpdate=?{$stringBuffer} WHERE bondKey = ?;", [
+        $dbC->execute("UPDATE nexusbond SET espStatusUpdateAvailable='1', auxStatus1=?, auxStatus2=?, thStatus=?, htStatus=?, clStatus=?, tempNow=?, humidNow=?, lastUpdate=?{$stringBuffer} WHERE bondKey = ?;", [
             (!in_array("auxStatus1", $updateBuffer)) ? $json["a1"] : $fetchData["auxStatus1"],
             (!in_array("auxStatus2", $updateBuffer)) ? $json["a2"] : $fetchData["auxStatus2"],
             (!in_array("thStatus", $updateBuffer)) ? $json["tc"] : $fetchData["thStatus"],
@@ -68,7 +68,7 @@ function updateTnHnS($bondKey, $json, $dbC)
             $bondKey
         ]);
     } else
-        $dbC->runQuery("UPDATE nexusbond SET tempNow=?, humidNow=?, lastUpdate=?{$stringBuffer} WHERE bondKey = ?;", [round($json["data"][0], 2), round($json["data"][1], 2), gmdate("Y-m-d H:i:s", $json["unix"]), $bondKey]);
+        $dbC->execute("UPDATE nexusbond SET tempNow=?, humidNow=?, lastUpdate=?{$stringBuffer} WHERE bondKey = ?;", [round($json["data"][0], 2), round($json["data"][1], 2), gmdate("Y-m-d H:i:s", $json["unix"]), $bondKey]);
     // Send update response if there are updateAvailable from server
 
     $restartOrFallbackFlag = false;
@@ -160,7 +160,7 @@ function updateTnHnS($bondKey, $json, $dbC)
         }
     }
     if ($fetchData["updateAvailable"] == "1" || $restartOrFallbackFlag == true) {
-        $dbC->runQuery("UPDATE nexusbond SET updateAvailable=:someKey,updateBuffer=:updateBuffer WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "someKey" => $someKey, "updateBuffer" => $fetchData["updateBuffer"]]);
+        $dbC->execute("UPDATE nexusbond SET updateAvailable=:someKey,updateBuffer=:updateBuffer WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "someKey" => $someKey, "updateBuffer" => $fetchData["updateBuffer"]]);
         echo json_encode($buffer);
     }
 }

@@ -69,8 +69,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     // Verify password
                     if (password_verify($password, $hashed_password)) {
                         // Password is correct, so start a new session
-                        session_start();
-
+                        if (session_status() == PHP_SESSION_NONE) {
+                            session_start();
+                        }
                         // Store data in session variables
                         $_SESSION["loggedin"] = true;
                         $_SESSION["id"] = $id;

@@ -22,7 +22,7 @@ class Auth
         $dbHandler = new DatabaseController();
 
         $expired = 1;
-        $fetchResult = $dbHandler->runQuery("UPDATE tbl_token_auth SET is_expired = :expired WHERE id = :tokenId", ["expired" => $expired, "tokenId" => $tokenId]);
+        $fetchResult = $dbHandler->execute("UPDATE tbl_token_auth SET is_expired = :expired WHERE id = :tokenId", ["expired" => $expired, "tokenId" => $tokenId]);
 
         return $fetchResult;
     }
@@ -31,7 +31,7 @@ class Auth
     {
         $dbHandler = new DatabaseController();
 
-        $fetchResult = $dbHandler->runQuery("INSERT INTO tbl_token_auth (username, password_hash, selector_hash, expiry_date) values (?, ?, ?,?)", [$username, $random_password_hash, $random_selector_hash, $expiry_date]);
+        $fetchResult = $dbHandler->execute("INSERT INTO tbl_token_auth (username, password_hash, selector_hash, expiry_date) values (?, ?, ?,?)", [$username, $random_password_hash, $random_selector_hash, $expiry_date]);
 
         return $fetchResult;
     }

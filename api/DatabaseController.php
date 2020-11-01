@@ -39,6 +39,17 @@ class DatabaseController
             print_r($e);
         }
     }
+
+    function execute($query, $param_array)
+    {
+        $stmt = $this->database->prepare($query);
+        if (!$stmt) {
+            $this->errorCode = "vqRZtoPE5Onglgm7VRxi";
+            return;
+        }
+        $stmt->execute($param_array);
+    }
+
     function runQuery($query, $param_array, $fetchMode = "SINGLE")
     {
         $stmt = $this->database->prepare($query);

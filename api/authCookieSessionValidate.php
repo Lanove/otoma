@@ -2,7 +2,9 @@
 require_once "Auth.php";
 require_once "Util.php";
 
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 $auth = new Auth();
 $dbHandler = new DatabaseController();
 $util = new Util();

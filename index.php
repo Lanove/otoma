@@ -11,6 +11,7 @@ require "api/CryptographyFunction.php";
 if (empty($_SESSION['ajaxToken'])) {
   $_SESSION['ajaxToken'] = bin2hex(random_bytes(16));
 }
+
 $token = encryptAes($aesKey, base64_encode($_SESSION['ajaxToken']) . "%" . base64_encode($_SESSION["username"]) . "%" . base64_encode($_SESSION["loggedin"]));
 
 $dbHandler = new DatabaseController(); // Open database

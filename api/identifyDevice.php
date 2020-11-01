@@ -42,10 +42,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $echoBack = "success";
                         $bondKey = bin2hex(random_bytes(5)); // Create a 10 length random string for bondKey
                         // Initialize bond with user
-                        $dbHandler->runQuery("INSERT INTO bond(username, deviceToken,deviceType, bondKey, masterName,softSSID,softPass,MAC,softwareVersion) VALUES (:username, :token, :type, :bondKey, :masterName, :softSSID, :softPass, :MAC, :buildVersion)", ["username" => $username, "token" => $deviceToken, "type" => $deviceType, "bondKey" => $bondKey, "masterName" => $bondKey, "softSSID" => $softSSID, "softPass" => $softPW, "MAC" => $macAddr, "buildVersion" => $buildVersion]);
+                        $dbHandler->execute("INSERT INTO bond(username, deviceToken,deviceType, bondKey, masterName,softSSID,softPass,MAC,softwareVersion) VALUES (:username, :token, :type, :bondKey, :masterName, :softSSID, :softPass, :MAC, :buildVersion)", ["username" => $username, "token" => $deviceToken, "type" => $deviceType, "bondKey" => $bondKey, "masterName" => $bondKey, "softSSID" => $softSSID, "softPass" => $softPW, "MAC" => $macAddr, "buildVersion" => $buildVersion]);
                         // Device type specific table row insert
                         if ($deviceType == "nexus") {
-                            $dbHandler->runQuery("INSERT INTO nexusbond(username, bondKey) VALUES (:username, :bondKey)", ["username" => $username, "bondKey" => $bondKey]);
+                            $dbHandler->execute("INSERT INTO nexusbond(bondKey) VALUES (:bondKey)", ["bondKey" => $bondKey]);
                         }
                     }
                 } else { // Wrong password is inserted, oops...
