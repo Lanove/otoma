@@ -961,7 +961,7 @@ if (deviceBelonging) {
       return stringBuffer;
     }
 
-    function spsetOut(oSelectedValues) {
+    function decimalSetOut(oSelectedValues) {
       var stringBuffer = "",
         numberPal = [".", ""];
       for (i in oSelectedValues.values) {
@@ -973,33 +973,6 @@ if (deviceBelonging) {
         )
           stringBuffer += "0" + numberPal[i];
         else stringBuffer += oSelectedValues.values[i].val + numberPal[i];
-      }
-      if (this.elem.id == "spsetting") {
-        $("#spvalue").text(String(stringBuffer) + "°C");
-        requestAJAX(
-          "NexusService",
-          {
-            token: getMeta("token"),
-            bondKey: getBondKey(),
-            requestType: "changeSetpoint",
-            data: stringBuffer,
-          },
-          function (response) {},
-          3000,
-          function (status) {
-            bootbox.alert({
-              size: "large",
-              title: "Gagal mengganti setpoin suhu",
-              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
-              closeButton: false,
-              buttons: {
-                ok: {
-                  label: "Tutup",
-                },
-              },
-            });
-          }
-        );
       }
       return stringBuffer;
     }
@@ -1090,7 +1063,7 @@ if (deviceBelonging) {
           },
         ],
         parseInput: formatSHInput,
-        formatOutput: spsetOut,
+        formatOutput: decimalSetOut,
       });
     }
 
@@ -1844,8 +1817,6 @@ if (deviceBelonging) {
       }
       $("#tempnow").text(arg.tempNow + "°C");
       $("#humidnow").text(arg.humidNow + "%");
-      $("#spvalue").text(arg.sp + "°C");
-      $("#spsetting").val(arg.sp);
 
       if (long) 
         binarySwitch(arg);
@@ -2359,44 +2330,6 @@ if (deviceBelonging) {
       var yyyy = today.getFullYear();
       today = yyyy + "-" + mm + "-" + dd;
       $("#dateselector,#datebuffer").val(today); // set today as default value of datepicker
-      // Enable anypicker on setpoint setting
-      var oArrData = [];
-      createDataSource(oArrData, [100, 9]);
-      $("#spsetting").unbind().removeData();
-      $("#spsetting").AnyPicker({
-        mode: "select",
-        lang: "id",
-        showComponentLabel: true,
-        components: [
-          {
-            component: 0,
-            name: "c",
-            label: "Suhu (°C)",
-            width: "30%",
-            textAlign: "center",
-          },
-          {
-            component: 1,
-            name: "d",
-            label: "Koma",
-            width: "30%",
-            textAlign: "center",
-          },
-        ],
-        dataSource: [
-          {
-            component: 0,
-            data: oArrData[0],
-          },
-          {
-            component: 1,
-            data: oArrData[1],
-          },
-        ],
-        parseInput: formatSHInput,
-        formatOutput: spsetOut,
-      });
-
       $("#aux1Switch, #aux2Switch")
         .unbind()
         .removeData();

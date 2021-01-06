@@ -84,43 +84,6 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="nexusthspbox">
-                        <div class="mini-overlay" id="setpointoverlay" style="height: calc(100% + 10px);">
-                            <div class="mino d-flex align-items-center justify-content-center text-center">
-                                <p>Pengaturan set point suhu hanya dapat dilakukan dalam thermal controller mode auto</p>
-                            </div>
-                        </div>
-                        <div class="header">
-                            <div class="row">
-                                <div class="col-12">
-                                    <span class="text centerme">Set Poin Suhu</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="content">
-                            <div class="row">
-                                <div class="col-12 centerme">
-                                    <i class="fas fa-thermometer-half icon ibcolor"></i>
-                                    <i class="fas fa-cog ibcolor" style="position:relative;top:-14px;"></i>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12 centerme d-inline-flex">
-                                    <span id="spvalue"></span>
-                                    <div class="btn-group-vertical">
-                                        <i class="fas fa-caret-square-up udbutton"></i>
-                                        <i class="fas fa-caret-square-down udbutton"></i>
-                                    </div>
-                                    <a href="#0" class="d-inline-flex" id="spsetting">
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
                     <div class="row auxheader">
                         <div class="col-12 d-inline-flex align-items-center" style="margin-left:-5px;padding-right:5px;">
                             <i class=" fas fa-plug icon ibcolor"></i>
@@ -131,8 +94,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-6">
                     <div class="row auxheader">
                         <div class="col-12 d-inline-flex align-items-center" style="margin-left:-5px;padding-right:5px;">
                             <i class=" fas fa-plug icon ibcolor"></i>

@@ -1,13 +1,4 @@
 <?php
-// ALTER TABLE `nexusbond`
-// DROP `thStatus`,
-// DROP `htStatus`,
-// DROP `clStatus`,
-// DROP `thercoInfo`,
-// DROP `heaterMode`,
-// DROP `coolerMode`,
-// DROP `heaterPar`,
-// DROP `coolerPar`;
 if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is POST
     require "DatabaseController.php";
     $dbController = new DatabaseController();
@@ -39,9 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                             loadPlot($json, $dbController);
                         } else if ($requestType === "toggleSwitch") {
                             toggleSwitch($json, $dbController);
-                        } else if ($requestType === "changeSetpoint") {
-                            changeSetpoint($json, $dbController);
-                        } else if ($requestType === "updateProgram") {
+                        }else if ($requestType === "updateProgram") {
                             updateProgram($json, $dbController);
                         } else if ($requestType === "deleteProgram") {
                             deleteProgram($json, $dbController);
@@ -117,7 +106,7 @@ function loadSetting($arg, $dbC)
 function requestStatus($arg, $dbC)
 {
     $bondKey = $arg["bondKey"];
-    $fetchResult["status"] = $dbC->runQuery("SELECT auxStatus1, auxStatus2, tempNow, humidNow, sp, espStatusUpdateAvailable FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
+    $fetchResult["status"] = $dbC->runQuery("SELECT auxStatus1, auxStatus2, tempNow, humidNow, espStatusUpdateAvailable FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
     if ($fetchResult["status"]["espStatusUpdateAvailable"] == 1) {
         $dbC->execute("UPDATE nexusbond SET espStatusUpdateAvailable='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
     }
@@ -364,21 +353,6 @@ function updateProgram($arg, $dbC) // Be careful, within this function there are
     echo json_encode($response);
 }
 
-function changeSetpoint($arg, $dbC)
-{
-    if (isset($arg["data"])) {
-        $data = $arg["data"];
-        $bondKey = $arg["bondKey"];
-        if (is_numeric($data) && $data >= 0 && $data <= 100) {
-            $fetchResult = $dbC->runQuery("SELECT updateBuffer FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
-            if (!(strpos($fetchResult["updateBuffer"], "sp") !== false)) {
-                $fetchResult["updateBuffer"] .= "sp,";
-            }
-            $dbC->execute("UPDATE nexusbond SET sp=:data, updateAvailable='1', updateBuffer=:updateBuffer WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "data" => $data, "updateBuffer" => $fetchResult["updateBuffer"]]);
-        }
-    }
-}
-
 function toggleSwitch($arg, $dbC)
 {
     if (isset($arg["id"]) &&  isset($arg["status"])) {
@@ -452,7 +426,7 @@ function loadDeviceInformation($arg, $dbC)
         // Get every name of masterDevice with fetchAll
         $fetchResult["otherName"] = $dbC->runQuery("SELECT masterName FROM bond WHERE username = :name AND masterName != :exception ORDER BY id ASC;", ["name" => $arg["username"], "exception" => $fetchResult["deviceInfo"]["masterName"]], "ALL");
 
-        $fetchResult["nexusBond"] = $dbC->runQuery("SELECT bondKey,deviceType,auxName1,auxName2,auxStatus1,auxStatus2,tempNow,humidNow,sp, lastUpdate FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+        $fetchResult["nexusBond"] = $dbC->runQuery("SELECT bondKey,deviceType,auxName1,auxName2,auxStatus1,auxStatus2,tempNow,humidNow, lastUpdate FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
         // Get the oldest record from daily plot data.
         $fetchResult["plot"]["oldest"] = $dbC->runQuery("SELECT MIN(date) AS oldestPlot FROM nexusplot WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
         // Get the newest record from daily plot data.
