@@ -1,4 +1,13 @@
 <?php
+// ALTER TABLE `nexusbond`
+// DROP `thStatus`,
+// DROP `htStatus`,
+// DROP `clStatus`,
+// DROP `thercoInfo`,
+// DROP `heaterMode`,
+// DROP `coolerMode`,
+// DROP `heaterPar`,
+// DROP `coolerPar`;
 if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is POST
     require "DatabaseController.php";
     $dbController = new DatabaseController();
@@ -30,10 +39,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                             loadPlot($json, $dbController);
                         } else if ($requestType === "toggleSwitch") {
                             toggleSwitch($json, $dbController);
-                        } else if ($requestType === "modeSwitch") {
-                            modeSwitch($json, $dbController);
-                        } else if ($requestType === "submitParameter") {
-                            submitParameter($json, $dbController);
                         } else if ($requestType === "changeSetpoint") {
                             changeSetpoint($json, $dbController);
                         } else if ($requestType === "updateProgram") {
@@ -112,7 +117,7 @@ function loadSetting($arg, $dbC)
 function requestStatus($arg, $dbC)
 {
     $bondKey = $arg["bondKey"];
-    $fetchResult["status"] = $dbC->runQuery("SELECT auxStatus1, auxStatus2, thStatus, htStatus, clStatus, tempNow, humidNow, sp, thercoInfo, heaterMode, coolerMode, heaterPar, coolerPar, espStatusUpdateAvailable FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
+    $fetchResult["status"] = $dbC->runQuery("SELECT auxStatus1, auxStatus2, tempNow, humidNow, sp, espStatusUpdateAvailable FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
     if ($fetchResult["status"]["espStatusUpdateAvailable"] == 1) {
         $dbC->execute("UPDATE nexusbond SET espStatusUpdateAvailable='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
     }
@@ -374,162 +379,6 @@ function changeSetpoint($arg, $dbC)
     }
 }
 
-function submitParameter($arg, $dbC)
-{
-    if (isset($arg["id"]) && isset($arg["par"])) {
-        $id = $arg["id"];
-        $parameter = $arg["par"];
-        $bondKey = $arg["bondKey"];
-        $stringBuffer = "";
-        $columnName = "";
-        $failed = true;
-        $fetchResult = $dbC->runQuery("SELECT heaterPar,coolerPar,updateBuffer FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
-        if (($id === "submitcpid" || $id === "submithpid") &&
-            isset($parameter[0]) &&
-            isset($parameter[1]) &&
-            isset($parameter[2]) &&
-            isset($parameter[3])
-        ) { // Submit PID parameter requires 4 parameter of array to be passed, so check whether 4 array is empty and is numeric before proceeding the task.
-            if (
-                is_numeric($parameter[0]) &&
-                is_numeric($parameter[1]) &&
-                is_numeric($parameter[2]) &&
-                is_numeric($parameter[3])
-            ) {
-                for ($k = 0; $k < 3; $k++) {
-                    if ($parameter[$k] > 100000) $parameter[$k] = 100000;
-                    else if ($parameter[$k] < -100000) $parameter[$k] = -100000;
-                    $parameter[$k] = round($parameter[$k], 2);
-                }
-                if ($parameter[3] > 10000000) $parameter[3] = 10000000;
-                else if ($parameter[3] < 1000) $parameter[3] = 1000;
-                $parameter[3] = round($parameter[3], 0);
-                $split = "";
-                if ($id === "submitcpid") {
-                    $split = explode("%", $fetchResult["coolerPar"]);
-                    $columnName = "coolerPar";
-                } else {
-                    $split = explode("%", $fetchResult["heaterPar"]);
-                    $columnName = "heaterPar";
-                }
-                $stringBuffer = $parameter[0] . "/" . $parameter[1] . "/" . $parameter[2] . "/" . $parameter[3] . "%" . $split[1];
-                $failed = false;
-            }
-        } else if (($id === "submitchys" || $id === "submithhys") &&
-            isset($parameter[0]) &&
-            isset($parameter[1])
-        ) { // Submit Hysteresis parameter only requires 2 array of value or par, so just check the first 2 index only
-            if (
-                is_numeric($parameter[0]) &&
-                is_numeric($parameter[1])
-            ) {
-
-                for ($k = 0; $k < 2; $k++) {
-                    if ($parameter[$k] > 100) $parameter[$k] = 100;
-                    else if ($parameter[$k] < 0) $parameter[$k] = 0;
-                    $parameter[$k] = round($parameter[$k], 2);
-                }
-                $split = "";
-                if ($id === "submitchys") {
-                    $split = explode("%", $fetchResult["coolerPar"]);
-                    $columnName = "coolerPar";
-                } else {
-                    $split = explode("%", $fetchResult["heaterPar"]);
-                    $columnName = "heaterPar";
-                }
-                $stringBuffer = $split[0] . "%" . $parameter[0] . "/" . $parameter[1];
-                $failed = false;
-            }
-        }
-        if (strlen($stringBuffer) > 50) {
-            $stringBuffer = "0/0/0/0%0/0";
-        }
-        if (
-            $stringBuffer !== "" &&
-            $columnName !== "" &&
-            !$failed
-        ) {
-
-            $stringBuffer = filter_var($stringBuffer, FILTER_SANITIZE_STRING);
-            if (!(strpos($fetchResult["updateBuffer"], $columnName) !== false)) {
-                $fetchResult["updateBuffer"] .= $columnName . ",";
-            }
-            $dbC->execute("UPDATE nexusbond SET {$columnName}=:stringBuffer, updateAvailable='1', updateBuffer=:updateBuffer WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "stringBuffer" => $stringBuffer, "updateBuffer" => $fetchResult["updateBuffer"]]);
-
-            $callback = $dbC->runQuery("SELECT heaterPar,coolerPar FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
-            $callback["heaterPar"] = explode("%", $callback["heaterPar"]);
-            for ($m = 0; $m < 2; $m++) {
-                $callback["heaterPar"][$m] = explode("/", $callback["heaterPar"][$m]);
-                foreach ($callback["heaterPar"][$m] as $key => $value) {
-                    $callback["heaterPar"][$m][$key] = floatval($callback["heaterPar"][$m][$key]);
-                }
-            }
-            $callback["coolerPar"] = explode("%", $callback["coolerPar"]);
-            for ($m = 0; $m < 2; $m++) {
-                $callback["coolerPar"][$m] = explode("/", $callback["coolerPar"][$m]);
-                foreach ($callback["coolerPar"][$m] as $key => $value) {
-                    $callback["coolerPar"][$m][$key] = floatval($callback["coolerPar"][$m][$key]);
-                }
-            }
-            echo json_encode(["failed" => $failed, $callback]);
-        } else {
-            echo json_encode(["failed" => $failed]);
-        }
-    }
-}
-
-function modeSwitch($arg, $dbC)
-{
-    if (isset($arg["mode"]) &&  isset($arg["docchi"])) {
-        $mode = $arg["mode"];
-        $docchi = $arg["docchi"];
-        $bondKey = $arg["bondKey"];
-        $fetchResult = $dbC->runQuery("SELECT thercoInfo,updateBuffer FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
-        $stringBuffer = "";
-        $columnName = "";
-        if (
-            $docchi === "operation" &&
-            ($mode === "auto" || $mode === "manual")
-        ) {
-            if ($mode === "auto") {
-                $dbC->execute("UPDATE nexusbond SET htStatus='0',clStatus='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
-            }
-            $fetchResult["thercoInfo"] = explode("%", $fetchResult["thercoInfo"]);
-            $stringBuffer = $mode . "%" . $fetchResult["thercoInfo"][1];
-            $columnName = "thercoInfo";
-        } else if (
-            $docchi === "thermmode" &&
-            ($mode === "cool" || $mode === "heat" || $mode === "dual")
-        ) {
-            $fetchResult["thercoInfo"] = explode("%", $fetchResult["thercoInfo"]);
-            $stringBuffer = $fetchResult["thercoInfo"][0] . "%" . $mode;
-            $columnName = "thercoInfo";
-        } else if (
-            $docchi === "hmode"  &&
-            ($mode === "hys" || $mode === "pid")
-        ) {
-            $stringBuffer = $mode;
-            $columnName = "heaterMode";
-        } else if (
-            $docchi === "cmode"  &&
-            ($mode === "hys" || $mode === "pid")
-        ) {
-            $stringBuffer = $mode;
-            $columnName = "coolerMode";
-        }
-        if (
-            $stringBuffer !== "" &&
-            $columnName !== ""
-        ) {
-            $stringBuffer = filter_var($stringBuffer, FILTER_SANITIZE_STRING);
-            if (!(strpos($fetchResult["updateBuffer"], $columnName) !== false)) {
-                $fetchResult["updateBuffer"] .= $columnName . ",";
-            }
-            $dbC->execute("UPDATE nexusbond SET {$columnName}=:data, updateAvailable='1', updateBuffer=:updateBuffer WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "data" => $stringBuffer, "updateBuffer" => $fetchResult["updateBuffer"]]);
-        }
-    }
-}
-
 function toggleSwitch($arg, $dbC)
 {
     if (isset($arg["id"]) &&  isset($arg["status"])) {
@@ -541,12 +390,6 @@ function toggleSwitch($arg, $dbC)
         // THERE SHOULD BE SOME SERVER FILTER IF SOME CONDITIONAL WERE REFERRED TO SOME SWITCH
         if ($id === "aux2Switch")
             $columnData = "auxStatus2";
-        else if ($id === "heaterSwitch")
-            $columnData = "htStatus";
-        else if ($id === "coolerSwitch")
-            $columnData = "clStatus";
-        else if ($id === "thSwitch")
-            $columnData = "thStatus";
         $fetchResult = $dbC->runQuery("SELECT updateBuffer FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
         if (!(strpos($fetchResult["updateBuffer"], $columnData) !== false)) {
             $fetchResult["updateBuffer"] .= $columnData . ",";
@@ -609,7 +452,7 @@ function loadDeviceInformation($arg, $dbC)
         // Get every name of masterDevice with fetchAll
         $fetchResult["otherName"] = $dbC->runQuery("SELECT masterName FROM bond WHERE username = :name AND masterName != :exception ORDER BY id ASC;", ["name" => $arg["username"], "exception" => $fetchResult["deviceInfo"]["masterName"]], "ALL");
 
-        $fetchResult["nexusBond"] = $dbC->runQuery("SELECT bondKey,deviceType,auxName1,auxName2,auxStatus1,auxStatus2,thStatus,htStatus,clStatus,tempNow,humidNow,sp,thercoInfo,heaterMode,coolerMode,heaterPar,coolerPar,lastUpdate FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+        $fetchResult["nexusBond"] = $dbC->runQuery("SELECT bondKey,deviceType,auxName1,auxName2,auxStatus1,auxStatus2,tempNow,humidNow,sp, lastUpdate FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
         // Get the oldest record from daily plot data.
         $fetchResult["plot"]["oldest"] = $dbC->runQuery("SELECT MIN(date) AS oldestPlot FROM nexusplot WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
         // Get the newest record from daily plot data.
