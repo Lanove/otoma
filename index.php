@@ -155,7 +155,7 @@ if ($fetchResult) {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.4.0/bootbox.min.js" integrity="sha512-8vfyGnaOX2EeMypNMptU+MwwK206Jk1I/tMQV4NkhOz+W8glENoMhGyU6n/6VgQUhQcJH8NqQgHhMtZjJJBv3A==" crossorigin="anonymous"></script>
   <!-- accordiom.js -->
   <script type="text/javascript" src="js/accordiom.min.js"></script>
-  <script src="js/index.min.js"></script>
+  <script src="js/index.js"></script>
 </body>
 
 </html>

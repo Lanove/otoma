@@ -15,9 +15,9 @@ class DatabaseController
     );
 
     private $host = "localhost";
-    private $name   = "otomamyi_otomadatabase";
-    private $user = "otomamyi";
-    private $pass = "H5TQ2G83CFR";
+    private $name   = "otoma-database";
+    private $user = "root";
+    private $pass = "";
     private $row;
     private $errorCode = "";
 
