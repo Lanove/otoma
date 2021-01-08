@@ -49,12 +49,8 @@
                         <div class="content">
                             <div class="row">
                                 <div class="col-12 centerme">
-                                    <i class="fas fa-thermometer-half icon ibcolor"></i>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12 centerme">
-                                    <span id="tempnow"></span>
+                                    <i class="fas fa-thermometer-half icon ibcolor" id="js_tempIcon"></i>
+                                    <div id="js_temp-radial" class="radial-gauge"></div>
                                 </div>
                             </div>
                         </div>
@@ -72,12 +68,8 @@
                         <div class="content">
                             <div class="row">
                                 <div class="col-12 centerme">
-                                    <i class="fas fa-tint icon ibcolor"></i>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12 centerme">
-                                    <span id="humidnow"></span>
+                                    <i class="fas fa-tint icon ibcolor" id="js_humIcon"></i>
+                                    <div id="js_humid-radial" class="radial-gauge"></div>
                                 </div>
                             </div>
                         </div>
@@ -101,6 +93,26 @@
                             <div class="material-switch pull-right ml-auto switch" style="position:relative;top:2px;">
                                 <input id="aux2Switch" type="checkbox" />
                                 <label for="aux2Switch" class="label-primary"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row auxheader">
+                        <div class="col-12 d-inline-flex align-items-center" style="margin-left:-5px;padding-right:5px;">
+                            <i class=" fas fa-plug icon ibcolor"></i>
+                            <span class="text" style="font-size:1.25rem;margin-left:10px;" id="auxname3"></span>
+                            <div class="material-switch pull-right ml-auto switch" style="position:relative;top:2px;">
+                                <input id="aux3Switch" type="checkbox" />
+                                <label for="aux3Switch" class="label-primary"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row auxheader">
+                        <div class="col-12 d-inline-flex align-items-center" style="margin-left:-5px;padding-right:5px;">
+                            <i class=" fas fa-plug icon ibcolor"></i>
+                            <span class="text" style="font-size:1.25rem;margin-left:10px;" id="auxname4"></span>
+                            <div class="material-switch pull-right ml-auto switch" style="position:relative;top:2px;">
+                                <input id="aux4Switch" type="checkbox" />
+                                <label for="aux4Switch" class="label-primary"></label>
                             </div>
                         </div>
                     </div>

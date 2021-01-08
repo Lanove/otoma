@@ -414,7 +414,7 @@ function pageChanger() {
         });
       }
       if (helppick != null) {
-          $().accordiom.openItem("#main-accordion", 2);
+        $().accordiom.openItem("#main-accordion", 2);
       }
       retractSidebar();
     }
@@ -433,8 +433,81 @@ function pageChanger() {
     }
   });
 }
-
+let humidRadial, tempRadial;
 $(document).ready(function () {
+  humidRadial = new ProgressBar.SemiCircle("#js_humid-radial", {
+    strokeWidth: 12,
+    color: "#1f81ff",
+    trailColor: "#50a0a0",
+    trailWidth: 12,
+    easing: "easeInOut",
+    duration: 1400,
+    svgStyle: null,
+    text: {
+      value: "0%",
+      alignToBottom: true,
+    },
+    from: {
+      color: "#1f81ff",
+    },
+    to: {
+      color: "#f5bd1f",
+    },
+    // Set default step function for all animate calls
+    step: (state, bar) => {
+      bar.path.setAttribute("stroke", state.color);
+      var value = Math.round(bar.value() * 100);
+      if (value === 0) {
+        bar.setText("0%");
+      } else {
+        bar.setText(value + "%");
+      }
+
+      bar.text.style.color = state.color;
+      $("#js_humIcon").css("color", state.color);
+    },
+  });
+  tempRadial = new ProgressBar.SemiCircle("#js_temp-radial", {
+    strokeWidth: 12,
+    color: "#1f81ff",
+    trailColor: "#50a0a0",
+    trailWidth: 12,
+    easing: "easeInOut",
+    duration: 1400,
+    svgStyle: null,
+    text: {
+      value: "0°C",
+      alignToBottom: true,
+    },
+    from: {
+      color: "#1f81ff",
+    },
+    to: {
+      color: "#f54029",
+    },
+    // Set default step function for all animate calls
+    step: (state, bar) => {
+      bar.path.setAttribute("stroke", state.color);
+      value = Math.round(bar.value() * 10000) / 100;
+      // var value = Math.round(bar.value() * 100);
+      if (value === 0) {
+        bar.setText("0°C");
+      } else {
+        bar.setText(value + "°C");
+      }
+
+      bar.text.style.color = state.color;
+      $("#js_tempIcon").css("color", state.color);
+    },
+  });
+  humidRadial.text.style.fontFamily = "Poppins, sans-serif;";
+  humidRadial.text.style.fontSize = "2rem";
+  humidRadial.text.style.top = "60%";
+  humidRadial.animate(0.0); // Number from 0.0 to 1.0
+  tempRadial.text.style.fontFamily = "Poppins, sans-serif;";
+  tempRadial.text.style.fontSize = "2rem";
+  tempRadial.text.style.top = "60%";
+  tempRadial.animate(0.0); // Number from 0.0 to 1.0
   // Add event listener for device size
   const checkUltraMobile = window.matchMedia("screen and (max-width: 380px)");
   const checkMobile = window.matchMedia(
@@ -1106,7 +1179,7 @@ if (deviceBelonging) {
               "Output 1",
               "Output 2",
               "Pemanas",
-              "Pendingin"
+              "Pendingin",
             ]),
           },
         ],
@@ -1815,11 +1888,10 @@ if (deviceBelonging) {
       if (arg.espStatusUpdateAvailable == 1) {
         binarySwitch(arg);
       }
-      $("#tempnow").text(arg.tempNow + "°C");
-      $("#humidnow").text(arg.humidNow + "%");
+      tempRadial.animate(arg.tempNow / 100);
+      // humidRadial.animate(arg.humidNow/100);
 
-      if (long) 
-        binarySwitch(arg);
+      if (long) binarySwitch(arg);
     }
 
     function reloadStatus() {
@@ -2330,13 +2402,9 @@ if (deviceBelonging) {
       var yyyy = today.getFullYear();
       today = yyyy + "-" + mm + "-" + dd;
       $("#dateselector,#datebuffer").val(today); // set today as default value of datepicker
-      $("#aux1Switch, #aux2Switch")
-        .unbind()
-        .removeData();
+      $("#aux1Switch, #aux2Switch").unbind().removeData();
       // Onclick switches
-      $(
-        "#aux1Switch, #aux2Switch"
-      ).click(function () {
+      $("#aux1Switch, #aux2Switch").click(function () {
         const elem = $(this);
         var check = elem.prop("checked");
         const switchToggle = function (arg) {
@@ -2358,7 +2426,7 @@ if (deviceBelonging) {
               bootbox.alert({
                 size: "large",
                 title: `Gagal mengubah kondisi saklar ${
-                  arg.id == arg.id == "aux1Switch"
+                  (arg.id == arg.id) == "aux1Switch"
                     ? $("#auxname1").text()
                     : arg.id == "aux2Switch"
                     ? $("#auxname2").text()
@@ -2491,6 +2559,7 @@ if (deviceBelonging) {
       setTimeout(function reload() {
         if (getBondKey() != "" && $("#nexus-dashboard").length) {
           reloadStatus();
+          humidRadial.animate(Math.random());
         }
         setTimeout(reload, 3000);
       }, 3000);

@@ -146,6 +146,8 @@ if ($fetchResult) {
   <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
   <!-- echarts.js -->
   <script type="text/javascript" src="js/echarts.min.js"></script>
+  <!-- progressbar.js -->
+  <script src="https://rawgit.com/kimmobrunfeldt/progressbar.js/master/dist/progressbar.js"></script>
   <!-- Anypicker -->
   <link rel="stylesheet" type="text/css" href="style/anypicker-font.css" />
   <link rel="stylesheet" type="text/css" href="style/anypicker.css" />
