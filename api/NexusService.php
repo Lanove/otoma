@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                             loadPlot($json, $dbController);
                         } else if ($requestType === "toggleSwitch") {
                             toggleSwitch($json, $dbController);
-                        }else if ($requestType === "updateProgram") {
+                        } else if ($requestType === "updateProgram") {
                             updateProgram($json, $dbController);
                         } else if ($requestType === "deleteProgram") {
                             deleteProgram($json, $dbController);
@@ -89,10 +89,12 @@ function updateName($arg, $dbC)
             if ($validFlag)
                 $dbC->execute("UPDATE bond SET masterName=:masterName WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "masterName" => $arg["name"]]);
             echo json_encode(["duplicate" => !$validFlag]);
-        } else if ($arg["docchi"] == "aux" && isset($arg["name"][0]) && isset($arg["name"][1])) {
+        } else if ($arg["docchi"] == "aux" && isset($arg["name"][0]) && isset($arg["name"][1]) && isset($arg["name"][2]) && isset($arg["name"][3])) {
             $arg["name"][0] = filter_var($arg["name"][0], FILTER_SANITIZE_STRING);
             $arg["name"][1] = filter_var($arg["name"][1], FILTER_SANITIZE_STRING);
-            $dbC->execute("UPDATE nexusbond SET auxName1=:auxName1, auxName2=:auxName2 WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "auxName1" => $arg["name"][0], "auxName2" => $arg["name"][1]]);
+            $arg["name"][2] = filter_var($arg["name"][2], FILTER_SANITIZE_STRING);
+            $arg["name"][3] = filter_var($arg["name"][3], FILTER_SANITIZE_STRING);
+            $dbC->execute("UPDATE nexusbond SET auxName1=:auxName1, auxName2=:auxName2, auxName3=:auxName3, auxName4=:auxName4 WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "auxName1" => $arg["name"][0], "auxName2" => $arg["name"][1], "auxName3" => $arg["name"][2], "auxName4" => $arg["name"][3]]);
         }
     }
 }
@@ -100,13 +102,13 @@ function updateName($arg, $dbC)
 function loadSetting($arg, $dbC)
 {
     $bondKey = $arg["bondKey"];
-    echo json_encode(array_merge($dbC->runQuery("SELECT masterName,softSSID,softPass,softIP,MAC,softwareVersion FROM bond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]), $dbC->runQuery("SELECT auxName1, auxName2 FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey])));
+    echo json_encode(array_merge($dbC->runQuery("SELECT masterName,softSSID,softPass,softIP,MAC,softwareVersion FROM bond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]), $dbC->runQuery("SELECT auxName1, auxName2, auxName3, auxName4 FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey])));
 }
 
 function requestStatus($arg, $dbC)
 {
     $bondKey = $arg["bondKey"];
-    $fetchResult["status"] = $dbC->runQuery("SELECT auxStatus1, auxStatus2, tempNow, humidNow, espStatusUpdateAvailable FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
+    $fetchResult["status"] = $dbC->runQuery("SELECT auxStatus1, auxStatus2, auxStatus3,auxStatus4, tempNow, humidNow, espStatusUpdateAvailable FROM nexusbond WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
     if ($fetchResult["status"]["espStatusUpdateAvailable"] == 1) {
         $dbC->execute("UPDATE nexusbond SET espStatusUpdateAvailable='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
     }
@@ -171,16 +173,18 @@ function updateProgram($arg, $dbC) // Be careful, within this function there are
         $action = $arg["passedData"]["acCd"];
         $progNum = (int)$arg["passedData"]["progNum"];
         $validAction = array(
-            "Nyalakan Output 1",
-            "Nyalakan Output 2",
-            "Nyalakan Pemanas",
-            "Nyalakan Pendingin",
-            "Nyalakan Thermocontrol",
-            "Matikan Output 1",
-            "Matikan Output 2",
-            "Matikan Pemanas",
-            "Matikan Pendingin",
-            "Matikan Thermocontrol"
+            "0 0",
+            "0 1",
+            "0 2",
+            "0 3",
+            "1 0",
+            "1 1",
+            "1 2",
+            "1 3",
+            "0",
+            "1",
+            "2",
+            "3"
         );
         $validFlag = false;
         foreach ($validAction as $k) {
@@ -330,16 +334,27 @@ function updateProgram($arg, $dbC) // Be careful, within this function there are
                     $component = $arg["passedData"]["cndCd"];
                     $condition = $arg["passedData"]["cnddCd"];
                     $bondKey = $arg["bondKey"];
-                    if (($component == "Output 1" || $component == "Output 2" ||
-                            $component == "Pemanas" || $component == "Pendingin" ||
-                            $component == "Thermocontrol") &&
-                        ($condition == "Menyala" || $condition == "Mati")
-                    ) {
+                    if (intval($component) >= 0 && intval($component) <= 3 &&($condition == "Menyala" || $condition == "Mati")) {
                         $dbC->execute("UPDATE nexusautomation SET exist='1', progData1=:trigger, progData2=:action, progData3=:component, progData4=:condition, progData5='', progData6='', progData7='', progData8='' WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "component" => $component, "condition" => $condition, "bondKey" => $bondKey, "progNum" => $progNum]);
-
                         $doubleCheck = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondKey AND progNumber = :progNumber;", ["bondKey" => $bondKey, "progNumber" => $progNum]);
-
                         if ($doubleCheck["progData1"] == $trigger && $doubleCheck["progData2"] == $action && $doubleCheck["progData3"] == $component && $doubleCheck["progData4"] == $condition && $doubleCheck["exist"] == '1')
+                            $response["success"] = true;
+                    }
+                }
+            } else if ($trigger == "Pemanas" || $trigger == "Pendingin" || $trigger == "Humidifier"){
+                if(isset($arg["passedData"]["aturKe"]) && isset($arg["passedData"]["toleransi"])){
+                    $aturKe = (float)$arg["passedData"]["aturKe"];
+                    $toleransi = (float)$arg["passedData"]["toleransi"];
+                    if(!is_nan($aturKe) && !is_nan($toleransi) && $toleransi >= 0 && $toleransi <= 100.9 && $aturKe >= 0 && $aturKe <= 100.9){
+                        $dbC->execute("UPDATE nexusautomation SET exist='1', progData1=:trigger, progData2=:action, progData3=:aturKe, progData4=:toleransi, progData5='', progData6='', progData7='', progData8='' WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "toleransi" => $toleransi, "aturKe" => $aturKe, "bondKey" => $bondKey, "progNum" => $progNum]);
+                        $doubleCheck = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondKey AND progNumber = :progNumber;", ["bondKey" => $bondKey, "progNumber" => $progNum]);
+                        if (
+                            $doubleCheck["progData1"] == $trigger &&
+                            $doubleCheck["progData2"] == $action &&
+                            $doubleCheck["progData3"] == $aturKe &&
+                            $doubleCheck["progData4"] == $toleransi &&
+                            $doubleCheck["exist"] == '1'
+                        )
                             $response["success"] = true;
                     }
                 }
@@ -364,6 +379,10 @@ function toggleSwitch($arg, $dbC)
         // THERE SHOULD BE SOME SERVER FILTER IF SOME CONDITIONAL WERE REFERRED TO SOME SWITCH
         if ($id === "aux2Switch")
             $columnData = "auxStatus2";
+        else if ($id === "aux3Switch")
+            $columnData = "auxStatus3";
+        else if ($id === "aux4Switch")
+            $columnData = "auxStatus4";
         $fetchResult = $dbC->runQuery("SELECT updateBuffer FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
         if (!(strpos($fetchResult["updateBuffer"], $columnData) !== false)) {
             $fetchResult["updateBuffer"] .= $columnData . ",";
@@ -426,7 +445,7 @@ function loadDeviceInformation($arg, $dbC)
         // Get every name of masterDevice with fetchAll
         $fetchResult["otherName"] = $dbC->runQuery("SELECT masterName FROM bond WHERE username = :name AND masterName != :exception ORDER BY id ASC;", ["name" => $arg["username"], "exception" => $fetchResult["deviceInfo"]["masterName"]], "ALL");
 
-        $fetchResult["nexusBond"] = $dbC->runQuery("SELECT bondKey,deviceType,auxName1,auxName2,auxStatus1,auxStatus2,tempNow,humidNow, lastUpdate FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+        $fetchResult["nexusBond"] = $dbC->runQuery("SELECT bondKey,deviceType,auxName1,auxName2,auxName3,auxName4,auxStatus1,auxStatus2,auxStatus3,auxStatus4,tempNow,humidNow, lastUpdate FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
         // Get the oldest record from daily plot data.
         $fetchResult["plot"]["oldest"] = $dbC->runQuery("SELECT MIN(date) AS oldestPlot FROM nexusplot WHERE bondKey = :bondkey;", ["bondkey" => $bondKey]);
         // Get the newest record from daily plot data.

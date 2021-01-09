@@ -435,79 +435,6 @@ function pageChanger() {
 }
 let humidRadial, tempRadial;
 $(document).ready(function () {
-  humidRadial = new ProgressBar.SemiCircle("#js_humid-radial", {
-    strokeWidth: 12,
-    color: "#1f81ff",
-    trailColor: "#50a0a0",
-    trailWidth: 12,
-    easing: "easeInOut",
-    duration: 1400,
-    svgStyle: null,
-    text: {
-      value: "0%",
-      alignToBottom: true,
-    },
-    from: {
-      color: "#1f81ff",
-    },
-    to: {
-      color: "#f5bd1f",
-    },
-    // Set default step function for all animate calls
-    step: (state, bar) => {
-      bar.path.setAttribute("stroke", state.color);
-      var value = Math.round(bar.value() * 100);
-      if (value === 0) {
-        bar.setText("0%");
-      } else {
-        bar.setText(value + "%");
-      }
-
-      bar.text.style.color = state.color;
-      $("#js_humIcon").css("color", state.color);
-    },
-  });
-  tempRadial = new ProgressBar.SemiCircle("#js_temp-radial", {
-    strokeWidth: 12,
-    color: "#1f81ff",
-    trailColor: "#50a0a0",
-    trailWidth: 12,
-    easing: "easeInOut",
-    duration: 1400,
-    svgStyle: null,
-    text: {
-      value: "0°C",
-      alignToBottom: true,
-    },
-    from: {
-      color: "#1f81ff",
-    },
-    to: {
-      color: "#f54029",
-    },
-    // Set default step function for all animate calls
-    step: (state, bar) => {
-      bar.path.setAttribute("stroke", state.color);
-      value = Math.round(bar.value() * 10000) / 100;
-      // var value = Math.round(bar.value() * 100);
-      if (value === 0) {
-        bar.setText("0°C");
-      } else {
-        bar.setText(value + "°C");
-      }
-
-      bar.text.style.color = state.color;
-      $("#js_tempIcon").css("color", state.color);
-    },
-  });
-  humidRadial.text.style.fontFamily = "Poppins, sans-serif;";
-  humidRadial.text.style.fontSize = "2rem";
-  humidRadial.text.style.top = "60%";
-  humidRadial.animate(0.0); // Number from 0.0 to 1.0
-  tempRadial.text.style.fontFamily = "Poppins, sans-serif;";
-  tempRadial.text.style.fontSize = "2rem";
-  tempRadial.text.style.top = "60%";
-  tempRadial.animate(0.0); // Number from 0.0 to 1.0
   // Add event listener for device size
   const checkUltraMobile = window.matchMedia("screen and (max-width: 380px)");
   const checkMobile = window.matchMedia(
@@ -715,6 +642,7 @@ if (deviceBelonging) {
 
   if (deviceBelonging.hasClass("maindevice")) {
   } else if (deviceBelonging.hasClass("nexusdevice")) {
+    let outputNames = [];
     var nexusChart,
       config = {
         color: ["#b8002b", "#002bb8", "#00b82b", "#2b00b8"],
@@ -1144,7 +1072,7 @@ if (deviceBelonging) {
       $(`#condition${spaceNum} .content`).append(`
       <div class="item ctCd">
         <span>Jika</span>
-        <input style="max-width:150px;text-align:center;" type="text" class="form-control" id="cndCd${spaceNum}" value="Output 1" readonly>
+        <input style="max-width:150px;text-align:center;" type="text" class="form-control" id="cndCd${spaceNum}" value="${outputNames[0]}" readonly>
       </div>
       <div class="item ctCd">
         <span>Sedang</span>
@@ -1175,12 +1103,7 @@ if (deviceBelonging) {
         dataSource: [
           {
             component: 0,
-            data: createTextDataSource([
-              "Output 1",
-              "Output 2",
-              "Pemanas",
-              "Pendingin",
-            ]),
+            data: createTextDataSource([...outputNames]),
           },
         ],
       });
@@ -1434,7 +1357,102 @@ if (deviceBelonging) {
       });
     }
 
-    function buildActionPicker(spaceNum, acContent) {
+    function buildHysteresisController(spaceNum, val) {
+      $(`#condition${spaceNum} .content`).append(`
+      <div class="item ctCd">
+        <span>Atur Ke</span>
+        <input style="max-width:70px;text-align:center;" type="text" class="form-control" id="js-aturKe${spaceNum}" value="0" readonly>
+      </div>    
+      <div class="item ctCd">
+        <span>Toleransi</span>
+        <input style="max-width:70px;text-align:center;" type="text" class="form-control" id="js-toleransi${spaceNum}" value="0" readonly>
+      </div>
+      <div class="item ctCd">
+          <span>Pada Output</span>
+          <input style="max-width:220px;text-align:center;" type="text" class="form-control" id="acCd${spaceNum}" readonly>
+      </div>`);
+      var oArrData = [];
+      createDataSource(oArrData, [100, 9]);
+      $("#js-aturKe" + spaceNum)
+        .unbind()
+        .removeData();
+      $(`#js-aturKe${spaceNum}`).AnyPicker({
+        // Add anypicker to every timer
+        showComponentLabel: true,
+        mode: "select",
+        lang: "id",
+        components: [
+          {
+            component: 0,
+            name: "c",
+            label:
+              val == "Pemanas" || val == "Pendingin"
+                ? "Suhu (°C)"
+                : "Humiditas (%)",
+            width: "30%",
+            textAlign: "center",
+          },
+          {
+            component: 1,
+            name: "d",
+            label: "Koma",
+            width: "30%",
+            textAlign: "center",
+          },
+        ],
+        dataSource: [
+          {
+            component: 0,
+            data: oArrData[0],
+          },
+          {
+            component: 1,
+            data: oArrData[1],
+          },
+        ],
+        parseInput: formatSHInput,
+        formatOutput: decimalSetOut,
+      });
+      $("#js-toleransi" + spaceNum)
+        .unbind()
+        .removeData();
+      $(`#js-toleransi${spaceNum}`).AnyPicker({
+        // Add anypicker to every timer
+        showComponentLabel: true,
+        mode: "select",
+        lang: "id",
+        components: [
+          {
+            component: 0,
+            name: "c",
+            label: "Toleransi",
+            width: "30%",
+            textAlign: "center",
+          },
+          {
+            component: 1,
+            name: "d",
+            label: "Koma",
+            width: "30%",
+            textAlign: "center",
+          },
+        ],
+        dataSource: [
+          {
+            component: 0,
+            data: oArrData[0],
+          },
+          {
+            component: 1,
+            data: oArrData[1],
+          },
+        ],
+        parseInput: formatSHInput,
+        formatOutput: decimalSetOut,
+      });
+    }
+
+    function buildActionPicker(spaceNum, acContent, hysteresis = false) {
       $("#acCd" + spaceNum)
         .unbind()
         .removeData();
@@ -1446,8 +1464,8 @@ if (deviceBelonging) {
         components: [
           {
             component: 0,
-            name: "aksi",
-            label: "Aksi",
+            name: hysteresis == false ? "aksi" : "output",
+            label: hysteresis == false ? "Aksi" : "Output",
             width: "50%",
             textAlign: "center",
           },
@@ -1471,7 +1489,7 @@ if (deviceBelonging) {
                 </div>
                 <div class="d-flex content justify-content-center">
                     <div class="item pgCd">
-                        <span>Pemicu</span>
+                        <span>Pilih<span>
                         <input type="text" class="form-control" id="ifCd${spaceNum}" style="max-width:150px;text-align:center;" readonly>
                     </div>
                 </div>
@@ -1497,8 +1515,8 @@ if (deviceBelonging) {
         components: [
           {
             component: 0,
-            name: "pemicu",
-            label: "Pemicu",
+            name: "program",
+            label: "Program",
             width: "50%",
             textAlign: "center",
           },
@@ -1564,14 +1582,20 @@ if (deviceBelonging) {
                 passedData.faCd.split(":"),
                 passedData.feCd.split(":"),
               ];
-              if (
+              comparator.forEach((selement, mindex) => {
+                comparator[mindex].forEach((element, index) => {
+                  comparator[mindex][index] = parseInt(element);
+                });
+              });
+              let totalSecond = [
                 comparator[0][0] * 3600 +
                   comparator[0][1] * 60 +
-                  comparator[0][2] >
+                  comparator[0][2],
                 comparator[1][0] * 3600 +
                   comparator[1][1] * 60 +
-                  comparator[1][2]
-              ) {
+                  comparator[1][2],
+              ];
+              if (totalSecond[0] > totalSecond[1]) {
                 span.append(
                   `<span class="tfailed" style="display:block;">Input Jam (Dari) tidak boleh melebihi dari Input Jam (Hingga)<span>`
                 );
@@ -1647,6 +1671,9 @@ if (deviceBelonging) {
             }
           } else if (ifVal == "Keadaan") {
             passedData.cndCd = $(`#cndCd${spaceNum}`).val();
+            outputNames.forEach((element, index) => {
+              passedData.cndCd = passedData.cndCd.replace(element, `${index}`);
+            });
             passedData.cnddCd = $(`#cnddCd${spaceNum}`).val();
             passedData.acCd = $(`#acCd${spaceNum}`).val();
             if ($(`#cndCd${spaceNum}`).val() == "") {
@@ -1667,10 +1694,32 @@ if (deviceBelonging) {
               );
               success = false;
             }
+          } else if (
+            ifVal == "Pemanas" ||
+            ifVal == "Pendingin" ||
+            ifVal == "Humidifier"
+          ) {
+            if (
+              $(`#acCd${spaceNum}`).val() == "" ||
+              $(`#js-toleransi${spaceNum}`).val() == "" ||
+              $(`#js-aturKe${spaceNum}`).val() == ""
+            ) {
+              span.append(
+                `<span class="tfailed" style="display:block;">Tidak boleh ada input/kotak yang kosong<span>`
+              );
+              success = false;
+            } else {
+              passedData.toleransi = $(`#js-toleransi${spaceNum}`).val();
+              passedData.aturKe = $(`#js-aturKe${spaceNum}`).val();
+              passedData.acCd = $(`#acCd${spaceNum}`).val();
+              outputNames.forEach((element, index) => {
+                passedData.acCd = passedData.acCd.replace(element, `${index}`);
+              });
+            }
           } else {
             success = false;
             span.append(
-              `<span class="tfailed" style="display:block;">Pemicu tidak boleh kosong<span>`
+              `<span class="tfailed" style="display:block;">Program tidak boleh kosong<span>`
             );
           }
 
@@ -1680,6 +1729,11 @@ if (deviceBelonging) {
             );
             passedData.trCd = ifVal;
             passedData.progNum = spaceNum;
+            passedData.acCd = passedData.acCd.replace("Nyalakan", "1");
+            passedData.acCd = passedData.acCd.replace("Matikan", "0");
+            outputNames.forEach((element, index) => {
+              passedData.acCd = passedData.acCd.replace(element, `${index}`);
+            });
             requestAJAX(
               "NexusService",
               {
@@ -1770,66 +1824,39 @@ if (deviceBelonging) {
       if (id.substring(0, 4) === "ifCd") {
         var acContent = [];
         $(`#condition${spaceNum} .ctCd`).remove();
-        if (val == "Timer") {
-          buildTimer(spaceNum);
-          acContent = [
-            "Nyalakan Output 1",
-            "Nyalakan Output 2",
-            "Nyalakan Pemanas",
-            "Nyalakan Pendingin",
-            "Matikan Pemanas",
-            "Matikan Pendingin",
-          ];
-        } else if (val == "Nilai Suhu" || val == "Nilai Humiditas") {
+        if (val == "Nilai Suhu" || val == "Nilai Humiditas")
           buildTempOrHum(spaceNum, val);
+        else if (val == "Jadwal Harian") buildDailyPicker(spaceNum);
+        else if (val == "Tanggal Waktu") buildDateTimePicker(spaceNum);
+        else if (val == "Keadaan") buildConditionalPicker(spaceNum);
+        else if (val == "Pemanas" || val == "Pendingin" || val == "Humidifier")
+          buildHysteresisController(spaceNum, val);
+        // else if (val == "")
+
+        let hysFlag = false;
+        if (
+          val == "Nilai Suhu" ||
+          val == "Nilai Humiditas" ||
+          val == "Jadwal Harian" ||
+          val == "Tanggal Waktu" ||
+          val == "Keadaan"
+        )
           acContent = [
-            "Nyalakan Output 1",
-            "Nyalakan Output 2",
-            "Nyalakan Pemanas",
-            "Nyalakan Pendingin",
-            "Matikan Output 1",
-            "Matikan Output 2",
-            "Matikan Pemanas",
-            "Matikan Pendingin",
+            `Nyalakan ${outputNames[0]}`,
+            `Nyalakan ${outputNames[1]}`,
+            `Nyalakan ${outputNames[2]}`,
+            `Nyalakan ${outputNames[3]}`,
+            `Matikan ${outputNames[0]}`,
+            `Matikan ${outputNames[1]}`,
+            `Matikan ${outputNames[2]}`,
+            `Matikan ${outputNames[3]}`,
           ];
-        } else if (val == "Jadwal Harian") {
-          buildDailyPicker(spaceNum);
-          acContent = [
-            "Nyalakan Output 1",
-            "Nyalakan Output 2",
-            "Nyalakan Pemanas",
-            "Nyalakan Pendingin",
-            "Matikan Output 1",
-            "Matikan Output 2",
-            "Matikan Pemanas",
-            "Matikan Pendingin",
-          ];
-        } else if (val == "Tanggal Waktu") {
-          buildDateTimePicker(spaceNum);
-          acContent = [
-            "Nyalakan Output 1",
-            "Nyalakan Output 2",
-            "Nyalakan Pemanas",
-            "Nyalakan Pendingin",
-            "Matikan Output 1",
-            "Matikan Output 2",
-            "Matikan Pemanas",
-            "Matikan Pendingin",
-          ];
-        } else if (val == "Keadaan") {
-          buildConditionalPicker(spaceNum);
-          acContent = [
-            "Nyalakan Output 1",
-            "Nyalakan Output 2",
-            "Nyalakan Pemanas",
-            "Nyalakan Pendingin",
-            "Matikan Output 1",
-            "Matikan Output 2",
-            "Matikan Pemanas",
-            "Matikan Pendingin",
-          ];
+        else {
+          acContent = [...outputNames];
+          hysFlag = true;
         }
-        buildActionPicker(spaceNum, acContent);
+
+        buildActionPicker(spaceNum, acContent, hysFlag);
       }
 
       return val;
@@ -1882,6 +1909,8 @@ if (deviceBelonging) {
       // Adjust the position of switch based on database value
       $("#aux1Switch").prop("checked", Boolean(Number(arg.auxStatus1)));
       $("#aux2Switch").prop("checked", Boolean(Number(arg.auxStatus2)));
+      $("#aux3Switch").prop("checked", Boolean(Number(arg.auxStatus3)));
+      $("#aux4Switch").prop("checked", Boolean(Number(arg.auxStatus4)));
     }
 
     function parameterReload(arg, long = false) {
@@ -1889,7 +1918,7 @@ if (deviceBelonging) {
         binarySwitch(arg);
       }
       tempRadial.animate(arg.tempNow / 100);
-      // humidRadial.animate(arg.humidNow/100);
+      humidRadial.animate(arg.humidNow / 100);
 
       if (long) binarySwitch(arg);
     }
@@ -1970,8 +1999,86 @@ if (deviceBelonging) {
             ); // Add name but without caret or dropdown
           }
 
-          $("#auxname1").text(parseJson.nexusBond.auxName1 + " (1)");
-          $("#auxname2").text(parseJson.nexusBond.auxName2 + " (2)");
+          humidRadial = new ProgressBar.SemiCircle("#js_humid-radial", {
+            strokeWidth: 12,
+            color: "#1f81ff",
+            trailColor: "#50a0a0",
+            trailWidth: 12,
+            easing: "easeInOut",
+            duration: 1400,
+            svgStyle: null,
+            text: {
+              value: "0%",
+              alignToBottom: true,
+            },
+            from: {
+              color: "#1f81ff",
+            },
+            to: {
+              color: "#f5bd1f",
+            },
+            // Set default step function for all animate calls
+            step: (state, bar) => {
+              bar.path.setAttribute("stroke", state.color);
+              var value = Math.round(bar.value() * 100);
+              if (value === 0) {
+                bar.setText("0%");
+              } else {
+                bar.setText(value + "%");
+              }
+
+              bar.text.style.color = state.color;
+              $("#js_humIcon").css("color", state.color);
+            },
+          });
+          tempRadial = new ProgressBar.SemiCircle("#js_temp-radial", {
+            strokeWidth: 12,
+            color: "#1f81ff",
+            trailColor: "#50a0a0",
+            trailWidth: 12,
+            easing: "easeInOut",
+            duration: 1400,
+            svgStyle: null,
+            text: {
+              value: "0°C",
+              alignToBottom: true,
+            },
+            from: {
+              color: "#1f81ff",
+            },
+            to: {
+              color: "#f54029",
+            },
+            // Set default step function for all animate calls
+            step: (state, bar) => {
+              bar.path.setAttribute("stroke", state.color);
+              value = Math.round(bar.value() * 10000) / 100;
+              // var value = Math.round(bar.value() * 100);
+              if (value === 0) {
+                bar.setText("0°C");
+              } else {
+                bar.setText(value + "°C");
+              }
+
+              bar.text.style.color = state.color;
+              $("#js_tempIcon").css("color", state.color);
+            },
+          });
+          humidRadial.text.style.fontFamily = "Poppins, sans-serif;";
+          humidRadial.text.style.fontSize = "2rem";
+          humidRadial.text.style.top = "60%";
+          tempRadial.text.style.fontFamily = "Poppins, sans-serif;";
+          tempRadial.text.style.fontSize = "2rem";
+          tempRadial.text.style.top = "60%";
+
+          $("#auxname1").text(parseJson.nexusBond.auxName1);
+          $("#auxname2").text(parseJson.nexusBond.auxName2);
+          $("#auxname3").text(parseJson.nexusBond.auxName3);
+          $("#auxname4").text(parseJson.nexusBond.auxName4);
+          outputNames[0] = parseJson.nexusBond.auxName1;
+          outputNames[1] = parseJson.nexusBond.auxName2;
+          outputNames[2] = parseJson.nexusBond.auxName3;
+          outputNames[3] = parseJson.nexusBond.auxName4;
 
           parameterReload(parseJson.nexusBond, true);
 
@@ -2036,9 +2143,9 @@ if (deviceBelonging) {
           }
           $("#conditional").html("");
           for (index in parseJson.programs) {
-            const progNum = parseJson.programs[index].progNumber;
-            const trigger = parseJson.programs[index].progData1;
-            const action = parseJson.programs[index].progData2;
+            let progNum = parseJson.programs[index].progNumber;
+            let trigger = parseJson.programs[index].progData1;
+            let action = parseJson.programs[index].progData2;
             appendConditionalChild(progNum, [
               "Nilai Suhu",
               "Nilai Humiditas",
@@ -2046,6 +2153,9 @@ if (deviceBelonging) {
               "Tanggal Waktu",
               //"Timer",
               "Keadaan",
+              "Pemanas",
+              "Pendingin",
+              "Humidifier"
             ]);
             // buildTempOrHum(spaceNum), buildTimer(spaceNum), buildDailyPicker(spaceNum), buildDateTimePicker(spaceNum), buildActionPicker(spaceNum, acContent)
             $(`#ifCd${progNum}`).val(trigger);
@@ -2066,33 +2176,46 @@ if (deviceBelonging) {
               $(`#timerCd${progNum}`).val(parseJson.programs[index].progData3);
             } else if (trigger == "Keadaan") {
               buildConditionalPicker(progNum);
-              $(`#cndCd${progNum}`).val(parseJson.programs[index].progData3);
+              let stringBuffer = parseJson.programs[index].progData3;
+              outputNames.forEach((element,index) => {
+                stringBuffer = stringBuffer.replace(`${index}`,element);
+              });
+              $(`#cndCd${progNum}`).val(stringBuffer);
               $(`#cnddCd${progNum}`).val(parseJson.programs[index].progData4);
+            }else if (trigger == "Pemanas" || trigger == "Pendingin" || trigger == "Humidifier"){
+              buildHysteresisController(progNum, trigger);
+              $(`#js-aturKe${progNum}`).val(parseJson.programs[index].progData3);
+              $(`#js-toleransi${progNum}`).val(parseJson.programs[index].progData4);
             }
             var acContent = [];
-            if (trigger != "timer") {
+            if (trigger != "Pemanas" && trigger != "Pendingin" && trigger != "Humidifier") {
               acContent = [
-                "Nyalakan Output 1",
-                "Nyalakan Output 2",
-                "Nyalakan Pemanas",
-                "Nyalakan Pendingin",
-                "Matikan Output 1",
-                "Matikan Output 2",
-                "Matikan Pemanas",
-                "Matikan Pendingin",
+                `Nyalakan ${outputNames[0]}`,
+                `Nyalakan ${outputNames[1]}`,
+                `Nyalakan ${outputNames[2]}`,
+                `Nyalakan ${outputNames[3]}`,
+                `Matikan ${outputNames[0]}`,
+                `Matikan ${outputNames[1]}`,
+                `Matikan ${outputNames[2]}`,
+                `Matikan ${outputNames[3]}`,
               ];
+              action = action.split(" ");
+              action[0] = action[0].replace("1","Nyalakan ");
+              action[0] = action[0].replace("0","Matikan ");
+              outputNames.forEach((element, index) => {
+                action[1] = action[1].replace(`${index}`,element);
+              });
+              buildActionPicker(progNum, acContent);
+              $(`#acCd${progNum}`).val(action[0] + action[1]);
+              
             } else {
-              acContent = [
-                "Nyalakan Output 1",
-                "Nyalakan Output 2",
-                "Nyalakan Pemanas",
-                "Nyalakan Pendingin",
-                "Matikan Pemanas",
-                "Matikan Pendingin",
-              ];
+              acContent = [...outputNames];
+              outputNames.forEach((element, index) => {
+                action = action.replace(`${index}`,element);
+              });
+              buildActionPicker(progNum, acContent);
+              $(`#acCd${progNum}`).val(action);
             }
-            buildActionPicker(progNum, acContent);
-            $(`#acCd${progNum}`).val(action);
           }
         },
         10000,
@@ -2263,7 +2386,12 @@ if (deviceBelonging) {
           {
             requestType: "updateName",
             docchi: "aux",
-            name: [$("#aux1Name").val(), $("#aux2Name").val()],
+            name: [
+              $("#aux1Name").val(),
+              $("#aux2Name").val(),
+              $("#aux3Name").val(),
+              $("#aux4Name").val(),
+            ],
             bondKey: getBondKey(),
             token: getMeta("token"),
           },
@@ -2362,6 +2490,8 @@ if (deviceBelonging) {
           $("#softIP").val(json.softIP);
           $("#aux1Name").val(json.auxName1);
           $("#aux2Name").val(json.auxName2);
+          $("#aux3Name").val(json.auxName3);
+          $("#aux4Name").val(json.auxName4);
           $("#deviceNameEdit").val(json.masterName);
         },
         8000,
@@ -2402,9 +2532,11 @@ if (deviceBelonging) {
       var yyyy = today.getFullYear();
       today = yyyy + "-" + mm + "-" + dd;
       $("#dateselector,#datebuffer").val(today); // set today as default value of datepicker
-      $("#aux1Switch, #aux2Switch").unbind().removeData();
+      $("#aux1Switch, #aux2Switch,#aux3Switch, #aux4Switch")
+        .unbind()
+        .removeData();
       // Onclick switches
-      $("#aux1Switch, #aux2Switch").click(function () {
+      $("#aux1Switch, #aux2Switch,#aux3Switch, #aux4Switch").click(function () {
         const elem = $(this);
         var check = elem.prop("checked");
         const switchToggle = function (arg) {
@@ -2430,6 +2562,10 @@ if (deviceBelonging) {
                     ? $("#auxname1").text()
                     : arg.id == "aux2Switch"
                     ? $("#auxname2").text()
+                    : arg.id == "aux3Switch"
+                    ? $("#auxname3").text()
+                    : arg.id == "aux4Switch"
+                    ? $("#auxname4").text()
                     : ""
                 }`,
                 message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
@@ -2466,8 +2602,10 @@ if (deviceBelonging) {
             "Nilai Humiditas",
             "Jadwal Harian",
             "Tanggal Waktu",
-            // "Timer",
             "Keadaan",
+            "Pemanas",
+            "Pendingin",
+            "Humidifier",
           ]);
           $("html, body").animate(
             {
@@ -2559,7 +2697,7 @@ if (deviceBelonging) {
       setTimeout(function reload() {
         if (getBondKey() != "" && $("#nexus-dashboard").length) {
           reloadStatus();
-          humidRadial.animate(Math.random());
+          // humidRadial.animate(Math.random());
         }
         setTimeout(reload, 3000);
       }, 3000);

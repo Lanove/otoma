@@ -78,6 +78,18 @@
                         <div class="col-12">
                             <span>Output 2 :</span>
                             <input type="text" class="form-control" id="aux2Name">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <span>Output 3 :</span>
+                            <input type="text" class="form-control" id="aux3Name">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <span>Output 4 :</span>
+                            <input type="text" class="form-control" id="aux4Name">
                             <span style="display:block;" id="infoAuxName"></span>
                             <button type="button" class="btn btn-primary  mt-3" id="auxNameSubmit">Update</button>
                         </div>
