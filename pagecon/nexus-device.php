@@ -34,7 +34,6 @@
         </div>
     </div>
     <div class="tab-content" id="myTabContent">
-
         <div class="tab-pane fade show active" id="menu1" role="tabpanel" aria-labelledby="contact-tab">
             <div class="row">
                 <div class="col-md-4">

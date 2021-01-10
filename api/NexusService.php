@@ -443,7 +443,7 @@ function loadDeviceInformation($arg, $dbC)
             $fetchResult["deviceInfo"] = $dbC->runQuery("SELECT bondKey,masterName FROM bond WHERE bondKey = :bondKey ORDER BY id ASC;", ["bondKey" => $bondKey]);
         }
         // Get every name of masterDevice with fetchAll
-        $fetchResult["otherName"] = $dbC->runQuery("SELECT masterName FROM bond WHERE username = :name AND masterName != :exception ORDER BY id ASC;", ["name" => $arg["username"], "exception" => $fetchResult["deviceInfo"]["masterName"]], "ALL");
+        $fetchResult["otherName"] = $dbC->runQuery("SELECT masterName,deviceType FROM bond WHERE username = :name AND masterName != :exception ORDER BY id ASC;", ["name" => $arg["username"], "exception" => $fetchResult["deviceInfo"]["masterName"]], "ALL");
 
         $fetchResult["nexusBond"] = $dbC->runQuery("SELECT bondKey,deviceType,auxName1,auxName2,auxName3,auxName4,auxStatus1,auxStatus2,auxStatus3,auxStatus4,tempNow,humidNow, lastUpdate FROM nexusbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
         // Get the oldest record from daily plot data.
