@@ -2109,7 +2109,7 @@ if (deviceBelonging) {
             dateTimeFormat: "yyyy-MM-dd",
             lang: "id",
             formatOutput: setTrigger,
-            minValue: new Date(oldest[0], oldest[1], 01),
+            minValue: new Date(oldest[0]-1, oldest[1], 01),
             maxValue: new Date(newest[0], newest[1], 00),
           });
 
