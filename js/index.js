@@ -1,5 +1,6 @@
 var deviceBelonging = $("#bigdevicebox");
-
+let nexusReloadTimer, nitenanReloadTimer;
+let nitenan;
 $.fn.animateRotate = function (start, end, duration, easing, complete) {
   var args = $.speed(duration, easing, complete);
   var step = args.step;
@@ -613,6 +614,10 @@ $(document).ready(function () {
             }
           }
         );
+      } else if (
+        deviceBelonging.hasClass("nitenan") &&
+        !$("#nitenan-dashboard").length
+      ) {
       } else {
         retractSidebar();
       }
@@ -1961,14 +1966,43 @@ function loadDeviceInformation(master) {
           $(".subMasterName" + String(x)).on("click", function () {
             setBondKey("");
             $(".absolute-overlay").removeClass("loaded");
+            let clickedDeviceName = $(
+              "." + $(this).attr("class").split(/\s+/)[1]
+            ).text();
             if ($(this).attr("data-device-type") == "nexus") {
               loadDeviceInformation({
                 requestType: "loadDeviceInformation",
-                master: $("." + $(this).attr("class").split(/\s+/)[1]).text(),
+                master: clickedDeviceName,
                 token: getMeta("token"),
               });
             } else if ($(this).attr("data-device-type") == "nitenan") {
-              console.log("h");
+              $("#content").html("");
+              $("#content").load(
+                "pagecon/nitenan-device.php",
+                function (responseTxt, statusTxt, xhr) {
+                  if (statusTxt == "success") {
+                    loadNitenanInfo({
+                      requestType: "loadNitenanInfo",
+                      master: clickedDeviceName,
+                      token: getMeta("token"),
+                    });
+                    $(".absolute-overlay").addClass("loaded");
+                  }
+                  if (status == "error") {
+                    bootbox.alert({
+                      size: "large",
+                      title: "Gagal memuat laman",
+                      message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian`,
+                      closeButton: false,
+                      buttons: {
+                        ok: {
+                          label: "Tutup",
+                        },
+                      },
+                    });
+                  }
+                }
+              );
             }
             const check = setInterval(function () {
               // Function to check every 0.1s if bondKey is available, then execute reloadStatus() and destroy itself.
@@ -2507,12 +2541,12 @@ function nexusSettingLoad() {
   );
 }
 
-function nexusFirstLoad(bondKey = null) {
+function nexusFirstLoad(bondKey = null, devName = null) {
   // Awal loading page load device yang paling atas.
   if (bondKey == null)
     loadDeviceInformation({
       requestType: "loadDeviceInformation",
-      master: "master",
+      master: devName == null ? "master" : devName,
       token: getMeta("token"),
     });
   else
@@ -2627,6 +2661,196 @@ function nexusFirstLoad(bondKey = null) {
   });
 
   $('[data-toggle="popover"]').popover({ html: true });
+  clearTimeout(nexusReloadTimer);
+  nexusReloadTimer = setTimeout(function reload() {
+    if (getBondKey() != "" && $("#nexus-dashboard").length) {
+      reloadStatus();
+      // humidRadial.animate(Math.random());
+    }
+    nexusReloadTimer = setTimeout(reload, 3000);
+  }, 3000);
+}
+
+function loadNitenanInfo(ajaxBuffer) {
+  requestAJAX(
+    "NitenanService",
+    ajaxBuffer,
+    function callback(response) {
+      var parseJson = JSON.parse(response);
+      nitenan = parseJson;
+      // Add device bondKey information
+      setBondKey(parseJson["deviceInfo"]["bondKey"]);
+      if (parseJson.otherName) {
+        // If user had more than one device
+        // Add text and icon to the title of the main header
+        $("#deviceheader .text").text(parseJson["deviceInfo"]["masterName"]);
+        $("#deviceheader .text").append("<i class = 'fas fa-caret-down'></i>");
+        //Add submasters name that user had to dropdown
+        $("#deviceheader .dropdown-menu").html("");
+        for (x in parseJson.otherName) {
+          $("#deviceheader .dropdown-menu").append(
+            `<a href="#" data-device-type="${parseJson.otherName[x]["deviceType"]}"class="dropdown-item ` +
+              "subMasterName" +
+              String(x) +
+              '">' +
+              parseJson.otherName[x]["masterName"] +
+              "</a>"
+          );
+
+          $(".subMasterName" + String(x))
+            .unbind()
+            .removeData();
+          $(".subMasterName" + String(x)).on("click", function () {
+            setBondKey("");
+            $(".absolute-overlay").removeClass("loaded");
+            let clickedDeviceName = $(
+              "." + $(this).attr("class").split(/\s+/)[1]
+            ).text();
+            if ($(this).attr("data-device-type") == "nexus") {
+              $("#content").html("");
+              $("#content").load(
+                "pagecon/nexus-device.php",
+                function (responseTxt, statusTxt, xhr) {
+                  if (statusTxt == "success") {
+                    nexusFirstLoad(null, clickedDeviceName);
+                    $(".absolute-overlay").addClass("loaded");
+                  }
+                  if (status == "error") {
+                    bootbox.alert({
+                      size: "large",
+                      title: "Gagal memuat laman",
+                      message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian`,
+                      closeButton: false,
+                      buttons: {
+                        ok: {
+                          label: "Tutup",
+                        },
+                      },
+                    });
+                  }
+                }
+              );
+            } else if ($(this).attr("data-device-type") == "nitenan") {
+              loadNitenanInfo({
+                requestType: "loadNitenanInfo",
+                master: clickedDeviceName,
+                token: getMeta("token"),
+              });
+            }
+            const check = setInterval(function () {
+              // Function to check every 0.1s if bondKey is available, then execute reloadStatus() and destroy itself.
+              if (getBondKey() != "") {
+                $(".absolute-overlay").addClass("loaded");
+                clearInterval(check); // kill after executed
+              }
+            }, 100);
+          });
+        }
+      } else {
+        // If user had just only one device then
+        $("#deviceheader .dropdown").html(""); // remove dropdown menu
+        $("#deviceheader .dropdown").prepend(
+          "<p class='text'>" + parseJson["deviceInfo"]["masterName"] + "</p>"
+        ); // Add name but without caret or dropdown
+      }
+
+      $("#js-brightness")[0].value = parseInt(
+        parseJson.nitenanBond.flashBrightness
+      );
+      $("#js-servo")[0].value = parseInt(parseJson.nitenanBond.flashBrightness);
+
+      clearTimeout(nitenanReloadTimer);
+      nitenanReloadTimer = setTimeout(function reload() {
+        if (getBondKey() != "" && $("#nitenan-dashboard").length) {
+          requestAJAX("NitenanService", {
+            requestType: "updateStatus",
+            bondKey: getBondKey(),
+            token: getMeta("token"),
+            data: {
+              flash: $("#js-brightness")[0].value,
+              servo: $("#js-servo")[0].value,
+            },
+          });
+        }
+        nitenanReloadTimer = setTimeout(reload, 1000);
+      }, 1000);
+
+      if (
+        new Date().getTime() / 1000 -
+          new Date(parseJson.nitenanBond.lastUpdate).getTime() / 1000 >=
+        300
+      ) {
+        parseJson.nitenanBond.lastUpdate = parseJson.nitenanBond.lastUpdate.split(
+          " "
+        );
+        setTimeout(function () {
+          bootbox.alert({
+            size: "large",
+            title: "Pemberitahuan",
+            message: `Kontroller anda dengan nama <b>${
+              parseJson.deviceInfo.masterName
+            }</b> sudah tidak mengirim respon ke server selama lebih dari 5 menit, <b>pastikan kontroller anda menyambung ke internet</b> agar anda dapat mengkontrol atau mengupdate kontroller.<br>Kontroller anda terakhir online pada<b> ${convertToDateLong(
+              parseJson.nitenanBond.lastUpdate[0]
+            )} ${parseJson.nitenanBond.lastUpdate[1]}</b>`,
+            closeButton: false,
+            buttons: {
+              ok: {
+                label: "Tutup",
+              },
+            },
+          });
+        }, 2000);
+      }
+    },
+    10000,
+    function (status) {
+      bootbox.alert({
+        size: "large",
+        title: "Gagal memuat laman",
+        message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+        closeButton: false,
+        buttons: {
+          ok: {
+            label: "Tutup",
+          },
+        },
+      });
+    }
+  );
+
+  $("#js-potret").unbind().removeData();
+  $("#js-potret").click(function () {
+    requestAJAX("NitenanService", {
+      requestType: "takeSnapshot",
+      bondKey: getBondKey(),
+      token: getMeta("token"),
+    });
+    setTimeout(function () {
+      requestAJAX(
+        "NitenanService",
+        {
+          requestType: "checkSnapshot",
+          bondKey: getBondKey(),
+          token: getMeta("token"),
+        },
+        function callback(response) {
+          if (response == "1") {
+            bootbox.alert({
+              size: "large",
+              title: "Pemberitahuan",
+              message: `Kontroller anda dengan nama <b>${nitenan.deviceInfo.masterName}</b> tidak memberikan respon pada perintah mengambil gambar, <b>pastikan kontroller anda menyambung ke internet</b> agar anda dapat mengambil gambar.`,
+              closeButton: false,
+              buttons: {
+                ok: {
+                  label: "Tutup",
+                },
+              },
+            });
+          }
+        }
+      );
+    }, 3000);
+  });
 }
 
 if (deviceBelonging.hasClass("maindevice")) {
@@ -2689,14 +2913,6 @@ if (deviceBelonging.hasClass("maindevice")) {
         }
       );
     });
-
-    setTimeout(function reload() {
-      if (getBondKey() != "" && $("#nexus-dashboard").length) {
-        reloadStatus();
-        // humidRadial.animate(Math.random());
-      }
-      setTimeout(reload, 3000);
-    }, 3000);
   });
 
   const check = setInterval(function () {
@@ -2707,5 +2923,18 @@ if (deviceBelonging.hasClass("maindevice")) {
     }
   }, 100);
 } else if (deviceBelonging.hasClass("nitenan")) {
-  $(".absolute-overlay").addClass("loaded");
+  $(document).ready(function () {
+    loadNitenanInfo({
+      requestType: "loadNitenanInfo",
+      master: "master",
+      token: getMeta("token"),
+    });
+  });
+  const check = setInterval(function () {
+    // Function to check every 0.1s if bondKey is available, then execute reloadStatus() and destroy itself.
+    if (getBondKey() != "") {
+      $(".absolute-overlay").addClass("loaded");
+      clearInterval(check); // kill after executed
+    }
+  }, 100);
 }
