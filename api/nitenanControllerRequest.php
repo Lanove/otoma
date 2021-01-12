@@ -19,36 +19,36 @@ function arrayDiff($A, $B)
 if (
     $_SERVER["REQUEST_METHOD"] == "POST" &&
     isset($_SERVER['HTTP_DEVICE_TOKEN']) &&
-    isset($_SERVER['HTTP_NITENAN_BUILD_VERSION']) &&
-    isset($_SERVER['HTTP_NITENAN_SDK_VERSION']) &&
-    isset($_SERVER['HTTP_NITENAN_CHIP_VERSION']) &&
-    isset($_SERVER['HTTP_NITENAN_FREE_SKETCH']) &&
-    isset($_SERVER['HTTP_NITENAN_SKETCH_SIZE']) &&
-    isset($_SERVER['HTTP_NITENAN_FLASH_SIZE']) &&
-    isset($_SERVER['HTTP_NITENAN_SKETCH_MD5']) &&
-    isset($_SERVER['HTTP_NITENAN_CPU_FREQ']) &&
-    isset($_SERVER['HTTP_NITENAN_MAC']) &&
-    isset($_SERVER['HTTP_NITENAN_USERNAME']) &&
-    isset($_SERVER['HTTP_NITENAN_WIFI_SSID']) &&
-    isset($_SERVER['HTTP_NITENAN_AP_SSID']) &&
-    isset($_SERVER['HTTP_NITENAN_AP_PASS']) &&
-    isset($_SERVER['HTTP_NITENAN_AP_IP'])
+    isset($_SERVER['HTTP_ESP32_BUILD_VERSION']) &&
+    isset($_SERVER['HTTP_ESP32_SDK_VERSION']) &&
+    isset($_SERVER['HTTP_ESP32_CHIP_VERSION']) &&
+    isset($_SERVER['HTTP_ESP32_FREE_SKETCH']) &&
+    isset($_SERVER['HTTP_ESP32_SKETCH_SIZE']) &&
+    isset($_SERVER['HTTP_ESP32_FLASH_SIZE']) &&
+    isset($_SERVER['HTTP_ESP32_SKETCH_MD5']) &&
+    isset($_SERVER['HTTP_ESP32_CPU_FREQ']) &&
+    isset($_SERVER['HTTP_ESP32_MAC']) &&
+    isset($_SERVER['HTTP_ESP32_USERNAME']) &&
+    isset($_SERVER['HTTP_ESP32_WIFI_SSID']) &&
+    isset($_SERVER['HTTP_ESP32_AP_SSID']) &&
+    isset($_SERVER['HTTP_ESP32_AP_PASS']) &&
+    isset($_SERVER['HTTP_ESP32_AP_IP'])
 ) {
     $deviceData["deviceToken"] = $_SERVER['HTTP_DEVICE_TOKEN'];
-    $deviceData["softwareVersion"] = $_SERVER['HTTP_NITENAN_BUILD_VERSION'];
-    $deviceData["sdkVersion"] = $_SERVER['HTTP_NITENAN_SDK_VERSION'];
-    $deviceData["chipVersion"] = $_SERVER['HTTP_NITENAN_CHIP_VERSION'];
-    $deviceData["freeSketch"] = $_SERVER['HTTP_NITENAN_FREE_SKETCH'];
-    $deviceData["sketchSize"] = $_SERVER['HTTP_NITENAN_SKETCH_SIZE'];
-    $deviceData["flashSize"] = $_SERVER['HTTP_NITENAN_FLASH_SIZE'];
-    $deviceData["sketchMD5"] = $_SERVER['HTTP_NITENAN_SKETCH_MD5'];
-    $deviceData["cpuFreq"] = $_SERVER['HTTP_NITENAN_CPU_FREQ'];
-    $deviceData["MAC"] = $_SERVER['HTTP_NITENAN_MAC'];
-    $deviceData["username"] = $_SERVER['HTTP_NITENAN_USERNAME'];
-    $deviceData["wifiSSID"] = $_SERVER['HTTP_NITENAN_WIFI_SSID'];
-    $deviceData["softSSID"] = $_SERVER['HTTP_NITENAN_AP_SSID'];
-    $deviceData["softPass"] = $_SERVER['HTTP_NITENAN_AP_PASS'];
-    $deviceData["softIP"] = $_SERVER['HTTP_NITENAN_AP_IP'];
+    $deviceData["softwareVersion"] = $_SERVER['HTTP_ESP32_BUILD_VERSION'];
+    $deviceData["sdkVersion"] = $_SERVER['HTTP_ESP32_SDK_VERSION'];
+    $deviceData["chipVersion"] = $_SERVER['HTTP_ESP32_CHIP_VERSION'];
+    $deviceData["freeSketch"] = $_SERVER['HTTP_ESP32_FREE_SKETCH'];
+    $deviceData["sketchSize"] = $_SERVER['HTTP_ESP32_SKETCH_SIZE'];
+    $deviceData["flashSize"] = $_SERVER['HTTP_ESP32_FLASH_SIZE'];
+    $deviceData["sketchMD5"] = $_SERVER['HTTP_ESP32_SKETCH_MD5'];
+    $deviceData["cpuFreq"] = $_SERVER['HTTP_ESP32_CPU_FREQ'];
+    $deviceData["MAC"] = $_SERVER['HTTP_ESP32_MAC'];
+    $deviceData["username"] = $_SERVER['HTTP_ESP32_USERNAME'];
+    $deviceData["wifiSSID"] = $_SERVER['HTTP_ESP32_WIFI_SSID'];
+    $deviceData["softSSID"] = $_SERVER['HTTP_ESP32_AP_SSID'];
+    $deviceData["softPass"] = $_SERVER['HTTP_ESP32_AP_PASS'];
+    $deviceData["softIP"] = $_SERVER['HTTP_ESP32_AP_IP'];
 
     require "DatabaseController.php";
     $dbController = new DatabaseController();
@@ -88,7 +88,6 @@ if (
             ]
         );
     }
-    $bondKey = "";
     uploadPhoto($_FILES, $bondKey, $dbController);
 } else
     header('HTTP/1.1 403 Forbidden');
