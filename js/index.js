@@ -1,5 +1,5 @@
 var deviceBelonging = $("#bigdevicebox");
-let nexusReloadTimer, nitenanReloadTimer;
+let nexusReloadTimer, nitenanReloadTimer, nitenanPhotoTimer;
 let nitenan;
 $.fn.animateRotate = function (start, end, duration, easing, complete) {
   var args = $.speed(duration, easing, complete);
@@ -2759,6 +2759,49 @@ function loadNitenanInfo(ajaxBuffer) {
       );
       $("#js-servo")[0].value = parseInt(parseJson.nitenanBond.flashBrightness);
 
+      $("#js-potret").unbind().removeData();
+      $("#js-potret").click(function () {
+        requestAJAX("NitenanService", {
+          requestType: "takeSnapshot",
+          bondKey: getBondKey(),
+          token: getMeta("token"),
+        });
+        clearTimeout(nitenanPhotoTimer);
+        nitenanPhotoTimer = setTimeout(function () {
+          requestAJAX(
+            "NitenanService",
+            {
+              requestType: "checkSnapshot",
+              bondKey: getBondKey(),
+              token: getMeta("token"),
+            },
+            function callback(response) {
+              if (response == "1") {
+                bootbox.alert({
+                  size: "large",
+                  title: "Pemberitahuan",
+                  message: `Kontroller anda dengan nama <b>${nitenan.deviceInfo.masterName}</b> tidak memberikan respon pada perintah mengambil gambar, <b>pastikan kontroller anda menyambung ke internet</b> agar anda dapat mengambil gambar.`,
+                  closeButton: false,
+                  buttons: {
+                    ok: {
+                      label: "Tutup",
+                    },
+                  },
+                });
+              }
+            }
+          );
+        }, 8000);
+      });
+      $("#js-stream").unbind().removeData();
+      $("#js-stream").click(function () {
+        requestAJAX("NitenanService", {
+          requestType: "stream",
+          type: $(this).children("span").text().split(" ")[0],
+          bondKey: getBondKey(),
+          token: getMeta("token"),
+        });
+      });
       clearTimeout(nitenanReloadTimer);
       nitenanReloadTimer = setTimeout(function reload() {
         if (getBondKey() != "" && $("#nitenan-dashboard").length) {
@@ -2770,10 +2813,17 @@ function loadNitenanInfo(ajaxBuffer) {
               flash: $("#js-brightness")[0].value,
               servo: $("#js-servo")[0].value,
             },
+          }, function callback(xhrResponse){
+            let response = JSON.parse(xhrResponse);
+            if($("#js-nitenan-image").attr("data-timestamp") != response["lastPhotoStamp"]){
+              $("#js-nitenan-image").attr("data-timestamp",response["lastPhotoStamp"]);
+              $("#js-nitenan-image").attr("src",`./img/nitenan/${getBondKey()}/1.jpg?${new Date().getTime()}`);
+            }
+            $("#js-stream").children("span").text((response["streamCommand"] == 0)?"Mulai Stream":"Stop Stream");
           });
         }
         nitenanReloadTimer = setTimeout(reload, 1000);
-      }, 1000);
+      }, 500);
 
       if (
         new Date().getTime() / 1000 -
@@ -2817,40 +2867,6 @@ function loadNitenanInfo(ajaxBuffer) {
       });
     }
   );
-
-  $("#js-potret").unbind().removeData();
-  $("#js-potret").click(function () {
-    requestAJAX("NitenanService", {
-      requestType: "takeSnapshot",
-      bondKey: getBondKey(),
-      token: getMeta("token"),
-    });
-    setTimeout(function () {
-      requestAJAX(
-        "NitenanService",
-        {
-          requestType: "checkSnapshot",
-          bondKey: getBondKey(),
-          token: getMeta("token"),
-        },
-        function callback(response) {
-          if (response == "1") {
-            bootbox.alert({
-              size: "large",
-              title: "Pemberitahuan",
-              message: `Kontroller anda dengan nama <b>${nitenan.deviceInfo.masterName}</b> tidak memberikan respon pada perintah mengambil gambar, <b>pastikan kontroller anda menyambung ke internet</b> agar anda dapat mengambil gambar.`,
-              closeButton: false,
-              buttons: {
-                ok: {
-                  label: "Tutup",
-                },
-              },
-            });
-          }
-        }
-      );
-    }, 3000);
-  });
 }
 
 if (deviceBelonging.hasClass("maindevice")) {

@@ -35,6 +35,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                         if (($requestType === "takeSnapshot")) {
                             snapshotCommand($json, $dbController, "take");
                         }
+                        if (($requestType === "stream")) {
+                            streamCommand($json, $dbController);
+                        }
                     }
                 }
             }
@@ -44,12 +47,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
     $dbController = null;
 } else header('HTTP/1.1 403 Forbidden');
 
-function snapshotCommand($arg, $dbC, $cmd){
+function streamCommand($arg, $dbC)
+{
     $bondKey = $arg["bondKey"];
-    if($cmd == "take"){
+    $type = $arg["type"];
+    if ($type == "Mulai")
+        $dbC->execute("UPDATE nitenanbond SET streamCommand='1' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+    else
+        $dbC->execute("UPDATE nitenanbond SET streamCommand='0' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+}
+
+function snapshotCommand($arg, $dbC, $cmd)
+{
+    $bondKey = $arg["bondKey"];
+    if ($cmd == "take") {
         $dbC->execute("UPDATE nitenanbond SET snapCommand='1' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
         echo "OK";
-    }else{
+    } else {
         print_r($dbC->runQuery("SELECT snapCommand FROM nitenanbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey])["snapCommand"]);
     }
 }
@@ -63,6 +77,8 @@ function updateStatus($arg, $dbC)
         if ($flashValue >= 0 && $flashValue <= 100 && $servoValue >= 0 && $servoValue <= 180) {
             $dbC->execute("UPDATE nitenanbond SET flashBrightness=:flashValue, servoAngle=:servoValue WHERE bondKey = :bondKey;", ["bondKey" => $bondKey, "servoValue" => $servoValue, "flashValue" => $flashValue]);
         }
+        $nitenanBond = $dbC->runQuery("SELECT lastPhotoStamp,streamCommand FROM nitenanbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+        print_r(json_encode(["streamCommand" => $nitenanBond["streamCommand"], "lastPhotoStamp" => $nitenanBond["lastPhotoStamp"]]));
     }
 }
 function loadNitenanInfo($arg, $dbC)

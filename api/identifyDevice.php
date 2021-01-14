@@ -1,7 +1,7 @@
 <?php
 $echoBack = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $json = json_decode(file_get_contents('php://input'), true); // Get JSON Input from AJAX and decode it to PHP Array
+    $json = (json_decode(file_get_contents('php://input'), true) == true) ? json_decode(file_get_contents('php://input'), true) : json_decode(file_get_contents($_FILES["requestJSON"]["tmp_name"]), true); // Get JSON Input from AJAX and decode it to PHP Array
     if (
         isset($json["username"]) &&
         isset($json["password"]) &&
@@ -100,6 +100,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     } else
         $echoBack = "smwrong";
-    echo $echoBack;
+    print_r($echoBack);
 } else
     header('HTTP/1.1 403 Forbidden');

@@ -34,6 +34,7 @@ if (
     isset($_SERVER['HTTP_ESP32_AP_PASS']) &&
     isset($_SERVER['HTTP_ESP32_AP_IP'])
 ) {
+    header("Connection: keep-alive");
     $deviceData["deviceToken"] = $_SERVER['HTTP_DEVICE_TOKEN'];
     $deviceData["softwareVersion"] = $_SERVER['HTTP_ESP32_BUILD_VERSION'];
     $deviceData["sdkVersion"] = $_SERVER['HTTP_ESP32_SDK_VERSION'];
@@ -52,75 +53,85 @@ if (
 
     require "DatabaseController.php";
     $dbController = new DatabaseController();
-    $bond = $dbController->runQuery("SELECT * FROM bond WHERE deviceToken = :deviceToken;", ["deviceToken" => $deviceToken]);
-    $nitenanBond = $dbController->runQuery("SELECT * FROM nitenanbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
-    $bondKey = $bond["bondKey"];
-    // First merge the both table fetch array (bond and nitenanBond), to obtain array that had equal keys with deviceData
-    // compare the merged array with deviceData from HTTP request, which will return an object that had different value for the same key
-    // if arrayDiff return some value, this means that there are some differences between database data and device data
-    if (!empty(arrayDiff($deviceData, array_merge($bond, $nitenanBond)))) {
-        // If there are some differences, then synchronize changes to database
-        $dbC->execute(
-            "UPDATE bond SET deviceToken=?, softSSID=?, softPass=?, softIP=?, MAC=?, softwareVersion=? WHERE bondKey = ?;",
-            [
-                $deviceData["deviceToken"],
-                $deviceData["softSSID"],
-                $deviceData["softPass"],
-                $deviceData["softIP"],
-                $deviceData["MAC"],
-                $deviceData["softwareVersion"],
-                $bondKey
-            ]
-        );
-        $dbC->execute(
-            "UPDATE nitenanbond SET sdkVersion=?, chipVersion=?,freeSketch=?,sketchSize=?,flashSize=?,sketchMD5=?,cpuFreq=?,username=?,wifiSSID=? WHERE bondKey = ?;",
-            [
-                $deviceData["sdkVersion"],
-                $deviceData["chipVersion"],
-                $deviceData["freeSketch"],
-                $deviceData["sketchSize"],
-                $deviceData["flashSize"],
-                $deviceData["sketchMD5"],
-                $deviceData["cpuFreq"],
-                $deviceData["username"],
-                $deviceData["wifiSSID"],
-                $bondKey
-            ]
-        );
+    $bond = $dbController->runQuery("SELECT * FROM bond WHERE deviceToken = :deviceToken;", ["deviceToken" => $deviceData["deviceToken"]]);
+    if (isset($bond["bondKey"])) {
+        $bondKey = $bond["bondKey"];
+        $nitenanBond = $dbController->runQuery("SELECT * FROM nitenanbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+        $dbController->execute("UPDATE nitenanbond SET lastUpdate=? WHERE bondKey = ?;", [gmdate('Y-m-d H:i:s', (time() + 25200)), $bondKey]);
+        // First merge the both table fetch array (bond and nitenanBond), to obtain array that had equal keys with deviceData
+        // compare the merged array with deviceData from HTTP request, which will return an object that had different value for the same key
+        // if arrayDiff return some value, this means that there are some differences between database data and device data
+        if (!empty(arrayDiff($deviceData, array_merge($bond, $nitenanBond)))) {
+            // If there are some differences, then synchronize changes to database
+            $dbController->execute(
+                "UPDATE bond SET deviceToken=?, softSSID=?, softPass=?, softIP=?, MAC=?, softwareVersion=? WHERE bondKey = ?;",
+                [
+                    $deviceData["deviceToken"],
+                    $deviceData["softSSID"],
+                    $deviceData["softPass"],
+                    $deviceData["softIP"],
+                    $deviceData["MAC"],
+                    $deviceData["softwareVersion"],
+                    $bondKey
+                ]
+            );
+            $dbController->execute(
+                "UPDATE nitenanbond SET sdkVersion=?, chipVersion=?,freeSketch=?,sketchSize=?,flashSize=?,sketchMD5=?,cpuFreq=?,username=?,wifiSSID=? WHERE bondKey = ?;",
+                [
+                    $deviceData["sdkVersion"],
+                    $deviceData["chipVersion"],
+                    $deviceData["freeSketch"],
+                    $deviceData["sketchSize"],
+                    $deviceData["flashSize"],
+                    $deviceData["sketchMD5"],
+                    $deviceData["cpuFreq"],
+                    $deviceData["username"],
+                    $deviceData["wifiSSID"],
+                    $bondKey
+                ]
+            );
+        }
+        if ($nitenanBond["snapCommand"] == "1" || $nitenanBond["streamCommand"] == "1")
+            uploadPhoto($_FILES, $bondKey, $dbController);
+        echo json_encode(["servo" => intval($nitenanBond["servoAngle"]), "flash" => intval($nitenanBond["flashBrightness"])]);
     }
-    uploadPhoto($_FILES, $bondKey, $dbController);
 } else
     header('HTTP/1.1 403 Forbidden');
 
 
 function uploadPhoto($uploadedFile, $bondKey, $dbController)
 {
-    $target_dir = "uploads/";
-    $datum = mktime(date('H') + 0, date('i'), date('s'), date('m'), date('d'), date('y'));
-    $target_file = $target_dir .  generateRandomString() . "_" . date('Y-m-d_H_i_s', $datum) . basename($uploadedFile["imageFile"]["name"]);
+    $fileName = $uploadedFile["imageFile"]["name"];
+    $filePath = $uploadedFile["imageFile"]["tmp_name"];
+    $nitenanBond = $dbController->runQuery("SELECT * FROM nitenanbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+    $target_dir = "../img/nitenan/" . $bondKey;
+    if (!file_exists($target_dir)) {
+        mkdir($target_dir, 0755, true);
+    }
+    $target_file = $target_dir .  "/1.jpg";
+    if (file_exists($target_dir .  "/2.jpg"))
+        unlink($target_dir .  "/2.jpg");
+    if (file_exists($target_file))
+        rename($target_file, $target_dir .  "/2.jpg");
     $uploadOk = 1;
     $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
     // Check if image file is a actual image or fake image
-    $check = getimagesize($uploadedFile["imageFile"]["tmp_name"]);
+    $check = getimagesize($filePath);
     if ($check !== false) {
-        echo "File is an image - " . $check["mime"] . ".";
         $uploadOk = 1;
     } else {
-        echo "File is not an image.";
         $uploadOk = 0;
     }
 
 
     // Check if file already exists
     if (file_exists($target_file)) {
-        echo "Sorry, file already exists.";
         $uploadOk = 0;
     }
 
     // Check file size
     if ($uploadedFile["imageFile"]["size"] > 500000) {
-        echo "Sorry, your file is too large.";
         $uploadOk = 0;
     }
 
@@ -129,19 +140,16 @@ function uploadPhoto($uploadedFile, $bondKey, $dbController)
         $imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
         && $imageFileType != "gif"
     ) {
-        echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
         $uploadOk = 0;
     }
-
+    $source = imagecreatefromjpeg($filePath);
+    $imageRotate = imagerotate($source, 270, 0);
+    imagejpeg($imageRotate, $filePath, 100);
     // Check if $uploadOk is set to 0 by an error
-    if ($uploadOk == 0) {
-        echo "Sorry, your file was not uploaded.";
-        // if everything is ok, try to upload file
-    } else {
-        if (move_uploaded_file($uploadedFile["imageFile"]["tmp_name"], $target_file)) {
-            echo "The file " . basename($uploadedFile["imageFile"]["name"]) . " has been uploaded.";
-        } else {
-            echo "Sorry, there was an error uploading your file.";
-        }
+    if (move_uploaded_file($filePath, $target_file) && $uploadOk == 1) {
+        // echo "The file " . basename($uploadedFile["imageFile"]["name"]) . " has been uploaded.";
+        $dbController->execute("UPDATE nitenanbond SET snapCommand=0, lastPhotoStamp=? WHERE bondKey = ?;", [gmdate('Y-m-d H:i:s', (time() + 25200)), $bondKey]);
     }
+    imagedestroy($source);
+    imagedestroy($imageRotate);
 }
