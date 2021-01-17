@@ -790,6 +790,7 @@ body {
 #dashboard .nexusdevice #deviceheader #tabs .nav-tabs {
   border-bottom: 3px solid var(--text-color1);
 }
+
 #dashboard #spsetting {
   height: 50px;
   width: 160px;

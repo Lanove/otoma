@@ -84,6 +84,9 @@ if ($fetchResult) {
         <li>
           <a href="#" id="contactUs"><i class="fas fa-paper-plane"></i> Kontak Kami</a>
         </li>
+        <li>
+          <a href="#" id="js-marketplace"><i class="fas fa-store-alt"></i> Marketplace</a>
+        </li>
       </ul>
     </nav>
     <nav class="navbar nav-fill w-100 navbar-dark fixed-top">
@@ -108,16 +111,17 @@ if ($fetchResult) {
     <div id="bondContainer" value=""></div>
     <div id="content">
       <?php
-      if ($deviceBelonging) {
-        if ($deviceBelongingType == "main")
-          require "pagecon/main-device.php";
-        else if ($deviceBelongingType == "nexus")
-          require "pagecon/nexus-device.php";
-        else if ($deviceBelongingType == "nitenan")
-          require "pagecon/nitenan-device.php";
-      } else {
-        require "pagecon/no-device-found.php";
-      }
+      require "pagecon/marketplace.php";
+      // if ($deviceBelonging) {
+      //   if ($deviceBelongingType == "main")
+      //     require "pagecon/main-device.php";
+      //   else if ($deviceBelongingType == "nexus")
+      //     require "pagecon/nexus-device.php";
+      //   else if ($deviceBelongingType == "nitenan")
+      //     require "pagecon/nitenan-device.php";
+      // } else {
+      //   require "pagecon/no-device-found.php";
+      // }
       ?>
     </div>
     <div class="container-fluid footer justify-content-center align-items-center">
