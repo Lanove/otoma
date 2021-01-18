@@ -126,6 +126,86 @@
             top: 3px;
             color: #777;
         }
+
+        .product-box {
+            background-color: white;
+            border: 1px solid #ddffee;
+            border-radius: 10px;
+            padding: 10px;
+            height: 122px;
+        }
+
+        .product-box__image {
+            width: 120px;
+            height: 120px;
+            border-radius: 10px 0px 0px 10px;
+            position: relative;
+            bottom: 10px;
+            right: 10px;
+        }
+
+        .product-box__price-box {
+            font-size: 16px;
+            font-weight: bold;
+            position: relative;
+            left: 98px;
+            bottom: 7px;
+            width: 150px;
+            border-radius: 15px;
+            line-height: 30px;
+        }
+
+        .product-box__title-label {
+            font-weight: bold;
+            font-size: 18px;
+            position: relative;
+            bottom: 7px;
+        }
+
+        .product-box__from-label {
+            font-size: 12px;
+            color: #777;
+            position: relative;
+            bottom: 12px;
+        }
+
+        .product-box__oleh-label {
+            font-size: 12px;
+            color: #777;
+            position: relative;
+            bottom: 15px;
+        }
+
+        .product-box__star {
+            position: relative;
+            bottom: 48px;
+            font-size: 26px;
+            color: orange;
+        }
+
+        .product-box__rating {
+            position: relative;
+            bottom: 50px;
+            left: 3px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .product-box__out-of {
+            font-size: 12px;
+            color: #777;
+            position: relative;
+            bottom: 35px;
+            left: 3px;
+        }
+
+        .product-box__review-label {
+            font-size: 12px;
+            color: #777;
+            position: relative;
+            bottom: 20px;
+            right: 60px;
+        }
     </style>
     <div class="row mt-5 user-box">
         <div class="col-12">
@@ -157,176 +237,226 @@
             </div>
         </div>
     </div>
-    <div class="row mt-3 city-picker">
-        <div class="col-12">
-            <div class="row">
+
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="pembeli" role="tabpanel" aria-labelledby="contact-tab">
+            <div class="row mt-3 city-picker">
                 <div class="col-12">
-                    <span style="font-weight: 550;font-size: 18px;">Dikirim Dari</span>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <span class="city-picker__label">Provinsi</span>
-                    <div class="city-picker__selector mb-2" id="js-provinsi-selector" style="width:100%;">
-                        <select>
-                            <option value="0">Pilih Provinsi</option>
-                        </select>
+                    <div class="row">
+                        <div class="col-12">
+                            <span style="font-weight: 550;font-size: 18px;">Dikirim Dari</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <span class="city-picker__label">Provinsi</span>
+                            <div class="city-picker__selector mb-2" id="js-provinsi-selector" style="width:100%;">
+                                <select>
+                                    <option value="0">Pilih Provinsi</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <script>
-            function isElement(o) {
-                return typeof HTMLElement === "object" ?
-                    o instanceof HTMLElement //DOM2
-                    :
-                    o &&
-                    typeof o === "object" &&
-                    o !== null &&
-                    o.nodeType === 1 &&
-                    typeof o.nodeName === "string";
-            }
-            let provinsi;
+                <script>
+                    let provinsi;
 
-            /*when the select box is clicked, close any other select boxes,
-              and open/close the current select box*/
-            function selectBoxEvent(e) {
-                e.stopPropagation();
-                closeAllSelect(this);
-                this.nextSibling.classList.toggle("city-picker__selector--hide");
-                this.classList.toggle("city-picker__selector__arrow--active");
-            }
-
-            /*when an item of selector is clicked, update the original select box, and the selected item*/
-            function selectItemEvent(e) {
-                let y, i, k, s, h, sl, yl, selectorElmt, selectorId;
-                selectorElmt = this.parentNode.parentNode;
-                selectorId = selectorElmt.id;
-                s = this.parentNode.parentNode.getElementsByTagName("select")[0];
-                sl = s.length;
-                h = this.parentNode.previousSibling;
-                // If user changes the selector item, and it was a provinsi selector then..
-                if (selectorId == "js-provinsi-selector" && h.innerHTML != this.innerHTML) {
-                    let kotaSelector = document.getElementById("js-kota-selector"),
-                        adakahKotaSelector = (typeof(kotaSelector) != 'undefined' && kotaSelector != null);
-                    // Jika selector kota udah ada kita delete dulu sebelum recreate
-                    if (adakahKotaSelector){
-                        document.getElementById("js-kota-label").remove();
-                        kotaSelector.remove();
+                    /*when the select box is clicked, close any other select boxes,
+                      and open/close the current select box*/
+                    function selectBoxEvent(e) {
+                        e.stopPropagation();
+                        closeAllSelect(this);
+                        this.nextSibling.classList.toggle("city-picker__selector--hide");
+                        this.classList.toggle("city-picker__selector__arrow--active");
                     }
-                    selectorElmt.parentNode.insertAdjacentHTML(
-                        "beforeend",
-                        `<span class="city-picker__label" id="js-kota-label">Kota/Kabupaten</span>
+
+                    /*when an item of selector is clicked, update the original select box, and the selected item*/
+                    function selectItemEvent(e) {
+                        let y, i, k, s, h, sl, yl, selectorElmt, selectorId;
+                        selectorElmt = this.parentNode.parentNode;
+                        selectorId = selectorElmt.id;
+                        s = this.parentNode.parentNode.getElementsByTagName("select")[0];
+                        sl = s.length;
+                        h = this.parentNode.previousSibling;
+                        // If user changes the provinsi selector item, then...
+                        if (selectorId == "js-provinsi-selector" && h.innerHTML != this.innerHTML) {
+                            let kotaSelector = document.getElementById("js-kota-selector"),
+                                adakahKotaSelector = (typeof(kotaSelector) != 'undefined' && kotaSelector != null);
+                            // Jika selector kota udah ada kita delete dulu sebelum recreate
+                            if (adakahKotaSelector) {
+                                document.getElementById("js-kota-label").remove();
+                                kotaSelector.remove();
+                            }
+                            // Buat htmlnya city-picker untuk kota
+                            selectorElmt.parentNode.insertAdjacentHTML(
+                                "beforeend",
+                                `<span class="city-picker__label" id="js-kota-label">Kota/Kabupaten</span>
                             <div class="city-picker__selector" id="js-kota-selector" style="width:100%;">
                                 <select>
                                 <option value="0">Pilih Kota</option>
                                 </select>
                             </div>`
-                    );
-                    selectorElmt.parentNode.childNodes.forEach(element => {
-                        if (element.id == "js-kota-selector") kotaSelector = element;
-                    });
-                    provinsi[this.innerHTML].forEach((element, index) => {
-                        kotaSelector.childNodes[1].innerHTML += `<option value="${index+1}">${element}</option>`;
-                    });
-                    buildSelector(kotaSelector);
-                }
-                for (i = 0; i < sl; i++) {
-                    if (s.options[i].innerHTML == this.innerHTML) {
-                        s.selectedIndex = i;
-                        h.innerHTML = this.innerHTML;
-                        y = this.parentNode.getElementsByClassName(
-                            "city-picker__selector--same-as-selected"
-                        );
-                        yl = y.length;
-                        for (k = 0; k < yl; k++) {
-                            y[k].removeAttribute("class");
+                            );
+                            // cari elemen dengan id js-kota-selector buat dijadiin kotaSelector
+                            kotaSelector = document.getElementById("js-kota-selector");
+                            // Kita edit items dari kotaSelector sesuai provinsi yang terpilih
+                            provinsi[this.innerHTML].forEach((element, index) => {
+                                kotaSelector.childNodes[1].innerHTML += `<option value="${index+1}">${element}</option>`;
+                            });
+                            // Setelah itu kita buat selectornya
+                            buildSelector(kotaSelector);
                         }
-                        this.setAttribute(
-                            "class",
-                            "city-picker__selector--same-as-selected"
-                        );
-                        break;
+                        for (i = 0; i < sl; i++) {
+                            if (s.options[i].innerHTML == this.innerHTML) {
+                                s.selectedIndex = i;
+                                h.innerHTML = this.innerHTML;
+                                y = this.parentNode.getElementsByClassName(
+                                    "city-picker__selector--same-as-selected"
+                                );
+                                yl = y.length;
+                                for (k = 0; k < yl; k++) {
+                                    y[k].removeAttribute("class");
+                                }
+                                this.setAttribute(
+                                    "class",
+                                    "city-picker__selector--same-as-selected"
+                                );
+                                break;
+                            }
+                        }
+                        h.click();
                     }
-                }
-                h.click();
-            }
 
-            function closeAllSelect(elmnt) {
-                /*a function that will close all select boxes in the document,
-                              except the current select box:*/
-                var x,
-                    y,
-                    i,
-                    xl,
-                    yl,
-                    arrNo = [];
-                x = document.getElementsByClassName("city-picker__selector__items");
-                y = document.getElementsByClassName("city-picker__selector__selected");
-                xl = x.length;
-                yl = y.length;
-                for (i = 0; i < yl; i++) {
-                    if (elmnt == y[i]) {
-                        arrNo.push(i);
-                    } else {
-                        y[i].classList.remove("city-picker__selector__arrow--active");
+                    function closeAllSelect(elmnt) {
+                        /*a function that will close all select boxes in the document,
+                                      except the current select box:*/
+                        var x,
+                            y,
+                            i,
+                            xl,
+                            yl,
+                            arrNo = [];
+                        x = document.getElementsByClassName("city-picker__selector__items");
+                        y = document.getElementsByClassName("city-picker__selector__selected");
+                        xl = x.length;
+                        yl = y.length;
+                        for (i = 0; i < yl; i++) {
+                            if (elmnt == y[i]) {
+                                arrNo.push(i);
+                            } else {
+                                y[i].classList.remove("city-picker__selector__arrow--active");
+                            }
+                        }
+                        for (i = 0; i < xl; i++) {
+                            if (arrNo.indexOf(i)) {
+                                x[i].classList.add("city-picker__selector--hide");
+                            }
+                        }
                     }
-                }
-                for (i = 0; i < xl; i++) {
-                    if (arrNo.indexOf(i)) {
-                        x[i].classList.add("city-picker__selector--hide");
+                    document.addEventListener("click", closeAllSelect);
+
+                    function buildSelector(element) {
+                        let x,
+                            i,
+                            j,
+                            l,
+                            ll,
+                            selElmnt = element.getElementsByTagName("select")[0],
+                            a,
+                            b,
+                            c;
+                        ll = selElmnt.length;
+                        /*for each element, create a new DIV that will act as the selected item:*/
+                        a = document.createElement("DIV");
+                        a.setAttribute("class", "city-picker__selector__selected");
+                        a.innerHTML = selElmnt.options[selElmnt.selectedIndex].innerHTML;
+                        element.appendChild(a);
+                        /*for each element, create a new DIV that will contain the option list:*/
+                        b = document.createElement("DIV");
+                        b.setAttribute("class", "city-picker__selector__items city-picker__selector--hide");
+                        for (j = 1; j < ll; j++) {
+                            /*for each option in the original select element,create a new DIV that will act as an option item:*/
+                            c = document.createElement("DIV");
+                            c.innerHTML = selElmnt.options[j].innerHTML;
+                            c.addEventListener("click", selectItemEvent);
+                            b.appendChild(c);
+                        }
+                        element.appendChild(b);
+                        a.addEventListener("click", selectBoxEvent);
                     }
-                }
-            }
-            document.addEventListener("click", closeAllSelect);
 
-            function buildSelector(element) {
-                let x,
-                    i,
-                    j,
-                    l,
-                    ll,
-                    selElmnt = element.getElementsByTagName("select")[0],
-                    a,
-                    b,
-                    c;
-                ll = selElmnt.length;
-                /*for each element, create a new DIV that will act as the selected item:*/
-                a = document.createElement("DIV");
-                a.setAttribute("class", "city-picker__selector__selected");
-                a.innerHTML = selElmnt.options[selElmnt.selectedIndex].innerHTML;
-                element.appendChild(a);
-                /*for each element, create a new DIV that will contain the option list:*/
-                b = document.createElement("DIV");
-                b.setAttribute("class", "city-picker__selector__items city-picker__selector--hide");
-                for (j = 1; j < ll; j++) {
-                    /*for each option in the original select element,create a new DIV that will act as an option item:*/
-                    c = document.createElement("DIV");
-                    c.innerHTML = selElmnt.options[j].innerHTML;
-                    c.addEventListener("click", selectItemEvent);
-                    b.appendChild(c);
-                }
-                element.appendChild(b);
-                a.addEventListener("click", selectBoxEvent);
-            }
+                    fetch("js/json/pulau-jawa.json")
+                        .then((response) => response.json())
+                        .then((json) => {
+                            provinsi = json;
+                            let ii, x, l;
 
-            fetch("js/json/pulau-jawa.json")
-                .then((response) => response.json())
-                .then((json) => {
-                    provinsi = json;
-                    let ii, x, l;
+                            /*look for any elements with the class "city-picker__selector":*/
+                            x = document.getElementsByClassName("city-picker__selector");
+                            Object.keys(provinsi).forEach(function(key) {
+                                x[0].childNodes[1].innerHTML += `<option value=${++ii}>${key}</option>`;
+                            });
+                            l = x.length;
+                            // We build the provinsi selector from provided json
+                            for (i = 0; i < l; i++) {
+                                buildSelector(x[i]);
+                            }
+                        });
+                </script>
+            </div>
+            <div class="row mt-3 product-box" data-product-id="">
+                <div class="col-3" style="padding:0px;">
+                    <img class="product-box__image" src="https://kanaanglobal.net/wp-content/uploads/2019/04/cara-ternak-ayam-potong.jpg" alt="">
+                </div>
+                <div class="col-9" style="padding-left:45px;">
+                    <div class="row product-box__title-label">
+                        <span>Ayam Sehat</span>
+                    </div>
+                    <div class="row product-box__from-label">
+                        <span>Dari Kab. Kediri, Kec. Gurah</span>
+                    </div>
+                    <div class="row product-box__oleh-label">
+                        <span>Oleh Lanove</span>
+                    </div>
+                    <div class="row">
+                        <div class="product-box__price-box btn btn-info">Rp1.000,00.</div>
+                    </div>
+                    <div class="row">
+                        <span class="fa fa-star product-box__star"></span>
+                        <span class="product-box__rating">4.9</span>
+                        <span class="product-box__out-of">/5</span>
+                        <span class="product-box__review-label">89 Review</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3 product-box" data-product-id="">
+                <div class="col-3" style="padding:0px;">
+                    <img class="product-box__image" src="https://static.republika.co.id/uploads/images/inpicture_slide/doc-atau-bibit-anak-ayam-ilustrasi-_160126165434-203.JPG" alt="">
+                </div>
+                <div class="col-9" style="padding-left:45px;">
+                    <div class="row product-box__title-label">
+                        <span>Ayam Murah</span>
+                    </div>
+                    <div class="row product-box__from-label">
+                        <span>Dari Kab. Kediri, Kec. Grogol</span>
+                    </div>
+                    <div class="row product-box__oleh-label">
+                        <span>Oleh mbah kung</span>
+                    </div>
+                    <div class="row">
+                        <div class="product-box__price-box btn btn-info">Rp5.000,00.</div>
+                    </div>
+                    <div class="row">
+                        <span class="fa fa-star product-box__star"></span>
+                        <span class="product-box__rating">4.6</span>
+                        <span class="product-box__out-of">/5</span>
+                        <span class="product-box__review-label">27 Review</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                    /*look for any elements with the class "city-picker__selector":*/
-                    x = document.getElementsByClassName("city-picker__selector");
-                    Object.keys(provinsi).forEach(function(key) {
-                        x[0].childNodes[1].innerHTML += `<option value=${++ii}>${key}</option>`;
-                    });
-                    l = x.length;
-                    // We build the provinsi selector from provided json
-                    for (i = 0; i < l; i++) {
-                        buildSelector(x[i]);
-                    }
-                });
-        </script>
+        <div class="tab-pane fade" id="penjual" role="tabpanel" aria-labelledby="contact-tab">
+        </div>
     </div>
 </div>
