@@ -111,7 +111,7 @@ if ($fetchResult) {
     <div id="bondContainer" value=""></div>
     <div id="content">
       <?php
-      require "pagecon/marketplace.php";
+      require "pagecon/product-page.php";
       // if ($deviceBelonging) {
       //   if ($deviceBelongingType == "main")
       //     require "pagecon/main-device.php";

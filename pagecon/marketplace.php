@@ -450,7 +450,7 @@
                         <span class="fa fa-star product-box__star"></span>
                         <span class="product-box__rating">4.9</span>
                         <span class="product-box__out-of">/5</span>
-                        <span class="product-box__review-label">89 Review</span>
+                        <span class="product-box__review-label">89 Ulasan</span>
                         <div class="product-box__price-box btn btn-info">Rp1.000,00.</div>
                     </div>
                 </div>
@@ -473,7 +473,7 @@
                         <span class="fa fa-star product-box__star"></span>
                         <span class="product-box__rating">4.6</span>
                         <span class="product-box__out-of">/5</span>
-                        <span class="product-box__review-label">27 Review</span>
+                        <span class="product-box__review-label">27 Ulasan</span>
                         <div class="product-box__price-box btn btn-info">Rp5.000,00.</div>
                     </div>
                 </div>
