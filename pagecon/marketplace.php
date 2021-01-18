@@ -133,6 +133,7 @@
             border-radius: 10px;
             padding: 10px;
             height: 122px;
+            cursor: pointer;
         }
 
         .product-box__image {
@@ -147,9 +148,8 @@
         .product-box__price-box {
             font-size: 16px;
             font-weight: bold;
-            position: relative;
-            left: 98px;
-            bottom: 7px;
+            position: absolute;
+            right: 15px;
             width: 150px;
             border-radius: 15px;
             line-height: 30px;
@@ -178,15 +178,16 @@
 
         .product-box__star {
             position: relative;
-            bottom: 48px;
+            bottom: 4px;
+            right: 5px;
             font-size: 26px;
             color: orange;
         }
 
         .product-box__rating {
             position: relative;
-            bottom: 50px;
-            left: 3px;
+            bottom: 6px;
+            right: 2px;
             font-size: 24px;
             font-weight: bold;
         }
@@ -195,16 +196,43 @@
             font-size: 12px;
             color: #777;
             position: relative;
-            bottom: 35px;
-            left: 3px;
+            top: 9px;
+            right: 2px;
         }
 
         .product-box__review-label {
             font-size: 12px;
             color: #777;
             position: relative;
-            bottom: 20px;
-            right: 60px;
+            top: 24px;
+            right: 65px;
+        }
+
+        .add-box {
+            background-color: white;
+            margin-right: -20px;
+            margin-left: -20px;
+            border-bottom: 1px solid #ddffee;
+            border-top: 1px solid #ddffee;
+            padding: 15px;
+            padding-left: 5px;
+            padding-right: 5px;
+            padding-bottom: 0px;
+            cursor:pointer;
+        }
+
+        .add-box__plus-icon {
+            position: relative;
+            left: 27px;
+            bottom: 19px;
+            font-size: 12px;
+        }
+
+        .add-box__box-icon {
+            font-size: 1.7rem;
+            position: relative;
+            top: 5px;
+            margin-right:10px;
         }
     </style>
     <div class="row mt-5 user-box">
@@ -405,10 +433,10 @@
                 </script>
             </div>
             <div class="row mt-3 product-box" data-product-id="">
-                <div class="col-3" style="padding:0px;">
+                <div style="padding:0px;">
                     <img class="product-box__image" src="https://kanaanglobal.net/wp-content/uploads/2019/04/cara-ternak-ayam-potong.jpg" alt="">
                 </div>
-                <div class="col-9" style="padding-left:45px;">
+                <div style="padding-left:15px;">
                     <div class="row product-box__title-label">
                         <span>Ayam Sehat</span>
                     </div>
@@ -419,21 +447,19 @@
                         <span>Oleh Lanove</span>
                     </div>
                     <div class="row">
-                        <div class="product-box__price-box btn btn-info">Rp1.000,00.</div>
-                    </div>
-                    <div class="row">
                         <span class="fa fa-star product-box__star"></span>
                         <span class="product-box__rating">4.9</span>
                         <span class="product-box__out-of">/5</span>
                         <span class="product-box__review-label">89 Review</span>
+                        <div class="product-box__price-box btn btn-info">Rp1.000,00.</div>
                     </div>
                 </div>
             </div>
             <div class="row mt-3 product-box" data-product-id="">
-                <div class="col-3" style="padding:0px;">
+                <div style="padding:0px;">
                     <img class="product-box__image" src="https://static.republika.co.id/uploads/images/inpicture_slide/doc-atau-bibit-anak-ayam-ilustrasi-_160126165434-203.JPG" alt="">
                 </div>
-                <div class="col-9" style="padding-left:45px;">
+                <div style="padding-left:15px;">
                     <div class="row product-box__title-label">
                         <span>Ayam Murah</span>
                     </div>
@@ -444,19 +470,33 @@
                         <span>Oleh mbah kung</span>
                     </div>
                     <div class="row">
-                        <div class="product-box__price-box btn btn-info">Rp5.000,00.</div>
-                    </div>
-                    <div class="row">
                         <span class="fa fa-star product-box__star"></span>
                         <span class="product-box__rating">4.6</span>
                         <span class="product-box__out-of">/5</span>
                         <span class="product-box__review-label">27 Review</span>
+                        <div class="product-box__price-box btn btn-info">Rp5.000,00.</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="tab-pane fade" id="penjual" role="tabpanel" aria-labelledby="contact-tab">
+            <div class="row mt-3 add-box">
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-12">
+                            <span style="font-weight: 550;font-size: 18px;">Barang Saya</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mt-2" style="border-top:1px solid #ddffee;padding:10px;">
+                            <i class="fas fa-plus add-box__plus-icon"></i>
+                            <i class="fas fa-box-open add-box__box-icon"></i>
+                            <span>Tambahkan Produk</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
