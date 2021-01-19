@@ -159,9 +159,9 @@
         <div class="col-12">
             <span class="main-box__label">Tambahkan Produk</span>
             <span class="main-box__nama-label">Nama Produk</span>
-            <input class="main-box__input-text" type="text" name="nama" id="js-nama" placeholder="Masukkan nama barang">
+            <input class="main-box__input-text" type="text" name="nama" id="js-namaBarang" placeholder="Masukkan nama barang">
             <span class="main-box__nama-label mt-2">Harga Produk (Rp)</span>
-            <input class="main-box__input-text" type="number" name="harga" id="js-harga" placeholder="Masukkan harga barang">
+            <input class="main-box__input-text" type="number" name="harga" id="js-hargaBarang" min="100" max="100000000" placeholder="Masukkan harga barang">
             <span class="main-box__nama-label mt-2">Pilih Kamera</span>
             <div class="picker__selector" id="js-camera-selector" style="width:100%;">
                 <select>
@@ -169,16 +169,16 @@
                 </select>
             </div>
             <span class="main-box__nama-label mt-2">Deskripsi Produk</span>
-            <textarea placeholder="Masukkan deskripsi produk" name="deskripsi" id="js-deskripsi" class="main-box__deskripsi-box"></textarea>
+            <textarea placeholder="Masukkan deskripsi produk" name="deskripsi" id="js-deskripsiBarang" class="main-box__deskripsi-box"></textarea>
             <span class="main-box__nama-label mt-2">Gambar Produk</span>
             <input type="file" name="js-file-upload" id="js-file-upload" multiple class="input-file" />
             <label for="js-file-upload" class="d-inline-flex">
-                <img id="js-preview-1" class="input-file__preview" src="http://192.168.7.112:8080/otoma/img/upload-image-icon.jpg" alt="">
-                <img id="js-preview-2" class="ml-auto mr-auto input-file__preview" src="http://192.168.7.112:8080/otoma/img/upload-image-icon.jpg" alt="">
-                <img id="js-preview-3" class="input-file__preview" src="http://192.168.7.112:8080/otoma/img/upload-image-icon.jpg" alt="">
+                <img data-b64="" id="js-preview-1" class="input-file__preview" src="http://192.168.7.112:8080/otoma/img/upload-image-icon.jpg" alt="">
+                <img data-b64="" id="js-preview-2" class="ml-auto mr-auto input-file__preview" src="http://192.168.7.112:8080/otoma/img/upload-image-icon.jpg" alt="">
+                <img data-b64="" id="js-preview-3" class="input-file__preview" src="http://192.168.7.112:8080/otoma/img/upload-image-icon.jpg" alt="">
                 <button class="ml-auto input-file__label btn btn-info" onclick="this.parentNode.click();">Upload Gambar Disini</button>
             </label>
-            <button class="btn btn-info mt-2" style="width:100%;">Tambahkan Produk</button>
+            <button class="btn btn-info mt-2" style="width:100%;" onclick="submitAddProduct()">Tambahkan Produk</button>
         </div>
     </div>
 </div>

@@ -2,6 +2,9 @@ var cityPicker = 1,
   cameraPicker = 1;
 let provinsi;
 let userInfo;
+var deviceBelonging = $("#bigdevicebox");
+let nexusReloadTimer, nitenanReloadTimer, nitenanPhotoTimer;
+let nitenan;
 if (cityPicker) {
   document.addEventListener("click", closeAllSelect);
   fetch("js/json/pulau-jawa.json")
@@ -200,9 +203,78 @@ if (cameraPicker) {
   }
   document.addEventListener("click", closeAllCameraSelect);
 }
-var deviceBelonging = $("#bigdevicebox");
-let nexusReloadTimer, nitenanReloadTimer, nitenanPhotoTimer;
-let nitenan;
+
+function submitAddProduct() {
+  let productData = {
+    namaProduk: $("#js-namaBarang").val(),
+    hargaProduk: isNaN(parseInt($("#js-hargaBarang").val())) == false
+      ? parseInt($("#js-hargaBarang").val())
+      : 0,
+    kamera: $("#js-camera-selector").find(".picker__selector__selected").text(),
+    deskripsiProduk: $("#js-deskripsiBarang").val(),
+    gambar1: $("#js-preview-1").data("b64"),
+    gambar2: $("#js-preview-2").data("b64"),
+    gambar3: $("#js-preview-3").data("b64"),
+    username: userInfo.username,
+  };
+
+  requestAJAX(
+    "GlobalService",
+    {
+      requestType: "submitAddProduct",
+      token: getMeta("token"),
+      productData: productData,
+    },
+    function (response) {
+      response = JSON.parse(response);
+      if (response.status == true) {
+        bootbox.alert({
+          size: "large",
+          title: "Sukses menambahkan produk",
+          message:
+            "Produk anda telah ditambahkan, anda akan dialihkan ke marketplace setelah 3 detik...",
+          closeButton: false,
+          buttons: {
+            ok: {
+              label: "Tutup",
+            },
+          },
+        });
+        setTimeout(() => {
+          bootbox.hideAll();
+          $("#js-marketplace").trigger("click");
+        }, 3000);
+      } else {
+        bootbox.alert({
+          size: "large",
+          title: "Gagal menambahkan produk",
+          message: response.message,
+          closeButton: false,
+          buttons: {
+            ok: {
+              label: "Tutup",
+            },
+          },
+        });
+      }
+    },
+    5000,
+    function (status) {
+      bootbox.alert({
+        size: "large",
+        title: "Gagal menambahkan produk",
+        message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+        closeButton: false,
+        buttons: {
+          ok: {
+            label: "Tutup",
+          },
+        },
+      });
+    }
+  );
+}
+
 $.fn.animateRotate = function (start, end, duration, easing, complete) {
   var args = $.speed(duration, easing, complete);
   var step = args.step;
@@ -714,10 +786,31 @@ function pageChanger() {
           },
           function (response) {
             response = JSON.parse(response);
-            response.forEach(function (element,index) {
-              document.getElementById("js-camera-selector").childNodes[1].innerHTML += `<option value=${index+1}>${element.masterName}</option>`;
-            });
-            buildCameraSelector(document.getElementById("js-camera-selector"));
+            if (response) {
+              response.forEach(function (element, index) {
+                document.getElementById(
+                  "js-camera-selector"
+                ).childNodes[1].innerHTML += `<option value=${index + 1}>${
+                  element.masterName
+                }</option>`;
+              });
+              buildCameraSelector(
+                document.getElementById("js-camera-selector")
+              );
+            } else {
+              // If user had no nitenan device then diplay the alert
+              bootbox.alert({
+                size: "large",
+                title: "Informasi",
+                message: `Sepertinya anda tidak mempunyai kontroller Nitenan yang digunakan sebagai kamera produk, tanpa kamera anda tidak bisa menambahkan produk`,
+                closeButton: false,
+                buttons: {
+                  ok: {
+                    label: "Tutup",
+                  },
+                },
+              });
+            }
           },
           8000,
           function (status) {
@@ -914,6 +1007,7 @@ $(document).ready(function () {
           let div = document.createElement("div");
           output.src = picFile.result;
           output.title = picFile.name;
+          $(output).data("b64", event.target.result);
         });
         //Read the image
         picReader.readAsDataURL(file);

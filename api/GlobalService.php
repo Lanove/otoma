@@ -28,14 +28,140 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                 echo json_encode($dbController->runQuery("SELECT email,phoneNumber,provinsi,kota,nama,photoPath FROM users WHERE username = :username;", ["username" => $json["username"]]));
             } else if ($requestType == "deleteAccount") {
                 deleteAccount($json, $dbController);
-            } else if ($requestType == "getOwnedNitenan"){
+            } else if ($requestType == "getOwnedNitenan") {
                 echo json_encode($dbController->runQuery("SELECT masterName FROM bond WHERE username = :username AND deviceType='nitenan';", ["username" => $json["username"]], "ALL"));
+            } else if ($requestType == "submitAddProduct") {
+                submitAddProduct($json, $dbController);
             }
         }
     }
     $dbController->close();
     $dbController = null;
 } else header('HTTP/1.1 403 Forbidden');
+
+function submitAddProduct($arg, $dbC)
+{
+    $responseBuffer = array();
+    $responseBuffer["message"] = "";
+    $responseBuffer["status"] = true;
+    if (
+        isset($arg["productData"]["namaProduk"]) &&
+        isset($arg["productData"]["hargaProduk"]) &&
+        isset($arg["productData"]["deskripsiProduk"]) &&
+        isset($arg["productData"]["kamera"]) &&
+        isset($arg["productData"]["gambar1"]) &&
+        isset($arg["productData"]["gambar2"]) &&
+        isset($arg["productData"]["gambar3"])
+    ) {
+        $namaProduk = filter_var($arg["productData"]["namaProduk"], FILTER_SANITIZE_STRING);
+        $hargaProduk = intVal(filter_var($arg["productData"]["hargaProduk"], FILTER_SANITIZE_NUMBER_INT));
+        $deskripsiProduk = filter_var($arg["productData"]["deskripsiProduk"], FILTER_SANITIZE_STRING);
+        $kamera = $arg["productData"]["kamera"];
+        if ($kamera == "Pilih Kamera" || empty($kamera)) {
+            $responseBuffer["message"] .= "Tolong pilih kamera untuk menambahkan produk\n";
+            $responseBuffer["status"] = false;
+            echo json_encode($responseBuffer);
+            exit;
+        }
+        if (empty($namaProduk)) {
+            $responseBuffer["message"] .= "Tolong masukkan nama produk\n";
+            $responseBuffer["status"] = false;
+            echo json_encode($responseBuffer);
+            exit;
+        }
+        if (empty($hargaProduk)) {
+            $responseBuffer["message"] .= "Tolong masukkan harga produk\n";
+            $responseBuffer["status"] = false;
+            echo json_encode($responseBuffer);
+            exit;
+        }
+        if (empty($deskripsiProduk)) {
+            $responseBuffer["message"] .= "Tolong masukkan deskripsi produk\n";
+            $responseBuffer["status"] = false;
+            echo json_encode($responseBuffer);
+            exit;
+        }
+        if (empty($arg["productData"]["gambar1"]) || strlen($arg["productData"]["gambar1"])<800) {
+            $responseBuffer["message"] .= "Tidak dapat membaca gambar 1, pastikan gambar sudah terupload dengan benar\n";
+            $responseBuffer["status"] = false;
+            echo json_encode($responseBuffer);
+            exit;
+        }
+        if (empty($arg["productData"]["gambar2"]) || strlen($arg["productData"]["gambar2"])<800) {
+            $responseBuffer["message"] .= "Tidak dapat membaca gambar 2, pastikan gambar sudah terupload dengan benar\n";
+            $responseBuffer["status"] = false;
+            echo json_encode($responseBuffer);
+            exit;
+        }
+        if (empty($arg["productData"]["gambar3"]) || strlen($arg["productData"]["gambar3"])<800) {
+            $responseBuffer["message"] .= "Tidak dapat membaca gambar 3, pastikan gambar sudah terupload dengan benar\n";
+            $responseBuffer["status"] = false;
+            echo json_encode($responseBuffer);
+            exit;
+        }
+        $gambar = array($arg["productData"]["gambar1"],$arg["productData"]["gambar2"],$arg["productData"]["gambar3"]);
+        $fetchResult = $dbC->runQuery("SELECT * FROM bond WHERE username = :username AND masterName=:masterName;", ["masterName" => $kamera, "username" => $arg["username"]]);
+        if ($fetchResult) {
+            $bondKey = $fetchResult["bondKey"];
+            $duplicateCheck = $dbC->runQuery("SELECT * FROM lapak WHERE bondKey=?;", [$bondKey]);
+            if ($duplicateCheck) {
+                $responseBuffer["message"] .= "Anda tidak boleh menambahkan lebih dari 1 produk pada 1 kamera, mohon gunakan kamera lain untuk menambahkan produk baru\n";
+                $responseBuffer["status"] = false;
+                echo json_encode($responseBuffer);
+                exit;
+            }
+            if (strlen($namaProduk) > 100) {
+                $responseBuffer["message"] .= "Nama Produk tidak boleh lebih dari 100 huruf\n";
+                $responseBuffer["status"] = false;
+            }
+            if (strlen($namaProduk) < 5) {
+                $responseBuffer["message"] .= "Nama Produk harus lebih panjang dari 5 huruf\n";
+                $responseBuffer["status"] = false;
+            }
+            if ($hargaProduk < 100) {
+                $responseBuffer["message"] .= "Harga produk tidak boleh kurang dari 100 rupiah\n";
+                $responseBuffer["status"] = false;
+            }
+            if ($hargaProduk > 100000000) {
+                $responseBuffer["message"] .= "Harga produk tidak boleh lebih dari 100 juta rupiah\n";
+                $responseBuffer["status"] = false;
+            }
+            if (strlen($deskripsiProduk) < 30) {
+                $responseBuffer["message"] .= "Deskripsi produk harus lebih panjang dari 30 huruf\n";
+                $responseBuffer["status"] = false;
+            }
+            if (strlen($namaProduk) > 1000) {
+                $responseBuffer["message"] .= "Deskripsi Produk tidak boleh lebih dari 1000 huruf\n";
+                $responseBuffer["status"] = false;
+            }
+            $imagePath = array();
+            if ($responseBuffer["status"] == true) {
+                for ($i = 0; $i < 3; $i++) {
+                    list($type, $gambar[$i]) = explode(';', $gambar[$i]);
+                    list(, $gambar[$i])      = explode(',', $gambar[$i]);
+                    $type = explode("/", $type)[1];
+                    $gambar[$i] = base64_decode($gambar[$i]);
+                    $randomString = bin2hex(random_bytes(5));
+                    $imagePath[$i] = "../img/product-photo/{$randomString}.{$type}";
+                    if (file_put_contents($imagePath[$i], $gambar[$i]) === FALSE) {
+                        $responseBuffer["message"] .= "Terjadi kesalahan saat mengupload gambar {$i}\n";
+                        $responseBuffer["status"] = false;
+                    };
+                }
+            }
+            if ($responseBuffer["status"] === true && $responseBuffer["message"] === "") {
+                $dbC->execute("INSERT INTO lapak(bondkey,namaBarang,hargaBarang,deskripsiBarang,gambar1,gambar2,gambar3) VALUES (?,?,?,?,?,?,?);", [$bondKey, $namaProduk, $hargaProduk, $deskripsiProduk, $imagePath[0], $imagePath[1], $imagePath[2]]);
+            }
+        } else {
+            $responseBuffer["message"] .= "Terjadi kesalahan, kontroller dengan nama {$kamera} tidak ditemukan\n";
+            $responseBuffer["status"] = false;
+        }
+    } else {
+        $responseBuffer["message"] .= "Terjadi kesalahan saat permintaan, mohon coba lagi sesaat kemudian\n";
+        $responseBuffer["status"] = false;
+    }
+    echo json_encode($responseBuffer);
+}
 
 function deleteAccount($arg, $dbC)
 {
@@ -52,7 +178,7 @@ function deleteAccount($arg, $dbC)
 
 function userInfoChange($arg, $dbC)
 {
-    if (isset($arg["email"]) && isset($arg["phoneNumber"]) && isset($arg["b64Image"]) && isset($arg["provinsi"]) && isset($arg["kota"])&& isset($arg["nama"])) {
+    if (isset($arg["email"]) && isset($arg["phoneNumber"]) && isset($arg["b64Image"]) && isset($arg["provinsi"]) && isset($arg["kota"]) && isset($arg["nama"])) {
         $original_email = $arg["email"];
         $original_number = $arg["phoneNumber"];
         $provinsi = $arg["provinsi"];
@@ -82,7 +208,7 @@ function userInfoChange($arg, $dbC)
             ($original_number == $clean_number && filter_var($original_number, FILTER_VALIDATE_INT))
         ) {
             if ($clean_email != $fetchResult["email"] || $clean_email != $fetchResult["phoneNumber"]) {
-                $dbC->execute("UPDATE users SET nama=:nama, email=:email, phoneNumber=:phoneNumber, photoPath=:imagePath, provinsi=:provinsi, kota=:kota WHERE username = :username;", ["nama" => $clean_name,"kota" => $kota, "provinsi" => $provinsi, "imagePath" => $imagePath, "phoneNumber" => $clean_number, "email" => $clean_email, "username" => $arg["username"]]);
+                $dbC->execute("UPDATE users SET nama=:nama, email=:email, phoneNumber=:phoneNumber, photoPath=:imagePath, provinsi=:provinsi, kota=:kota WHERE username = :username;", ["nama" => $clean_name, "kota" => $kota, "provinsi" => $provinsi, "imagePath" => $imagePath, "phoneNumber" => $clean_number, "email" => $clean_email, "username" => $arg["username"]]);
                 echo json_encode(["status" => "success", "message" => "Berhasil mengupdate informasi akun!"]);
             } else
                 echo json_encode(["status" => "failure", "message" => "Email/nomor lama dengan email/nomor baru tidak boleh sama"]);
