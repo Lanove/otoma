@@ -68,8 +68,8 @@
             position: absolute;
         }
 
-        .product__image .carousel-indicators{
-            z-index:1;
+        .product__image .carousel-indicators {
+            z-index: 1;
         }
 
         .penjual-box {
@@ -80,6 +80,7 @@
             border-top: 1px solid #ddffee;
             padding: 15px;
             position: relative;
+            height: 142px;
         }
 
         .penjual-box__photo {
@@ -105,14 +106,14 @@
         }
 
         .penjual-box__contact {
-            position: absolute;
-            right: 160px;
-            top: 95px;
+            position: relative;
+            right: -104px;
+            bottom: 30px;
         }
 
         .penjual-box__username {
             position: relative;
-            top:-20px;
+            top: -20px;
             font-weight: bold;
             left: 20px;
         }
