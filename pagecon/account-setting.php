@@ -1,5 +1,62 @@
 <div class="container-fluid">
     <div class="row">
+
+        <div class="col-sm-6">
+            <div class="row">
+                <div class="col-12">
+                    <div class="setting-box">
+                        <div class="header">
+                            <div class="row">
+                                <div class="col-12">
+                                    <span>Informasi Akun</span>
+                                </div>
+                            </div>
+                            <div class="line"></div>
+                        </div>
+                        <div class="content">
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <span>Nama :</span>
+                                    <input type="text" class="form-control" id="js-nama">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <span>Email :</span>
+                                    <input type="email" class="form-control" id="ACemail">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <span>Kontak :</span>
+                                    <input type="number" class="form-control" id="js-phoneNumber">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <span class="city-picker__label">Provinsi</span>
+                                    <div class="city-picker__selector mb-2" id="js-provinsi-selector" style="width:100%;">
+                                        <select>
+                                            <option value="0">Pilih Provinsi</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <span>Foto Profil :</span>
+                                    <br>
+                                    <input type="file" name="js-pp" id="js-pp" data-b64="">
+                                    <span style="display:block;" id="ACuserNotif"></span>
+                                    <button type="button" class="btn btn-primary  mt-3" id="ACuserSubmit">Update</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="col-sm-6">
             <div class="setting-box">
                 <div class="header">
@@ -33,55 +90,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="col-sm-6">
-            <div class="row">
-                <div class="col-12">
-                    <div class="setting-box">
-                        <div class="header">
-                            <div class="row">
-                                <div class="col-12">
-                                    <span>Informasi Akun</span>
-                                </div>
-                            </div>
-                            <div class="line"></div>
-                        </div>
-                        <div class="content">
-                            <div class="row">
-                                <div class="col-12">
-                                    <span>Email :</span>
-                                    <input type="email" class="form-control" id="ACemail">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12">
-                                    <span>Kontak :</span>
-                                    <input type="number" class="form-control" id="js-phoneNumber">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12">
-                                    <span class="city-picker__label">Provinsi</span>
-                                    <div class="city-picker__selector mb-2" id="js-provinsi-selector" style="width:100%;">
-                                        <select>
-                                            <option value="0">Pilih Provinsi</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12">
-                                    <span>Foto Profil :</span>
-                                    <input type="file" name="js-pp" id="js-pp" data-b64="">
-                                    <span style="display:block;" id="ACuserNotif"></span>
-                                    <button type="button" class="btn btn-primary  mt-3" id="ACuserSubmit">Update</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
             <div class="row">
                 <div class="col-12">
                     <div class="setting-box">

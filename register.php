@@ -90,7 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $param_password = password_hash($password, PASSWORD_DEFAULT); // Creates a password hash
 
                 // Insert into database!
-                $dbHandler->execute("INSERT INTO users(username, password) VALUES (?, ?)", [$param_username, $param_password]);
+                $dbHandler->execute("INSERT INTO users(username, password, nama) VALUES (?, ?, ?)", [$param_username, $param_password, $param_username]);
                 if (!empty($dbHandler->getErrorCode())) {
                     $dbHandler->errorHandler();
                     exit();

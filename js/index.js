@@ -1,5 +1,6 @@
 var cityPicker = 1;
 let provinsi;
+let userInfo;
 if (cityPicker) {
   document.addEventListener("click", closeAllSelect);
   fetch("js/json/pulau-jawa.json")
@@ -287,6 +288,7 @@ $(window).on("resize", function () {
 });
 
 function pageChanger() {
+  reloadUserInfo();
   var id = this.id;
   var helppick = null;
   $(".absolute-overlay").removeClass("loaded");
@@ -301,6 +303,8 @@ function pageChanger() {
     pageCon = "pagecon/help-page.php";
   } else if (id == "js-marketplace") {
     pageCon = "pagecon/marketplace.php";
+  } else if (id == "js-add-product") {
+    pageCon = "pagecon/add-product.php";
   }
   $("#content").load(pageCon, function (responseTxt, statusTxt, xhr) {
     if (statusTxt == "success") {
@@ -375,8 +379,17 @@ function pageChanger() {
             response = JSON.parse(response);
             $("#ACemail").val(response.email);
             $("#js-phoneNumber").val(response.phoneNumber);
-            $("#js-provinsi-selector").find(`.city-picker__selector__items div:contains("${response.provinsi}")`).trigger("click");
-            $("#js-kota-selector").find(`.city-picker__selector__items div:contains("${response.kota}")`).trigger("click");
+            $("#js-nama").val(response.nama);
+            $("#js-provinsi-selector")
+              .find(
+                `.city-picker__selector__items div:contains("${response.provinsi}")`
+              )
+              .trigger("click");
+            $("#js-kota-selector")
+              .find(
+                `.city-picker__selector__items div:contains("${response.kota}")`
+              )
+              .trigger("click");
           },
           8000,
           function (status) {
@@ -520,6 +533,7 @@ function pageChanger() {
               kota: $("#js-kota-selector")
                 .find(".city-picker__selector__selected")
                 .text(),
+              nama: $("#js-nama").val(),
             },
             function (response) {
               const parseJson = JSON.parse(response);
@@ -577,6 +591,59 @@ function pageChanger() {
 
           onLoad: function (accordionButton) {},
         });
+      } else if (id == "js-marketplace") {
+        $(".absolute-overlay").addClass("loaded");
+        requestAJAX(
+          "GlobalService",
+          {
+            requestType: "requestUserInfo",
+            token: getMeta("token"),
+          },
+          function (response) {
+            response = JSON.parse(response);
+            $("#js-userphoto").attr(
+              "src",
+              response.photoPath.replace("../", "")
+            );
+            $("#js-username").text(response.nama);
+          }
+        );
+      } else if (id == "js-add-product") {
+        let buildCameraSelector = function (element) {
+          let x,
+            i,
+            j,
+            l,
+            ll,
+            selElmnt = element.getElementsByTagName("select")[0],
+            a,
+            b,
+            c;
+          ll = selElmnt.length;
+          /*for each element, create a new DIV that will act as the selected item:*/
+          a = document.createElement("DIV");
+          a.setAttribute("class", "picker__selector__selected");
+          a.innerHTML = selElmnt.options[selElmnt.selectedIndex].innerHTML;
+          element.appendChild(a);
+          /*for each element, create a new DIV that will contain the option list:*/
+          b = document.createElement("DIV");
+          b.setAttribute(
+            "class",
+            "picker__selector__items picker__selector--hide"
+          );
+          for (j = 1; j < ll; j++) {
+            /*for each option in the original select element,create a new DIV that will act as an option item:*/
+            c = document.createElement("DIV");
+            c.innerHTML = selElmnt.options[j].innerHTML;
+            c.addEventListener("click", selectItemEvent);
+            b.appendChild(c);
+          }
+          element.appendChild(b);
+          a.addEventListener("click", selectBoxEvent);
+        };
+
+        buildSelector(document.getElementById("js-camera-selector"));
+        $(".absolute-overlay").addClass("loaded");
       }
       if (helppick != null) {
         $().accordiom.openItem("#main-accordion", 2);
@@ -742,9 +809,41 @@ $(document).ready(function () {
   if (!deviceBelonging.length) {
     $(".absolute-overlay").addClass("loaded");
   }
+  $(document).on("change", "#js-file-upload", function (event) {
+    let files = event.target.files; //FileList object
+    if (files.length == 3) {
+      for (let i = 0; i < files.length; i++) {
+        let output = document.getElementById(`js-preview-${i + 1}`);
+        let file = files[i];
+        //Only pics
+        if (!file.type.match("image")) continue;
+        let picReader = new FileReader();
+        picReader.addEventListener("load", function (event) {
+          let picFile = event.target;
+          let div = document.createElement("div");
+          output.src = picFile.result;
+          output.title = picFile.name;
+        });
+        //Read the image
+        picReader.readAsDataURL(file);
+      }
+    } else {
+      bootbox.alert({
+        size: "large",
+        title: "Peringatan",
+        message: `Tolong upload 3 gambar`,
+        closeButton: false,
+        buttons: {
+          ok: {
+            label: "Tutup",
+          },
+        },
+      });
+    }
+  });
   $(document).on(
     "click",
-    "#contactUs, #goHelp, #goAccount, #progHelp, #js-marketplace",
+    "#contactUs, #goHelp, #goAccount, #progHelp, #js-marketplace, #js-add-product",
     pageChanger
   );
   $("#otomaIcon, #goHome").on("click", function () {
@@ -807,7 +906,35 @@ $(document).ready(function () {
       retractSidebar();
     }
   });
+  reloadUserInfo();
 });
+
+function reloadUserInfo(){
+  requestAJAX(
+    "GlobalService",
+    {
+      requestType: "requestUserInfo",
+      token: getMeta("token"),
+    },
+    function (response) {
+      userInfo = JSON.parse(response);
+    },
+    8000,
+    function (status) {
+      bootbox.alert({
+        size: "large",
+        title: "Terjadi kesalahan",
+        message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+        closeButton: false,
+        buttons: {
+          ok: {
+            label: "Tutup",
+          },
+        },
+      });
+    }
+  );
+}
 
 let outputNames = [];
 var nexusChart,

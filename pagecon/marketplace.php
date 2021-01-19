@@ -238,14 +238,14 @@
     <div class="row mt-5 user-box">
         <div class="col-12">
             <div class="row">
-                <img class="user-box__photo ml-auto mr-auto" src="https://i.redd.it/4nj0lojm5no51.jpg" alt="">
+                <img id="js-userphoto" class="user-box__photo ml-auto mr-auto" src="img/image-not-found.jpg" alt="">
 
                 <a href="#0" id="js-marketplace-usersetting">
                     <i class="fas fa-cog user-box__setting-cog"></i>
                 </a>
             </div>
             <div class="row">
-                <span class="user-box__username ml-auto mr-auto">Lanove</span>
+                <span class="user-box__username ml-auto mr-auto" id="js-username"></span>
             </div>
             <div class="row">
                 <div class="col-12">
@@ -412,9 +412,6 @@
                         element.appendChild(b);
                         a.addEventListener("click", selectBoxEvent);
                     }
-
-                    let provinsi;
-                    document.addEventListener("click", closeAllSelect);
                     fetch("js/json/pulau-jawa.json")
                         .then((response) => response.json())
                         .then((json) => {
@@ -491,7 +488,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-12 mt-2" style="border-top:1px solid #ddffee;padding:10px;">
+                        <div id="js-add-product"class="col-12 mt-2" style="border-top:1px solid #ddffee;padding:10px;">
                             <i class="fas fa-plus add-box__plus-icon"></i>
                             <i class="fas fa-box-open add-box__box-icon"></i>
                             <span>Tambahkan Produk</span>

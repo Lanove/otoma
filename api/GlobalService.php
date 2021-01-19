@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
             } else if ($requestType == "userInfoChange") {
                 userInfoChange($json, $dbController);
             } else if ($requestType == "requestUserInfo") {
-                echo json_encode($dbController->runQuery("SELECT email,phoneNumber,provinsi,kota FROM users WHERE username = :username;", ["username" => $json["username"]]));
+                echo json_encode($dbController->runQuery("SELECT email,phoneNumber,provinsi,kota,nama,photoPath FROM users WHERE username = :username;", ["username" => $json["username"]]));
             } else if ($requestType == "deleteAccount") {
                 deleteAccount($json, $dbController);
             }
@@ -50,13 +50,15 @@ function deleteAccount($arg, $dbC)
 
 function userInfoChange($arg, $dbC)
 {
-    if (isset($arg["email"]) && isset($arg["phoneNumber"]) && isset($arg["b64Image"]) && isset($arg["provinsi"]) && isset($arg["kota"])) {
+    if (isset($arg["email"]) && isset($arg["phoneNumber"]) && isset($arg["b64Image"]) && isset($arg["provinsi"]) && isset($arg["kota"])&& isset($arg["nama"])) {
         $original_email = $arg["email"];
         $original_number = $arg["phoneNumber"];
         $provinsi = $arg["provinsi"];
         $kota = $arg["kota"];
         $clean_email = filter_var($original_email, FILTER_SANITIZE_EMAIL);
         $clean_number = filter_var($original_number, FILTER_SANITIZE_NUMBER_INT);
+        $clean_name = filter_var($arg["nama"], FILTER_SANITIZE_STRING);
+
         $fetchResult = $dbC->runQuery("SELECT * FROM users WHERE username = :username;", ["username" => $arg["username"]]);
 
         if ($arg["b64Image"] != "") {
@@ -78,7 +80,7 @@ function userInfoChange($arg, $dbC)
             ($original_number == $clean_number && filter_var($original_number, FILTER_VALIDATE_INT))
         ) {
             if ($clean_email != $fetchResult["email"] || $clean_email != $fetchResult["phoneNumber"]) {
-                $dbC->execute("UPDATE users SET email=:email, phoneNumber=:phoneNumber, photoPath=:imagePath, provinsi=:provinsi, kota=:kota WHERE username = :username;", ["kota" => $kota, "provinsi" => $provinsi, "imagePath" => $imagePath, "phoneNumber" => $clean_number, "email" => $clean_email, "username" => $arg["username"]]);
+                $dbC->execute("UPDATE users SET nama=:nama, email=:email, phoneNumber=:phoneNumber, photoPath=:imagePath, provinsi=:provinsi, kota=:kota WHERE username = :username;", ["nama" => $clean_name,"kota" => $kota, "provinsi" => $provinsi, "imagePath" => $imagePath, "phoneNumber" => $clean_number, "email" => $clean_email, "username" => $arg["username"]]);
                 echo json_encode(["status" => "success", "message" => "Berhasil mengupdate informasi akun!"]);
             } else
                 echo json_encode(["status" => "failure", "message" => "Email/nomor lama dengan email/nomor baru tidak boleh sama"]);
