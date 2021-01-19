@@ -218,7 +218,7 @@
             padding-left: 5px;
             padding-right: 5px;
             padding-bottom: 0px;
-            cursor:pointer;
+            cursor: pointer;
         }
 
         .add-box__plus-icon {
@@ -232,7 +232,7 @@
             font-size: 1.7rem;
             position: relative;
             top: 5px;
-            margin-right:10px;
+            margin-right: 10px;
         }
     </style>
     <div class="row mt-5 user-box">
@@ -287,10 +287,9 @@
                     </div>
                 </div>
                 <script>
-                    let provinsi;
-
                     /*when the select box is clicked, close any other select boxes,
                       and open/close the current select box*/
+
                     function selectBoxEvent(e) {
                         e.stopPropagation();
                         closeAllSelect(this);
@@ -309,7 +308,8 @@
                         // If user changes the provinsi selector item, then...
                         if (selectorId == "js-provinsi-selector" && h.innerHTML != this.innerHTML) {
                             let kotaSelector = document.getElementById("js-kota-selector"),
-                                adakahKotaSelector = (typeof(kotaSelector) != 'undefined' && kotaSelector != null);
+                                adakahKotaSelector =
+                                typeof kotaSelector != "undefined" && kotaSelector != null;
                             // Jika selector kota udah ada kita delete dulu sebelum recreate
                             if (adakahKotaSelector) {
                                 document.getElementById("js-kota-label").remove();
@@ -329,7 +329,8 @@
                             kotaSelector = document.getElementById("js-kota-selector");
                             // Kita edit items dari kotaSelector sesuai provinsi yang terpilih
                             provinsi[this.innerHTML].forEach((element, index) => {
-                                kotaSelector.childNodes[1].innerHTML += `<option value="${index+1}">${element}</option>`;
+                                kotaSelector.childNodes[1].innerHTML += `<option value="${index + 1
+                }">${element}</option>`;
                             });
                             // Setelah itu kita buat selectornya
                             buildSelector(kotaSelector);
@@ -345,10 +346,7 @@
                                 for (k = 0; k < yl; k++) {
                                     y[k].removeAttribute("class");
                                 }
-                                this.setAttribute(
-                                    "class",
-                                    "city-picker__selector--same-as-selected"
-                                );
+                                this.setAttribute("class", "city-picker__selector--same-as-selected");
                                 break;
                             }
                         }
@@ -357,7 +355,7 @@
 
                     function closeAllSelect(elmnt) {
                         /*a function that will close all select boxes in the document,
-                                      except the current select box:*/
+                                                            except the current select box:*/
                         var x,
                             y,
                             i,
@@ -381,7 +379,6 @@
                             }
                         }
                     }
-                    document.addEventListener("click", closeAllSelect);
 
                     function buildSelector(element) {
                         let x,
@@ -401,7 +398,10 @@
                         element.appendChild(a);
                         /*for each element, create a new DIV that will contain the option list:*/
                         b = document.createElement("DIV");
-                        b.setAttribute("class", "city-picker__selector__items city-picker__selector--hide");
+                        b.setAttribute(
+                            "class",
+                            "city-picker__selector__items city-picker__selector--hide"
+                        );
                         for (j = 1; j < ll; j++) {
                             /*for each option in the original select element,create a new DIV that will act as an option item:*/
                             c = document.createElement("DIV");
@@ -413,6 +413,8 @@
                         a.addEventListener("click", selectBoxEvent);
                     }
 
+                    let provinsi;
+                    document.addEventListener("click", closeAllSelect);
                     fetch("js/json/pulau-jawa.json")
                         .then((response) => response.json())
                         .then((json) => {

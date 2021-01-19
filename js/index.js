@@ -1,3 +1,139 @@
+var cityPicker = 1;
+let provinsi;
+if (cityPicker) {
+  document.addEventListener("click", closeAllSelect);
+  fetch("js/json/pulau-jawa.json")
+    .then((response) => response.json())
+    .then((json) => {
+      provinsi = json;
+      let ii, x, l;
+    });
+  /*when the select box is clicked, close any other select boxes,
+                      and open/close the current select box*/
+  function selectBoxEvent(e) {
+    e.stopPropagation();
+    closeAllSelect(this);
+    this.nextSibling.classList.toggle("city-picker__selector--hide");
+    this.classList.toggle("city-picker__selector__arrow--active");
+  }
+
+  /*when an item of selector is clicked, update the original select box, and the selected item*/
+  function selectItemEvent(e) {
+    let y, i, k, s, h, sl, yl, selectorElmt, selectorId;
+    selectorElmt = this.parentNode.parentNode;
+    selectorId = selectorElmt.id;
+    s = this.parentNode.parentNode.getElementsByTagName("select")[0];
+    sl = s.length;
+    h = this.parentNode.previousSibling;
+    // If user changes the provinsi selector item, then...
+    if (selectorId == "js-provinsi-selector" && h.innerHTML != this.innerHTML) {
+      let kotaSelector = document.getElementById("js-kota-selector"),
+        adakahKotaSelector =
+          typeof kotaSelector != "undefined" && kotaSelector != null;
+      // Jika selector kota udah ada kita delete dulu sebelum recreate
+      if (adakahKotaSelector) {
+        document.getElementById("js-kota-label").remove();
+        kotaSelector.remove();
+      }
+      // Buat htmlnya city-picker untuk kota
+      selectorElmt.parentNode.insertAdjacentHTML(
+        "beforeend",
+        `<span class="city-picker__label" id="js-kota-label">Kota/Kabupaten</span>
+                          <div class="city-picker__selector" id="js-kota-selector" style="width:100%;">
+                              <select>
+                              <option value="0">Pilih Kota</option>
+                              </select>
+                          </div>`
+      );
+      // cari elemen dengan id js-kota-selector buat dijadiin kotaSelector
+      kotaSelector = document.getElementById("js-kota-selector");
+      // Kita edit items dari kotaSelector sesuai provinsi yang terpilih
+      provinsi[this.innerHTML].forEach((element, index) => {
+        kotaSelector.childNodes[1].innerHTML += `<option value="${
+          index + 1
+        }">${element}</option>`;
+      });
+      // Setelah itu kita buat selectornya
+      buildSelector(kotaSelector);
+    }
+    for (i = 0; i < sl; i++) {
+      if (s.options[i].innerHTML == this.innerHTML) {
+        s.selectedIndex = i;
+        h.innerHTML = this.innerHTML;
+        y = this.parentNode.getElementsByClassName(
+          "city-picker__selector--same-as-selected"
+        );
+        yl = y.length;
+        for (k = 0; k < yl; k++) {
+          y[k].removeAttribute("class");
+        }
+        this.setAttribute("class", "city-picker__selector--same-as-selected");
+        break;
+      }
+    }
+    h.click();
+  }
+
+  function closeAllSelect(elmnt) {
+    /*a function that will close all select boxes in the document,
+                                      except the current select box:*/
+    var x,
+      y,
+      i,
+      xl,
+      yl,
+      arrNo = [];
+    x = document.getElementsByClassName("city-picker__selector__items");
+    y = document.getElementsByClassName("city-picker__selector__selected");
+    xl = x.length;
+    yl = y.length;
+    for (i = 0; i < yl; i++) {
+      if (elmnt == y[i]) {
+        arrNo.push(i);
+      } else {
+        y[i].classList.remove("city-picker__selector__arrow--active");
+      }
+    }
+    for (i = 0; i < xl; i++) {
+      if (arrNo.indexOf(i)) {
+        x[i].classList.add("city-picker__selector--hide");
+      }
+    }
+  }
+
+  function buildSelector(element) {
+    let x,
+      i,
+      j,
+      l,
+      ll,
+      selElmnt = element.getElementsByTagName("select")[0],
+      a,
+      b,
+      c;
+    ll = selElmnt.length;
+    /*for each element, create a new DIV that will act as the selected item:*/
+    a = document.createElement("DIV");
+    a.setAttribute("class", "city-picker__selector__selected");
+    a.innerHTML = selElmnt.options[selElmnt.selectedIndex].innerHTML;
+    element.appendChild(a);
+    /*for each element, create a new DIV that will contain the option list:*/
+    b = document.createElement("DIV");
+    b.setAttribute(
+      "class",
+      "city-picker__selector__items city-picker__selector--hide"
+    );
+    for (j = 1; j < ll; j++) {
+      /*for each option in the original select element,create a new DIV that will act as an option item:*/
+      c = document.createElement("DIV");
+      c.innerHTML = selElmnt.options[j].innerHTML;
+      c.addEventListener("click", selectItemEvent);
+      b.appendChild(c);
+    }
+    element.appendChild(b);
+    a.addEventListener("click", selectBoxEvent);
+  }
+}
 var deviceBelonging = $("#bigdevicebox");
 let nexusReloadTimer, nitenanReloadTimer, nitenanPhotoTimer;
 let nitenan;
@@ -163,6 +299,8 @@ function pageChanger() {
     helppick = "progHelp";
     id = "goHelp";
     pageCon = "pagecon/help-page.php";
+  } else if (id == "js-marketplace") {
+    pageCon = "pagecon/marketplace.php";
   }
   $("#content").load(pageCon, function (responseTxt, statusTxt, xhr) {
     if (statusTxt == "success") {
@@ -220,14 +358,25 @@ function pageChanger() {
         $("#xeR").popover();
         $(".absolute-overlay").addClass("loaded");
       } else if (id == "goAccount") {
+        let ii = 0;
+        Object.keys(provinsi).forEach(function (key) {
+          document.getElementById(
+            "js-provinsi-selector"
+          ).childNodes[1].innerHTML += `<option value=${++ii}>${key}</option>`;
+        });
+        buildSelector(document.getElementById("js-provinsi-selector"));
         requestAJAX(
           "GlobalService",
           {
-            requestType: "requestEmail",
+            requestType: "requestUserInfo",
             token: getMeta("token"),
           },
           function (response) {
-            $("#ACemail").val(response);
+            response = JSON.parse(response);
+            $("#ACemail").val(response.email);
+            $("#js-phoneNumber").val(response.phoneNumber);
+            $("#js-provinsi-selector").find(`.city-picker__selector__items div:contains("${response.provinsi}")`).trigger("click");
+            $("#js-kota-selector").find(`.city-picker__selector__items div:contains("${response.kota}")`).trigger("click");
           },
           8000,
           function (status) {
@@ -284,7 +433,6 @@ function pageChanger() {
             $("#ACpasswordNotif").text("");
           }, 15000);
         });
-
         $("#ACdelete").click(function () {
           bootbox.prompt({
             message: `Aksi ini tidak dapat dipulihkan. Seluruh informasi yang terhubung dengan akun ini akan terhapus seluruhnya. Mohon masukkan password anda dengan benar apabila anda yakin.`,
@@ -346,23 +494,40 @@ function pageChanger() {
             },
           });
         });
-        $("#ACemailSubmit").click(function () {
-          $("#ACemailNotif").removeClass();
-          $("#ACemailNotif").text("Memproses permintaan anda...");
+        $("#js-pp").on("change", function () {
+          if (this.files && this.files[0]) {
+            var FR = new FileReader();
+            FR.addEventListener("load", function (e) {
+              $("#js-pp").data("b64", e.target.result);
+            });
+            FR.readAsDataURL(this.files[0]);
+          }
+        });
+        $("#ACuserSubmit").click(function () {
+          $("#ACuserNotif").removeClass();
+          $("#ACuserNotif").text("Memproses permintaan anda...");
           requestAJAX(
             "GlobalService",
             {
-              requestType: "emailChange",
+              requestType: "userInfoChange",
               token: getMeta("token"),
               email: $("#ACemail").val(),
+              phoneNumber: $("#js-phoneNumber").val(),
+              b64Image: $("#js-pp").data("b64"),
+              provinsi: $("#js-provinsi-selector")
+                .find(".city-picker__selector__selected")
+                .text(),
+              kota: $("#js-kota-selector")
+                .find(".city-picker__selector__selected")
+                .text(),
             },
             function (response) {
               const parseJson = JSON.parse(response);
               if (parseJson.status == "failure")
-                $("#ACemailNotif").addClass("tfailed");
+                $("#ACuserNotif").addClass("tfailed");
               else if (parseJson.status == "success")
-                $("#ACemailNotif").addClass("tsucceed2");
-              $("#ACemailNotif").text(parseJson.message);
+                $("#ACuserNotif").addClass("tsucceed2");
+              $("#ACuserNotif").html(parseJson.message);
             },
             4000,
             function (status) {
@@ -381,10 +546,9 @@ function pageChanger() {
           );
 
           setTimeout(function () {
-            $("#ACemailNotif").text("");
+            $("#ACuserNotif").text("");
           }, 15000);
         });
-
         $(".absolute-overlay").addClass("loaded");
       } else if (id == "goHelp") {
         $("#main-accordion").accordiom({
@@ -580,7 +744,7 @@ $(document).ready(function () {
   }
   $(document).on(
     "click",
-    "#contactUs, #goHelp, #goAccount, #progHelp",
+    "#contactUs, #goHelp, #goAccount, #progHelp, #js-marketplace",
     pageChanger
   );
   $("#otomaIcon, #goHome").on("click", function () {
@@ -2805,22 +2969,41 @@ function loadNitenanInfo(ajaxBuffer) {
       clearTimeout(nitenanReloadTimer);
       nitenanReloadTimer = setTimeout(function reload() {
         if (getBondKey() != "" && $("#nitenan-dashboard").length) {
-          requestAJAX("NitenanService", {
-            requestType: "updateStatus",
-            bondKey: getBondKey(),
-            token: getMeta("token"),
-            data: {
-              flash: $("#js-brightness")[0].value,
-              servo: $("#js-servo")[0].value,
+          requestAJAX(
+            "NitenanService",
+            {
+              requestType: "updateStatus",
+              bondKey: getBondKey(),
+              token: getMeta("token"),
+              data: {
+                flash: $("#js-brightness")[0].value,
+                servo: $("#js-servo")[0].value,
+              },
             },
-          }, function callback(xhrResponse){
-            let response = JSON.parse(xhrResponse);
-            if($("#js-nitenan-image").attr("data-timestamp") != response["lastPhotoStamp"]){
-              $("#js-nitenan-image").attr("data-timestamp",response["lastPhotoStamp"]);
-              $("#js-nitenan-image").attr("src",`./img/nitenan/${getBondKey()}/1.jpg?${new Date().getTime()}`);
+            function callback(xhrResponse) {
+              let response = JSON.parse(xhrResponse);
+              if (
+                $("#js-nitenan-image").attr("data-timestamp") !=
+                response["lastPhotoStamp"]
+              ) {
+                $("#js-nitenan-image").attr(
+                  "data-timestamp",
+                  response["lastPhotoStamp"]
+                );
+                $("#js-nitenan-image").attr(
+                  "src",
+                  `./img/nitenan/${getBondKey()}/1.jpg?${new Date().getTime()}`
+                );
+              }
+              $("#js-stream")
+                .children("span")
+                .text(
+                  response["streamCommand"] == 0
+                    ? "Mulai Stream"
+                    : "Stop Stream"
+                );
             }
-            $("#js-stream").children("span").text((response["streamCommand"] == 0)?"Mulai Stream":"Stop Stream");
-          });
+          );
         }
         nitenanReloadTimer = setTimeout(reload, 1000);
       }, 500);

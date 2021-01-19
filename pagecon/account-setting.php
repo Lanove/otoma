@@ -42,7 +42,7 @@
                         <div class="header">
                             <div class="row">
                                 <div class="col-12">
-                                    <span>Ganti Email</span>
+                                    <span>Informasi Akun</span>
                                 </div>
                             </div>
                             <div class="line"></div>
@@ -52,8 +52,30 @@
                                 <div class="col-12">
                                     <span>Email :</span>
                                     <input type="email" class="form-control" id="ACemail">
-                                    <span style="display:block;" id="ACemailNotif"></span>
-                                    <button type="button" class="btn btn-primary  mt-3" id="ACemailSubmit">Update</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <span>Kontak :</span>
+                                    <input type="number" class="form-control" id="js-phoneNumber">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <span class="city-picker__label">Provinsi</span>
+                                    <div class="city-picker__selector mb-2" id="js-provinsi-selector" style="width:100%;">
+                                        <select>
+                                            <option value="0">Pilih Provinsi</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <span>Foto Profil :</span>
+                                    <input type="file" name="js-pp" id="js-pp" data-b64="">
+                                    <span style="display:block;" id="ACuserNotif"></span>
+                                    <button type="button" class="btn btn-primary  mt-3" id="ACuserSubmit">Update</button>
                                 </div>
                             </div>
                         </div>

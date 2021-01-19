@@ -1184,9 +1184,9 @@ body {
   height: 130px;
 }
 
-.nitenan-image{
-  margin-top:10px;
-  max-width:100%;
+.nitenan-image {
+  margin-top: 10px;
+  max-width: 100%;
   border-radius: 5px;
 }
 
@@ -1198,12 +1198,12 @@ body {
   -webkit-appearance: none;
   width: 100%;
   height: 15px;
-  border-radius: 5px;  
+  border-radius: 5px;
   background: #50a0a0;
   outline: none;
-  opacity:0.9;
-  -webkit-transition: .2s;
-  transition: opacity .2s;
+  opacity: 0.9;
+  -webkit-transition: 0.2s;
+  transition: opacity 0.2s;
 }
 
 .slider::-webkit-slider-thumb {
@@ -1211,7 +1211,7 @@ body {
   appearance: none;
   width: 25px;
   height: 25px;
-  border-radius: 50%; 
+  border-radius: 50%;
   background: var(--switch-on-color);
   cursor: pointer;
 }
@@ -1234,9 +1234,88 @@ body {
   align-items: center;
 }
 
-.slider-label{
-  color:var(--base-icon-color);
+.slider-label {
+  color: var(--base-icon-color);
   text-align: center;
   line-height: 1.4em;
-  margin-bottom:5px;
+  margin-bottom: 5px;
+}
+
+.city-picker {
+  background-color: white;
+  margin-right: -20px;
+  margin-left: -20px;
+  border-bottom: 1px solid #ddffee;
+  border-top: 1px solid #ddffee;
+  padding: 15px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.city-picker__selector {
+  position: relative;
+}
+
+.city-picker__selector select {
+  display: none;
+  /*hide original SELECT element: */
+}
+
+.city-picker__selector__selected {
+  background-color: #eee;
+}
+
+/* Style the arrow inside the select element: */
+.city-picker__selector__selected:after {
+  position: absolute;
+  content: "";
+  top: 14px;
+  right: 10px;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-color: black transparent transparent transparent;
+}
+
+/* Point the arrow upwards when the select box is open (active): */
+.city-picker__selector__selected.city-picker__selector__arrow--active:after {
+  border-color: transparent transparent black transparent;
+  top: 7px;
+}
+
+/* style the items (options), including the selected item: */
+.city-picker__selector__items div,
+.city-picker__selector__selected {
+  color: black;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+  cursor: pointer;
+}
+
+/* Style items (options): */
+.city-picker__selector__items {
+  position: absolute;
+  background-color: #eee;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+}
+
+/* Hide the items when the select box is closed: */
+.city-picker__selector--hide {
+  display: none;
+}
+
+.city-picker__selector__items div:hover,
+.city-picker__selector--same-as-selected {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.city-picker__label {
+  font-size: 14px;
+  position: relative;
+  top: 3px;
+  color: #e9e9e9;
 }
