@@ -1,4 +1,5 @@
-var cityPicker = 1;
+var cityPicker = 1,
+  cameraPicker = 1;
 let provinsi;
 let userInfo;
 if (cityPicker) {
@@ -134,6 +135,70 @@ if (cityPicker) {
     element.appendChild(b);
     a.addEventListener("click", selectBoxEvent);
   }
+}
+if (cameraPicker) {
+  /*when the select box is clicked, close any other select boxes,
+                and open/close the current select box*/
+  function selectCameraBoxEvent(e) {
+    e.stopPropagation();
+    closeAllCameraSelect(this);
+    this.nextSibling.classList.toggle("picker__selector--hide");
+    this.classList.toggle("picker__selector__arrow--active");
+  }
+
+  /*when an item of selector is clicked, update the original select box, and the selected item*/
+  function selectCameraItemEvent(e) {
+    let y, i, k, s, h, sl, yl, selectorElmt, selectorId;
+    selectorElmt = this.parentNode.parentNode;
+    selectorId = selectorElmt.id;
+    s = this.parentNode.parentNode.getElementsByTagName("select")[0];
+    sl = s.length;
+    h = this.parentNode.previousSibling;
+    for (i = 0; i < sl; i++) {
+      if (s.options[i].innerHTML == this.innerHTML) {
+        s.selectedIndex = i;
+        h.innerHTML = this.innerHTML;
+        y = this.parentNode.getElementsByClassName(
+          "picker__selector--same-as-selected"
+        );
+        yl = y.length;
+        for (k = 0; k < yl; k++) {
+          y[k].removeAttribute("class");
+        }
+        this.setAttribute("class", "picker__selector--same-as-selected");
+        break;
+      }
+    }
+    h.click();
+  }
+
+  function closeAllCameraSelect(elmnt) {
+    /*a function that will close all select boxes in the document,
+                    except the current select box:*/
+    var x,
+      y,
+      i,
+      xl,
+      yl,
+      arrNo = [];
+    x = document.getElementsByClassName("picker__selector__items");
+    y = document.getElementsByClassName("picker__selector__selected");
+    xl = x.length;
+    yl = y.length;
+    for (i = 0; i < yl; i++) {
+      if (elmnt == y[i]) {
+        arrNo.push(i);
+      } else {
+        y[i].classList.remove("picker__selector__arrow--active");
+      }
+    }
+    for (i = 0; i < xl; i++) {
+      if (arrNo.indexOf(i)) {
+        x[i].classList.add("picker__selector--hide");
+      }
+    }
+  }
+  document.addEventListener("click", closeAllCameraSelect);
 }
 var deviceBelonging = $("#bigdevicebox");
 let nexusReloadTimer, nitenanReloadTimer, nitenanPhotoTimer;
@@ -635,14 +700,40 @@ function pageChanger() {
             /*for each option in the original select element,create a new DIV that will act as an option item:*/
             c = document.createElement("DIV");
             c.innerHTML = selElmnt.options[j].innerHTML;
-            c.addEventListener("click", selectItemEvent);
+            c.addEventListener("click", selectCameraItemEvent);
             b.appendChild(c);
           }
           element.appendChild(b);
-          a.addEventListener("click", selectBoxEvent);
+          a.addEventListener("click", selectCameraBoxEvent);
         };
-
-        buildSelector(document.getElementById("js-camera-selector"));
+        requestAJAX(
+          "GlobalService",
+          {
+            requestType: "getOwnedNitenan",
+            token: getMeta("token"),
+          },
+          function (response) {
+            response = JSON.parse(response);
+            response.forEach(function (element,index) {
+              document.getElementById("js-camera-selector").childNodes[1].innerHTML += `<option value=${index+1}>${element.masterName}</option>`;
+            });
+            buildCameraSelector(document.getElementById("js-camera-selector"));
+          },
+          8000,
+          function (status) {
+            bootbox.alert({
+              size: "large",
+              title: "Terjadi kesalahan",
+              message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+              closeButton: false,
+              buttons: {
+                ok: {
+                  label: "Tutup",
+                },
+              },
+            });
+          }
+        );
         $(".absolute-overlay").addClass("loaded");
       }
       if (helppick != null) {
@@ -909,7 +1000,7 @@ $(document).ready(function () {
   reloadUserInfo();
 });
 
-function reloadUserInfo(){
+function reloadUserInfo() {
   requestAJAX(
     "GlobalService",
     {

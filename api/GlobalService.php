@@ -28,6 +28,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                 echo json_encode($dbController->runQuery("SELECT email,phoneNumber,provinsi,kota,nama,photoPath FROM users WHERE username = :username;", ["username" => $json["username"]]));
             } else if ($requestType == "deleteAccount") {
                 deleteAccount($json, $dbController);
+            } else if ($requestType == "getOwnedNitenan"){
+                echo json_encode($dbController->runQuery("SELECT masterName FROM bond WHERE username = :username AND deviceType='nitenan';", ["username" => $json["username"]], "ALL"));
             }
         }
     }
