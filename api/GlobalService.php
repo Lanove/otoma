@@ -32,12 +32,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                 echo json_encode($dbController->runQuery("SELECT masterName FROM bond WHERE username = :username AND deviceType='nitenan';", ["username" => $json["username"]], "ALL"));
             } else if ($requestType == "submitAddProduct") {
                 submitAddProduct($json, $dbController);
+            } else if ($requestType == "getProducts") {
+                getProducts($json, $dbController);
             }
         }
     }
     $dbController->close();
     $dbController = null;
 } else header('HTTP/1.1 403 Forbidden');
+
+function getProducts($arg, $dbC)
+{
+    $responseBuffer = array();
+    $responseBuffer["status"] = false;
+    if (isset($arg["provinsi"]) && isset($arg["kota"])) {
+        $provinsi = $arg["provinsi"];
+        $kota = $arg["kota"];
+        if ($provinsi == "" && $kota == "") // Unfiltered products request
+            $responseBuffer["products"] = $dbC->runQuery("SELECT * FROM lapak;", [], "ALL");
+        else // Filtered products request (with provinsi and kota)
+            $responseBuffer["products"] = $dbC->runQuery("SELECT * FROM lapak WHERE provinsi=? AND kota=?;", [$provinsi, $kota], "ALL");
+        $responseBuffer["myProducts"] = $dbC->runQuery("SELECT * FROM lapak WHERE username=?;", [$arg["username"]], "ALL");
+        $responseBuffer["status"] = true;
+    }
+    echo json_encode($responseBuffer);
+}
 
 function submitAddProduct($arg, $dbC)
 {
@@ -51,8 +70,14 @@ function submitAddProduct($arg, $dbC)
         isset($arg["productData"]["kamera"]) &&
         isset($arg["productData"]["gambar1"]) &&
         isset($arg["productData"]["gambar2"]) &&
-        isset($arg["productData"]["gambar3"])
+        isset($arg["productData"]["gambar3"]) &&
+        isset($arg["productData"]["nama"]) &&
+        isset($arg["productData"]["provinsi"]) &&
+        isset($arg["productData"]["kota"])
     ) {
+        $nama = $arg["productData"]["nama"];
+        $kota = $arg["productData"]["kota"];
+        $provinsi = $arg["productData"]["provinsi"];
         $namaProduk = filter_var($arg["productData"]["namaProduk"], FILTER_SANITIZE_STRING);
         $hargaProduk = intVal(filter_var($arg["productData"]["hargaProduk"], FILTER_SANITIZE_NUMBER_INT));
         $deskripsiProduk = filter_var($arg["productData"]["deskripsiProduk"], FILTER_SANITIZE_STRING);
@@ -81,25 +106,25 @@ function submitAddProduct($arg, $dbC)
             echo json_encode($responseBuffer);
             exit;
         }
-        if (empty($arg["productData"]["gambar1"]) || strlen($arg["productData"]["gambar1"])<800) {
+        if (empty($arg["productData"]["gambar1"]) || strlen($arg["productData"]["gambar1"]) < 800) {
             $responseBuffer["message"] .= "Tidak dapat membaca gambar 1, pastikan gambar sudah terupload dengan benar\n";
             $responseBuffer["status"] = false;
             echo json_encode($responseBuffer);
             exit;
         }
-        if (empty($arg["productData"]["gambar2"]) || strlen($arg["productData"]["gambar2"])<800) {
+        if (empty($arg["productData"]["gambar2"]) || strlen($arg["productData"]["gambar2"]) < 800) {
             $responseBuffer["message"] .= "Tidak dapat membaca gambar 2, pastikan gambar sudah terupload dengan benar\n";
             $responseBuffer["status"] = false;
             echo json_encode($responseBuffer);
             exit;
         }
-        if (empty($arg["productData"]["gambar3"]) || strlen($arg["productData"]["gambar3"])<800) {
+        if (empty($arg["productData"]["gambar3"]) || strlen($arg["productData"]["gambar3"]) < 800) {
             $responseBuffer["message"] .= "Tidak dapat membaca gambar 3, pastikan gambar sudah terupload dengan benar\n";
             $responseBuffer["status"] = false;
             echo json_encode($responseBuffer);
             exit;
         }
-        $gambar = array($arg["productData"]["gambar1"],$arg["productData"]["gambar2"],$arg["productData"]["gambar3"]);
+        $gambar = array($arg["productData"]["gambar1"], $arg["productData"]["gambar2"], $arg["productData"]["gambar3"]);
         $fetchResult = $dbC->runQuery("SELECT * FROM bond WHERE username = :username AND masterName=:masterName;", ["masterName" => $kamera, "username" => $arg["username"]]);
         if ($fetchResult) {
             $bondKey = $fetchResult["bondKey"];
@@ -150,7 +175,7 @@ function submitAddProduct($arg, $dbC)
                 }
             }
             if ($responseBuffer["status"] === true && $responseBuffer["message"] === "") {
-                $dbC->execute("INSERT INTO lapak(bondkey,namaBarang,hargaBarang,deskripsiBarang,gambar1,gambar2,gambar3) VALUES (?,?,?,?,?,?,?);", [$bondKey, $namaProduk, $hargaProduk, $deskripsiProduk, $imagePath[0], $imagePath[1], $imagePath[2]]);
+                $dbC->execute("INSERT INTO lapak(bondkey,namaBarang,hargaBarang,deskripsiBarang,gambar1,gambar2,gambar3,nama,provinsi,kota,username) VALUES (?,?,?,?,?,?,?,?,?,?,?);", [$bondKey, $namaProduk, $hargaProduk, $deskripsiProduk, $imagePath[0], $imagePath[1], $imagePath[2], $nama, $provinsi, $kota, $arg["username"]]);
             }
         } else {
             $responseBuffer["message"] .= "Terjadi kesalahan, kontroller dengan nama {$kamera} tidak ditemukan\n";

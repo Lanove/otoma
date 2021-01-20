@@ -14,6 +14,7 @@
             border-radius: 100%;
             position: relative;
             top: -40px;
+            border: 1px solid #ddd;
         }
 
         .user-box__username {
@@ -205,7 +206,9 @@
             color: #777;
             position: relative;
             top: 24px;
-            right: 65px;
+            right: 72px;
+            width: 70px;
+            text-align: center;
         }
 
         .add-box {
@@ -233,6 +236,31 @@
             position: relative;
             top: 5px;
             margin-right: 10px;
+        }
+
+        .not-found__frown {
+            display: block;
+            font-size: 100px;
+            font-family: "Gill Sans", "Gill Sans MT", "Trebuchet MS", sans-serif;
+            transform: rotate(90deg);
+            text-align: center;
+            position: relative;
+            top: 30px;
+            left: 12px;
+        }
+
+        .not-found__oops {
+            font-size: x-large;
+            display: block;
+            font-weight: bold;
+        }
+
+        .not-found__description {
+            display: block;
+            font-size: 14px;
+            color: #555;
+            position: relative;
+            bottom: 7px;
         }
     </style>
     <div class="row mt-5 user-box">
@@ -431,52 +459,6 @@
                         });
                 </script>
             </div>
-            <div class="row mt-3 product-box" data-product-id="">
-                <div style="padding:0px;">
-                    <img class="product-box__image" src="https://kanaanglobal.net/wp-content/uploads/2019/04/cara-ternak-ayam-potong.jpg" alt="">
-                </div>
-                <div style="padding-left:15px;">
-                    <div class="row product-box__title-label">
-                        <span>Ayam Sehat</span>
-                    </div>
-                    <div class="row product-box__from-label">
-                        <span>Dari Kab. Kediri, Kec. Gurah</span>
-                    </div>
-                    <div class="row product-box__oleh-label">
-                        <span>Oleh Lanove</span>
-                    </div>
-                    <div class="row">
-                        <span class="fa fa-star product-box__star"></span>
-                        <span class="product-box__rating">4.9</span>
-                        <span class="product-box__out-of">/5</span>
-                        <span class="product-box__review-label">89 Ulasan</span>
-                        <div class="product-box__price-box btn btn-info">Rp1.000,00.</div>
-                    </div>
-                </div>
-            </div>
-            <div class="row mt-3 product-box" data-product-id="">
-                <div style="padding:0px;">
-                    <img class="product-box__image" src="https://static.republika.co.id/uploads/images/inpicture_slide/doc-atau-bibit-anak-ayam-ilustrasi-_160126165434-203.JPG" alt="">
-                </div>
-                <div style="padding-left:15px;">
-                    <div class="row product-box__title-label">
-                        <span>Ayam Murah</span>
-                    </div>
-                    <div class="row product-box__from-label">
-                        <span>Dari Kab. Kediri, Kec. Grogol</span>
-                    </div>
-                    <div class="row product-box__oleh-label">
-                        <span>Oleh mbah kung</span>
-                    </div>
-                    <div class="row">
-                        <span class="fa fa-star product-box__star"></span>
-                        <span class="product-box__rating">4.6</span>
-                        <span class="product-box__out-of">/5</span>
-                        <span class="product-box__review-label">27 Ulasan</span>
-                        <div class="product-box__price-box btn btn-info">Rp5.000,00.</div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="tab-pane fade" id="penjual" role="tabpanel" aria-labelledby="contact-tab">
@@ -488,7 +470,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div id="js-add-product"class="col-12 mt-2" style="border-top:1px solid #ddffee;padding:10px;">
+                        <div id="js-add-product" class="col-12 mt-2" style="border-top:1px solid #ddffee;padding:10px;">
                             <i class="fas fa-plus add-box__plus-icon"></i>
                             <i class="fas fa-box-open add-box__box-icon"></i>
                             <span>Tambahkan Produk</span>

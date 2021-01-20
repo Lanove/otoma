@@ -8,10 +8,21 @@
             padding-bottom: 10px;
         }
 
+        .back-icon {
+            position: absolute;
+            font-size: 1.5rem;
+            top: 5px;
+            cursor: pointer;
+        }
+
         .main-box__label {
             display: block;
             font-size: 20px;
             font-weight: bold;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 10px;
         }
 
         .main-box__nama-label {
@@ -157,6 +168,7 @@
     </style>
     <div class="row main-box">
         <div class="col-12">
+            <i class="fas fa-arrow-left back-icon" id="js-marketplace"></i>
             <span class="main-box__label">Tambahkan Produk</span>
             <span class="main-box__nama-label">Nama Produk</span>
             <input class="main-box__input-text" type="text" name="nama" id="js-namaBarang" placeholder="Masukkan nama barang">

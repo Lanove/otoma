@@ -111,17 +111,16 @@ if ($fetchResult) {
     <div id="bondContainer" value=""></div>
     <div id="content">
       <?php
-      require "pagecon/add-product.php";
-      // if ($deviceBelonging) {
-      //   if ($deviceBelongingType == "main")
-      //     require "pagecon/main-device.php";
-      //   else if ($deviceBelongingType == "nexus")
-      //     require "pagecon/nexus-device.php";
-      //   else if ($deviceBelongingType == "nitenan")
-      //     require "pagecon/nitenan-device.php";
-      // } else {
-      //   require "pagecon/no-device-found.php";
-      // }
+      if ($deviceBelonging) {
+        if ($deviceBelongingType == "main")
+          require "pagecon/main-device.php";
+        else if ($deviceBelongingType == "nexus")
+          require "pagecon/nexus-device.php";
+        else if ($deviceBelongingType == "nitenan")
+          require "pagecon/nitenan-device.php";
+      } else {
+        require "pagecon/no-device-found.php";
+      }
       ?>
     </div>
     <div class="container-fluid footer justify-content-center align-items-center">
