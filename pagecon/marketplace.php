@@ -11,8 +11,8 @@
             transition: all 0.3s;
         }
 
-        .delete-icon:hover{
-            transform: scale(1.1,1.1);
+        .delete-icon:hover {
+            transform: scale(1.1, 1.1);
         }
 
         .user-box {
@@ -150,6 +150,7 @@
             padding: 10px;
             height: 122px;
             cursor: pointer;
+            position: relative;
         }
 
         .product-box__image {
@@ -165,45 +166,46 @@
             font-size: 16px;
             font-weight: bold;
             position: absolute;
-            right: 15px;
+            right: 10px;
             width: 150px;
             border-radius: 15px;
             line-height: 30px;
+            bottom: 5px;
         }
 
         .product-box__title-label {
             font-weight: bold;
             font-size: 18px;
-            position: relative;
-            bottom: 7px;
+            position: absolute;
+            top: 5px;
         }
 
         .product-box__from-label {
             font-size: 12px;
             color: #777;
-            position: relative;
-            bottom: 12px;
+            position: absolute;
+            top: 25px;
         }
 
         .product-box__oleh-label {
             font-size: 12px;
             color: #777;
-            position: relative;
-            bottom: 15px;
+            position: absolute;
+            top: 40px;
         }
 
         .product-box__star {
-            position: relative;
-            bottom: 4px;
-            right: 5px;
+            position: absolute;
+            top: 70px;
+            left: 140px;
             font-size: 26px;
             color: orange;
         }
 
         .product-box__rating {
-            position: relative;
-            bottom: 6px;
-            right: 2px;
+            position: absolute;
+            top: 67px;
+            left: 170px;
             font-size: 24px;
             font-weight: bold;
         }
@@ -211,17 +213,17 @@
         .product-box__out-of {
             font-size: 12px;
             color: #777;
-            position: relative;
-            top: 9px;
-            right: 2px;
+            position: absolute;
+            top: 80px;
+            left: 205px;
         }
 
         .product-box__review-label {
             font-size: 12px;
             color: #777;
-            position: relative;
-            top: 24px;
-            right: 72px;
+            position: absolute;
+            top: 95px;
+            left: 145px;
             width: 70px;
             text-align: center;
         }

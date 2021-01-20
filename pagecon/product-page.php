@@ -37,7 +37,7 @@
             display: block;
             font-weight: bold;
             position: absolute;
-            bottom: 24px;
+            top: 265px;
             font-size: 26px;
         }
 
@@ -47,7 +47,7 @@
 
         .product__star {
             position: absolute;
-            bottom: 34px;
+            top: 265px;
             right: 60px;
             font-size: 26px;
             color: orange;
@@ -55,7 +55,7 @@
 
         .product__rating {
             position: absolute;
-            bottom: 26px;
+            top: 265px;
             right: 24px;
             font-size: 24px;
             font-weight: bold;
@@ -65,7 +65,7 @@
             font-size: 12px;
             color: #777;
             position: absolute;
-            bottom: 31px;
+            top: 278px;
             right: 13px;
         }
 
@@ -73,7 +73,7 @@
             font-size: 12px;
             color: #777;
             position: absolute;
-            bottom: 18px;
+            top: 290px;
             right: 13px;
             width: 70px;
             text-align: center;
@@ -116,22 +116,22 @@
         }
 
         .penjual-box__dari {
-            position: relative;
-            right: 41px;
-            top: 1px;
+            position: absolute;
+            left: 120px;
+            top: 70px;
         }
 
         .penjual-box__contact {
-            position: relative;
-            right: -104px;
-            bottom: 30px;
+            position: absolute;
+            left: 120px;
+            top: 90px;
         }
 
         .penjual-box__username {
-            position: relative;
-            top: -20px;
+            position: absolute;
+            top: 50px;
             font-weight: bold;
-            left: 20px;
+            left: 120px;
         }
 
         .description-box,
@@ -209,7 +209,7 @@
                 </a>
             </div>
             <span class="product__price" id="js-price"></span>
-            <span class="product__title" id="js-title"></span>
+            <span class="product__title overflow-auto" id="js-title"></span>
             <span class="fa fa-star product__star"></span>
             <span class="product__rating" id="js-rating"></span>
             <span class="product__out-of">/5</span>
@@ -231,6 +231,8 @@
         <div class="live-image-box__status">ON</div>
         <span class="live-image-box__label">Live Camera</span>
         <span class="live-image-box__timeStamp"></span>
-        <img id="js-live-image" class="ml-auto mr-auto nitenan-image" src="img/image-not-found.jpg" alt="img/image-not-found.jpg" data-timestamp="">
+        <div class="d-inline-flex" style="width:100%;">
+            <img id="js-live-image" class="ml-auto mr-auto nitenan-image" src="img/image-not-found.jpg" alt="img/image-not-found.jpg" data-timestamp="">
+        </div>
     </div>
 </div>
