@@ -12,6 +12,19 @@
             padding-bottom: 5px;
         }
 
+
+        .back-icon {
+            position: absolute;
+            font-size: 1.5rem;
+            top: -5px;
+            left: 10px;
+            cursor: pointer;
+            -webkit-filter: invert(100%);
+            filter: invert(100%);
+            color: #f00;
+            z-index: 2;
+        }
+
         .product__image {
             width: calc(100% + 40px);
             height: 300px;
@@ -91,6 +104,7 @@
             border-radius: 100%;
             position: relative;
             left: 10px;
+            border:1px solid #ddd;
         }
 
         .penjual-box__label {
@@ -145,6 +159,9 @@
     </style>
     <div class="row product">
         <div class="col-12">
+            <div style="background-color:#f00">
+                <i class="fas fa-arrow-left back-icon" id="js-marketplace"></i>
+            </div>
             <div id="productCarousel" class="carousel slide product__image" data-ride="carousel">
                 <ol class="carousel-indicators">
                     <li data-target="#productCarousel" data-slide-to="0" class="active"></li>

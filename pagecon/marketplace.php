@@ -1,5 +1,20 @@
 <div class="container">
     <style>
+        .delete-icon {
+            position: absolute;
+            font-size: 1.5rem;
+            cursor: pointer;
+            -webkit-filter: invert(100%);
+            filter: invert(100%);
+            color: #f00;
+            z-index: 2;
+            transition: all 0.3s;
+        }
+
+        .delete-icon:hover{
+            transform: scale(1.1,1.1);
+        }
+
         .user-box {
             background-color: white;
             height: 130px;
@@ -271,8 +286,9 @@
             padding: 3px;
             cursor: pointer;
             background-color: #eee;
-            z-index:2;
+            z-index: 2;
         }
+
         .city-picker__reset:hover,
         .city-picker__reset:focus {
             background-color: #ddd;

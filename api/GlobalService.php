@@ -36,12 +36,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                 getProducts($json, $dbController);
             } else if ($requestType == "getSpecificProduct") {
                 getSpecificProduct($json, $dbController);
+            } else if ($requestType == "deleteProduct") {
+                deleteProduct($json, $dbController);
             }
         }
     }
     $dbController->close();
     $dbController = null;
 } else header('HTTP/1.1 403 Forbidden');
+
+function deleteProduct($arg, $dbC)
+{
+
+    $responseBuffer = array();
+    $responseBuffer["status"] = false;
+    if (isset($arg["id"])) {
+        $bondKey = $arg["id"];
+        $dbC->execute("DELETE FROM lapak WHERE bondKey=?;", [$bondKey]);
+        // Check if row is deleted
+        if (!$dbC->runQuery("SELECT * FROM lapak WHERE bondKey=?;", [$bondKey]))
+            $responseBuffer["status"] = true;
+    }
+    echo json_encode($responseBuffer);
+}
 
 function getSpecificProduct($arg, $dbC)
 {
@@ -88,7 +105,7 @@ function submitAddProduct($arg, $dbC)
         isset($arg["productData"]["nama"]) &&
         isset($arg["productData"]["provinsi"]) &&
         isset($arg["productData"]["kota"]) &&
-        isset($arg["productData"]["phoneNumber"])&&
+        isset($arg["productData"]["phoneNumber"]) &&
         isset($arg["productData"]["photoPath"])
     ) {
         $nama = $arg["productData"]["nama"];
@@ -193,7 +210,7 @@ function submitAddProduct($arg, $dbC)
                 }
             }
             if ($responseBuffer["status"] === true && $responseBuffer["message"] === "") {
-                $dbC->execute("INSERT INTO lapak(bondkey,namaBarang,hargaBarang,deskripsiBarang,gambar1,gambar2,gambar3,nama,provinsi,kota,username,phoneNumber,photoPath) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);", [$bondKey, $namaProduk, $hargaProduk, $deskripsiProduk, $imagePath[0], $imagePath[1], $imagePath[2], $nama, $provinsi, $kota, $arg["username"], $phoneNumber,$photoPath]);
+                $dbC->execute("INSERT INTO lapak(bondkey,namaBarang,hargaBarang,deskripsiBarang,gambar1,gambar2,gambar3,nama,provinsi,kota,username,phoneNumber,photoPath) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);", [$bondKey, $namaProduk, $hargaProduk, $deskripsiProduk, $imagePath[0], $imagePath[1], $imagePath[2], $nama, $provinsi, $kota, $arg["username"], $phoneNumber, $photoPath]);
             }
         } else {
             $responseBuffer["message"] .= "Terjadi kesalahan, kontroller dengan nama {$kamera} tidak ditemukan\n";

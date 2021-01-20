@@ -328,7 +328,7 @@ function submitAddProduct() {
     kota: userInfo.kota,
     provinsi: userInfo.provinsi,
     phoneNumber: userInfo.phoneNumber,
-    photoPath: userInfo.photoPath
+    photoPath: userInfo.photoPath,
   };
 
   requestAJAX(
@@ -994,6 +994,7 @@ function pageChanger() {
                 response.myProducts.forEach((element, index) => {
                   $("#penjual").append(`
                   <div class="row mt-3 product-box" id="${element.bondKey}">
+                      <i class="fas fa-trash-alt delete-icon"></i>
                       <div style="padding:0px;">
                           <img class="product-box__image" src="${element.gambar1.replace(
                             "../",
@@ -1314,38 +1315,75 @@ $(document).ready(function () {
   if (!deviceBelonging.length) {
     $(".absolute-overlay").addClass("loaded");
   }
-  $(document).on("click", ".product-box", function () {
-    let id = this.id;
-    $(".absolute-overlay").removeClass("loaded");
-    $("#content").html("");
-    $("#content").load(
-      "pagecon/product-page.php",
-      function (responseTxt, statusTxt, xhr) {
-        if (statusTxt == "success") {
-          requestAJAX(
-            "GlobalService",
-            {
-              requestType: "getSpecificProduct",
-              token: getMeta("token"),
-              id: id,
-            },
-            function (response) {
-              response = JSON.parse(response);
-              if (response.status) {
-                $(".absolute-overlay").addClass("loaded");
-                $("#js-gambar-1").attr("src",response.product.gambar1.replace("../",""));
-                $("#js-gambar-2").attr("src",response.product.gambar2.replace("../",""));
-                $("#js-gambar-3").attr("src",response.product.gambar3.replace("../",""));
-                $("#js-price").text(formatRupiah(response.product.hargaBarang));
-                $("#js-title").text(response.product.namaBarang);
-                $("#js-rating").text(parseFloat(response.product.rating).toFixed(1));
-                $("#js-review").text(response.product.review + " Ulasan");
-                $("#js-photo").attr("src",response.product.photoPath.replace("../",""));
-                $("#js-nama").text(response.product.nama);
-                $("#js-from").text(response.product.provinsi +", "+response.product.kota);
-                $("#js-contact").text(response.product.phoneNumber);
-                $("#js-description").html(response.product.deskripsiBarang.replace(/\n/gi, "<br>"));
-              } else
+  $(document).on("click", ".product-box, .delete-icon", function (e) {
+    e.stopPropagation();
+    let id;
+    if ($(this).hasClass("product-box")) {
+      id = this.id;
+      $(".absolute-overlay").removeClass("loaded");
+      $("#content").html("");
+      $("#content").load(
+        "pagecon/product-page.php",
+        function (responseTxt, statusTxt, xhr) {
+          if (statusTxt == "success") {
+            requestAJAX(
+              "GlobalService",
+              {
+                requestType: "getSpecificProduct",
+                token: getMeta("token"),
+                id: id,
+              },
+              function (response) {
+                response = JSON.parse(response);
+                if (response.status) {
+                  $(".absolute-overlay").addClass("loaded");
+                  $("#js-gambar-1").attr(
+                    "src",
+                    response.product.gambar1.replace("../", "")
+                  );
+                  $("#js-gambar-2").attr(
+                    "src",
+                    response.product.gambar2.replace("../", "")
+                  );
+                  $("#js-gambar-3").attr(
+                    "src",
+                    response.product.gambar3.replace("../", "")
+                  );
+                  $("#js-price").text(
+                    formatRupiah(response.product.hargaBarang)
+                  );
+                  $("#js-title").text(response.product.namaBarang);
+                  $("#js-rating").text(
+                    parseFloat(response.product.rating).toFixed(1)
+                  );
+                  $("#js-review").text(response.product.review + " Ulasan");
+                  $("#js-photo").attr(
+                    "src",
+                    response.product.photoPath.replace("../", "")
+                  );
+                  $("#js-nama").text(response.product.nama);
+                  $("#js-from").text(
+                    response.product.provinsi + ", " + response.product.kota
+                  );
+                  $("#js-contact").text(response.product.phoneNumber);
+                  $("#js-description").html(
+                    response.product.deskripsiBarang.replace(/\n/gi, "<br>")
+                  );
+                } else
+                  bootbox.alert({
+                    size: "large",
+                    title: "Gagal memuat halaman produk",
+                    message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+                    closeButton: false,
+                    buttons: {
+                      ok: {
+                        label: "Tutup",
+                      },
+                    },
+                  });
+              },
+              8000,
+              function (status) {
                 bootbox.alert({
                   size: "large",
                   title: "Gagal memuat halaman produk",
@@ -1357,26 +1395,79 @@ $(document).ready(function () {
                     },
                   },
                 });
-            },
-            8000,
-            function (status) {
-              bootbox.alert({
-                size: "large",
-                title: "Gagal memuat halaman produk",
-                message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
-                closeButton: false,
-                buttons: {
-                  ok: {
-                    label: "Tutup",
-                  },
-                },
-              });
-            }
-          );
+              }
+            );
+          }
         }
-      }
-    );
+      );
+    } else {
+      id = $(this).parent().attr("id");
+      bootbox.confirm({
+        title: "Hapus produk?",
+        className: "bootBoxPop",
+        message: `Apakah anda yakin ingin menghapus produk dengan nama <b>${$(
+          this
+        )
+          .parent()
+          .find(".product-box__title-label>span")
+          .text()}</b>?`,
+        buttons: {
+          cancel: {
+            label: '<i class="fa fa-times"></i> Tidak',
+            className: "btn-secondary",
+          },
+          confirm: {
+            label: '<i class="fa fa-check"></i> Ya',
+            className: "btn-danger",
+          },
+        },
+        callback: function (result) {
+          if (result) {
+            requestAJAX(
+              "GlobalService",
+              {
+                requestType: "deleteProduct",
+                id: id,
+                token: getMeta("token"),
+              },
+              function (response) {
+                response = JSON.parse(response);
+                if (response.status) {
+                  $(`div[id=${id}]`).remove();
+                  bootbox.alert({
+                    size: "large",
+                    title: "Hapus produk sukses",
+                    message: `Produk telah terhapus`,
+                    closeButton: false,
+                    buttons: {
+                      ok: {
+                        label: "Tutup",
+                      },
+                    },
+                  });
+                }
+              },
+              5000,
+              function (status) {
+                bootbox.alert({
+                  size: "large",
+                  title: "Terjadi kesalahan",
+                  message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+                  closeButton: false,
+                  buttons: {
+                    ok: {
+                      label: "Tutup",
+                    },
+                  },
+                });
+              }
+            );
+          }
+        },
+      });
+    }
   });
+
   $(document).on("change", "#js-file-upload", function (event) {
     let files = event.target.files; //FileList object
     if (files.length == 3) {
