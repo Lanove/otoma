@@ -230,7 +230,7 @@
     <div class="live-image-box mt-3" id="">
         <div class="live-image-box__status">ON</div>
         <span class="live-image-box__label">Live Camera</span>
-        <span class="live-image-box__timeStamp">Diambil pada : 2021-01-14 18:43:25</span>
+        <span class="live-image-box__timeStamp"></span>
         <img id="js-live-image" class="ml-auto mr-auto nitenan-image" src="img/image-not-found.jpg" alt="img/image-not-found.jpg" data-timestamp="">
     </div>
 </div>

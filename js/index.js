@@ -1377,6 +1377,7 @@ $(document).ready(function () {
                             "src",
                             `./img/nitenan/${$(".live-image-box").attr("id")}/1.jpg?${new Date().getTime()}`
                           );
+                          $(".live-image-box__timeStamp").text(`Diambil pada : ${responsee}`);
                         }
                         if (new Date().getTime() / 1000 - new Date(responsee).getTime() / 1000 >= 300
                         ) {
