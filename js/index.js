@@ -11,7 +11,6 @@ if (cityPicker) {
     .then((response) => response.json())
     .then((json) => {
       provinsi = json;
-      let ii, x, l;
     });
   /*when the select box is clicked, close any other select boxes,
                       and open/close the current select box*/
@@ -60,6 +59,162 @@ if (cityPicker) {
       });
       // Setelah itu kita buat selectornya
       buildSelector(kotaSelector);
+    }
+    if (selectorId == "js-kota-selector" && h.innerHTML != this.innerHTML) {
+      $("#pembeli").children(".product-box, .product-not-found").remove();
+      requestAJAX(
+        "GlobalService",
+        {
+          requestType: "getProducts",
+          token: getMeta("token"),
+          provinsi: $("#js-provinsi-selector")
+          .find(".city-picker__selector__selected")
+          .text(),
+          kota: this.innerHTML,
+        },
+        function (response) {
+          let formatRupiah = function (angka) {
+            var number_string = angka.replace(/[^,\d]/g, "").toString(),
+              split = number_string.split(","),
+              sisa = split[0].length % 3,
+              rupiah = split[0].substr(0, sisa),
+              ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+            // tambahkan titik jika yang di input sudah menjadi angka ribuan
+            if (ribuan) {
+              separator = sisa ? "." : "";
+              rupiah += separator + ribuan.join(".");
+            }
+            rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
+            return "Rp" + rupiah;
+          };
+          response = JSON.parse(response);
+          if (response.status) {
+            //Marketplace public products
+            if (response.products) {
+              response.products.forEach((element, index) => {
+                $("#pembeli").append(`
+                <div class="row mt-3 product-box" id="${element.bondKey}">
+                    <div style="padding:0px;">
+                        <img class="product-box__image" src="${element.gambar1.replace(
+                          "../",
+                          ""
+                        )}" alt="">
+                    </div>
+                    <div style="padding-left:15px;">
+                        <div class="row product-box__title-label">
+                            <span>${element.namaBarang}</span>
+                        </div>
+                        <div class="row product-box__from-label">
+                            <span>${
+                              "Dari " + element.provinsi + ", " + element.kota
+                            }</span>
+                        </div>
+                        <div class="row product-box__oleh-label">
+                            <span>Oleh ${element.nama}</span>
+                        </div>
+                        <div class="row">
+                            <span class="fa fa-star product-box__star"></span>
+                            <span class="product-box__rating">${parseFloat(
+                              element.rating
+                            ).toFixed(1)}</span>
+                            <span class="product-box__out-of">/5</span>
+                            <span class="product-box__review-label">${
+                              element.review
+                            } Ulasan</span>
+                            <div class="product-box__price-box btn btn-info">${formatRupiah(
+                              element.hargaBarang
+                            )}</div>
+                        </div>
+                    </div>
+                </div>`);
+              });
+            } else
+              $("#pembeli").append(`
+              <div class="row mt-3 product-not-found">
+                  <div class="col-12 text-center">
+                      <h3 class="not-found__frown">:(</h3>
+                      <span class="not-found__oops">Oops!</span>
+                      <span class="not-found__description">Sepertinya kami tidak dapat menemukan produk yang anda cari!</span>
+                  </div>
+              </div>`);
+            // User specific owned products
+
+            if (response.myProducts) {
+              response.myProducts.forEach((element, index) => {
+                $("#penjual").append(`
+                <div class="row mt-3 product-box" id="${element.bondKey}">
+                    <div style="padding:0px;">
+                        <img class="product-box__image" src="${element.gambar1.replace(
+                          "../",
+                          ""
+                        )}" alt="">
+                    </div>
+                    <div style="padding-left:15px;">
+                        <div class="row product-box__title-label">
+                            <span>${element.namaBarang}</span>
+                        </div>
+                        <div class="row product-box__from-label">
+                            <span>${
+                              "Dari " + element.provinsi + ", " + element.kota
+                            }</span>
+                        </div>
+                        <div class="row product-box__oleh-label">
+                            <span>Oleh ${element.nama}</span>
+                        </div>
+                        <div class="row">
+                            <span class="fa fa-star product-box__star"></span>
+                            <span class="product-box__rating">${parseFloat(
+                              element.rating
+                            ).toFixed(1)}</span>
+                            <span class="product-box__out-of">/5</span>
+                            <span class="product-box__review-label">${
+                              element.review
+                            } Ulasan</span>
+                            <div class="product-box__price-box btn btn-info">${formatRupiah(
+                              element.hargaBarang
+                            )}</div>
+                        </div>
+                    </div>
+                </div>`);
+              });
+            } else
+              $("#penjual").append(`
+              <div class="row mt-3 product-not-found">
+                  <div class="col-12 text-center">
+                      <h3 class="not-found__frown">:(</h3>
+                      <span class="not-found__oops">Oops!</span>
+                      <span class="not-found__description">Sepertinya anda tidak mempunyai produk yang anda jual!, tambahkan produk sekarang!</span>
+                  </div>
+              </div>`);
+          } else {
+            bootbox.alert({
+              size: "large",
+              title: "Gagal memuat produk-produk marketplace",
+              message: `Terjadi kesalahan saat memuat produk-produk marketplace, mohon coba lagi sesaat kemudian`,
+              closeButton: false,
+              buttons: {
+                ok: {
+                  label: "Tutup",
+                },
+              },
+            });
+          }
+        },
+        8000,
+        function (status) {
+          bootbox.alert({
+            size: "large",
+            title: "Gagal memuat produk-produk marketplace",
+            message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+            closeButton: false,
+            buttons: {
+              ok: {
+                label: "Tutup",
+              },
+            },
+          });
+        }
+      );
     }
     for (i = 0; i < sl; i++) {
       if (s.options[i].innerHTML == this.innerHTML) {
@@ -139,6 +294,7 @@ if (cityPicker) {
     a.addEventListener("click", selectBoxEvent);
   }
 }
+
 if (cameraPicker) {
   /*when the select box is clicked, close any other select boxes,
                 and open/close the current select box*/
@@ -709,6 +865,13 @@ function pageChanger() {
           onLoad: function (accordionButton) {},
         });
       } else if (id == "js-marketplace") {
+        let ii = 0;
+        Object.keys(provinsi).forEach(function (key) {
+          document.getElementById(
+            "js-provinsi-selector"
+          ).childNodes[1].innerHTML += `<option value=${++ii}>${key}</option>`;
+        });
+        buildSelector(document.getElementById("js-provinsi-selector"));
         $(".absolute-overlay").addClass("loaded");
         reloadUserInfo();
         $("#js-userphoto").attr("src", userInfo.photoPath.replace("../", ""));
@@ -780,7 +943,7 @@ function pageChanger() {
                 });
               } else
                 $("#pembeli").append(`
-                <div class="row mt-3">
+                <div class="row mt-3 product-not-found">
                     <div class="col-12 text-center">
                         <h3 class="not-found__frown">:(</h3>
                         <span class="not-found__oops">Oops!</span>
@@ -788,7 +951,7 @@ function pageChanger() {
                     </div>
                 </div>`);
               // User specific owned products
-              
+
               if (response.myProducts) {
                 response.myProducts.forEach((element, index) => {
                   $("#penjual").append(`
@@ -830,7 +993,7 @@ function pageChanger() {
               } else
                 $("#penjual").append(`
                 <div class="row mt-3">
-                    <div class="col-12 text-center">
+                    <div class="col-12 text-center product-not-found">
                         <h3 class="not-found__frown">:(</h3>
                         <span class="not-found__oops">Oops!</span>
                         <span class="not-found__description">Sepertinya anda tidak mempunyai produk yang anda jual!, tambahkan produk sekarang!</span>
