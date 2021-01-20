@@ -262,6 +262,21 @@
             position: relative;
             bottom: 7px;
         }
+
+        .city-picker__reset {
+            position: absolute;
+            right: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 3px;
+            cursor: pointer;
+            background-color: #eee;
+            z-index:2;
+        }
+        .city-picker__reset:hover,
+        .city-picker__reset:focus {
+            background-color: #ddd;
+        }
     </style>
     <div class="row mt-5 user-box">
         <div class="col-12">
@@ -298,6 +313,7 @@
         <div class="tab-pane fade show active" id="pembeli" role="tabpanel" aria-labelledby="contact-tab">
             <div class="row mt-3 city-picker">
                 <div class="col-12">
+                    <div id="js-reset-filter" class="city-picker__reset"><i class="fas fa-filter"></i>Reset Filter</div>
                     <div class="row">
                         <div class="col-12">
                             <span style="font-weight: 550;font-size: 18px;">Dikirim Dari</span>
