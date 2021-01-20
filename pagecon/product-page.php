@@ -104,7 +104,7 @@
             border-radius: 100%;
             position: relative;
             left: 10px;
-            border:1px solid #ddd;
+            border: 1px solid #ddd;
         }
 
         .penjual-box__label {
@@ -134,16 +134,19 @@
             left: 20px;
         }
 
-        .description-box {
+        .description-box,
+        .live-image-box {
             background-color: white;
             margin-right: -20px;
             margin-left: -20px;
             border-bottom: 1px solid #ddffee;
             border-top: 1px solid #ddffee;
             padding: 15px;
+            position: relative;
         }
 
-        .description-box__label {
+        .description-box__label,
+        .live-image-box__label {
             display: block;
             position: relative;
             bottom: 8px;
@@ -155,6 +158,23 @@
             display: block;
             font-size: 15px;
             line-height: 20px;
+        }
+
+        .live-image-box__timeStamp {
+            font-size: 14px;
+            color: #777;
+            position: absolute;
+            top: 35px;
+        }
+
+        .live-image-box__status {
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            padding: 5px;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            background-color: lawngreen;
         }
     </style>
     <div class="row product">
@@ -206,5 +226,11 @@
     <div class="description-box mt-3">
         <span class="description-box__label">Deskripsi Produk</span>
         <span class="description-box__content" id="js-description"></span>
+    </div>
+    <div class="live-image-box mt-3" id="">
+        <div class="live-image-box__status">ON</div>
+        <span class="live-image-box__label">Live Camera</span>
+        <span class="live-image-box__timeStamp">Diambil pada : 2021-01-14 18:43:25</span>
+        <img id="js-live-image" class="ml-auto mr-auto nitenan-image" src="img/image-not-found.jpg" alt="img/image-not-found.jpg" data-timestamp="">
     </div>
 </div>

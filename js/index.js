@@ -68,9 +68,8 @@ if (cityPicker) {
       kotaSelector = document.getElementById("js-kota-selector");
       // Kita edit items dari kotaSelector sesuai provinsi yang terpilih
       provinsi[this.innerHTML].forEach((element, index) => {
-        kotaSelector.childNodes[1].innerHTML += `<option value="${
-          index + 1
-        }">${element}</option>`;
+        kotaSelector.childNodes[1].innerHTML += `<option value="${index + 1
+          }">${element}</option>`;
       });
       // Setelah itu kita buat selectornya
       buildSelector(kotaSelector);
@@ -97,18 +96,17 @@ if (cityPicker) {
                 <div class="row mt-3 product-box" id="${element.bondKey}">
                     <div style="padding:0px;">
                         <img class="product-box__image" src="${element.gambar1.replace(
-                          "../",
-                          ""
-                        )}" alt="">
+                  "../",
+                  ""
+                )}" alt="">
                     </div>
                     <div style="padding-left:15px;">
                         <div class="row product-box__title-label">
                             <span>${element.namaBarang}</span>
                         </div>
                         <div class="row product-box__from-label">
-                            <span>${
-                              "Dari " + element.provinsi + ", " + element.kota
-                            }</span>
+                            <span>${"Dari " + element.provinsi + ", " + element.kota
+                  }</span>
                         </div>
                         <div class="row product-box__oleh-label">
                             <span>Oleh ${element.nama}</span>
@@ -116,15 +114,14 @@ if (cityPicker) {
                         <div class="row">
                             <span class="fa fa-star product-box__star"></span>
                             <span class="product-box__rating">${parseFloat(
-                              element.rating
-                            ).toFixed(1)}</span>
+                    element.rating
+                  ).toFixed(1)}</span>
                             <span class="product-box__out-of">/5</span>
-                            <span class="product-box__review-label">${
-                              element.review
-                            } Ulasan</span>
+                            <span class="product-box__review-label">${element.review
+                  } Ulasan</span>
                             <div class="product-box__price-box btn btn-info">${formatRupiah(
-                              element.hargaBarang
-                            )}</div>
+                    element.hargaBarang
+                  )}</div>
                         </div>
                     </div>
                 </div>`);
@@ -410,9 +407,9 @@ function retractSidebar() {
 function requestAJAX(
   fileName,
   jsonobject,
-  callback = function () {},
+  callback = function () { },
   timeOut = 0,
-  timeOutHandler = function () {}
+  timeOutHandler = function () { }
 ) {
   var json = JSON.stringify(jsonobject);
   $.ajax({
@@ -804,7 +801,7 @@ function pageChanger() {
               .find(".caret")
               .animateRotate(status * 180, status * 180 + 180, 500);
           },
-          afterchange: function () {},
+          afterchange: function () { },
         });
 
         $("#sub-accordion1, #sub-accordion2, #sub-accordion3").accordiom({
@@ -816,7 +813,7 @@ function pageChanger() {
               .animateRotate(status * 180, status * 180 + 180, 500);
           },
 
-          onLoad: function (accordionButton) {},
+          onLoad: function (accordionButton) { },
         });
       } else if (id == "js-marketplace") {
         let ii = 0;
@@ -858,18 +855,17 @@ function pageChanger() {
                 <div class="row mt-3 product-box" id="${element.bondKey}">
                     <div style="padding:0px;">
                         <img class="product-box__image" src="${element.gambar1.replace(
-                          "../",
-                          ""
-                        )}" alt="">
+                      "../",
+                      ""
+                    )}" alt="">
                     </div>
                     <div style="padding-left:15px;">
                         <div class="row product-box__title-label">
                             <span>${element.namaBarang}</span>
                         </div>
                         <div class="row product-box__from-label">
-                            <span>${
-                              "Dari " + element.provinsi + ", " + element.kota
-                            }</span>
+                            <span>${"Dari " + element.provinsi + ", " + element.kota
+                      }</span>
                         </div>
                         <div class="row product-box__oleh-label">
                             <span>Oleh ${element.nama}</span>
@@ -877,15 +873,14 @@ function pageChanger() {
                         <div class="row">
                             <span class="fa fa-star product-box__star"></span>
                             <span class="product-box__rating">${parseFloat(
-                              element.rating
-                            ).toFixed(1)}</span>
+                        element.rating
+                      ).toFixed(1)}</span>
                             <span class="product-box__out-of">/5</span>
-                            <span class="product-box__review-label">${
-                              element.review
-                            } Ulasan</span>
+                            <span class="product-box__review-label">${element.review
+                      } Ulasan</span>
                             <div class="product-box__price-box btn btn-info">${formatRupiah(
-                              element.hargaBarang
-                            )}</div>
+                        element.hargaBarang
+                      )}</div>
                         </div>
                     </div>
                 </div>`);
@@ -947,18 +942,17 @@ function pageChanger() {
                   <div class="row mt-3 product-box" id="${element.bondKey}">
                       <div style="padding:0px;">
                           <img class="product-box__image" src="${element.gambar1.replace(
-                            "../",
-                            ""
-                          )}" alt="">
+                    "../",
+                    ""
+                  )}" alt="">
                       </div>
                       <div style="padding-left:15px;">
                           <div class="row product-box__title-label">
                               <span>${element.namaBarang}</span>
                           </div>
                           <div class="row product-box__from-label">
-                              <span>${
-                                "Dari " + element.provinsi + ", " + element.kota
-                              }</span>
+                              <span>${"Dari " + element.provinsi + ", " + element.kota
+                    }</span>
                           </div>
                           <div class="row product-box__oleh-label">
                               <span>Oleh ${element.nama}</span>
@@ -966,15 +960,14 @@ function pageChanger() {
                           <div class="row">
                               <span class="fa fa-star product-box__star"></span>
                               <span class="product-box__rating">${parseFloat(
-                                element.rating
-                              ).toFixed(1)}</span>
+                      element.rating
+                    ).toFixed(1)}</span>
                               <span class="product-box__out-of">/5</span>
-                              <span class="product-box__review-label">${
-                                element.review
-                              } Ulasan</span>
+                              <span class="product-box__review-label">${element.review
+                    } Ulasan</span>
                               <div class="product-box__price-box btn btn-info">${formatRupiah(
-                                element.hargaBarang
-                              )}</div>
+                      element.hargaBarang
+                    )}</div>
                           </div>
                       </div>
                   </div>`);
@@ -997,18 +990,17 @@ function pageChanger() {
                       <i class="fas fa-trash-alt delete-icon"></i>
                       <div style="padding:0px;">
                           <img class="product-box__image" src="${element.gambar1.replace(
-                            "../",
-                            ""
-                          )}" alt="">
+                    "../",
+                    ""
+                  )}" alt="">
                       </div>
                       <div style="padding-left:15px;">
                           <div class="row product-box__title-label">
                               <span>${element.namaBarang}</span>
                           </div>
                           <div class="row product-box__from-label">
-                              <span>${
-                                "Dari " + element.provinsi + ", " + element.kota
-                              }</span>
+                              <span>${"Dari " + element.provinsi + ", " + element.kota
+                    }</span>
                           </div>
                           <div class="row product-box__oleh-label">
                               <span>Oleh ${element.nama}</span>
@@ -1016,15 +1008,14 @@ function pageChanger() {
                           <div class="row">
                               <span class="fa fa-star product-box__star"></span>
                               <span class="product-box__rating">${parseFloat(
-                                element.rating
-                              ).toFixed(1)}</span>
+                      element.rating
+                    ).toFixed(1)}</span>
                               <span class="product-box__out-of">/5</span>
-                              <span class="product-box__review-label">${
-                                element.review
-                              } Ulasan</span>
+                              <span class="product-box__review-label">${element.review
+                    } Ulasan</span>
                               <div class="product-box__price-box btn btn-info">${formatRupiah(
-                                element.hargaBarang
-                              )}</div>
+                      element.hargaBarang
+                    )}</div>
                           </div>
                       </div>
                   </div>`);
@@ -1112,8 +1103,7 @@ function pageChanger() {
               response.forEach(function (element, index) {
                 document.getElementById(
                   "js-camera-selector"
-                ).childNodes[1].innerHTML += `<option value=${index + 1}>${
-                  element.masterName
+                ).childNodes[1].innerHTML += `<option value=${index + 1}>${element.masterName
                 }</option>`;
               });
               buildCameraSelector(
@@ -1369,6 +1359,50 @@ $(document).ready(function () {
                   $("#js-description").html(
                     response.product.deskripsiBarang.replace(/\n/gi, "<br>")
                   );
+                  $(".live-image-box").attr("id", response.product.bondKey);
+
+                  let cameraFetch = function () {
+                    requestAJAX("NitenanService", {
+                      requestType: "liveCameraRequest",
+                      bondKey: $(".live-image-box").attr("id"),
+                      token: getMeta("token")
+                    },
+                      function (responsee) {
+                        if ($("#js-live-image").attr("data-timestamp") != responsee) {
+                          $("#js-live-image").attr(
+                            "data-timestamp",
+                            responsee
+                          );
+                          $("#js-live-image").attr(
+                            "src",
+                            `./img/nitenan/${$(".live-image-box").attr("id")}/1.jpg?${new Date().getTime()}`
+                          );
+                        }
+                        if (new Date().getTime() / 1000 - new Date(responsee).getTime() / 1000 >= 300
+                        ) {
+                          $(".live-image-box__status").text("OFF");
+                          $(".live-image-box__status").css(
+                            "background-color",
+                            "red"
+                          );
+                        } else {
+                          $(".live-image-box__status").text("ON");
+                          $(".live-image-box__status").css(
+                            "background-color",
+                            "lawngreen"
+                          );
+                        }
+                      },
+                    );
+                  }
+                  cameraFetch();
+                  clearTimeout(nitenanReloadTimer);
+                  nitenanReloadTimer = setTimeout(function reload() {
+                    if ($(".live-image-box").length) {
+                      cameraFetch();
+                    }
+                    nitenanReloadTimer = setTimeout(reload, 3000);
+                  }, 3000);
                 } else
                   bootbox.alert({
                     size: "large",
@@ -1820,8 +1854,8 @@ function redrawChart(plotData) {
     $("#goverlay").addClass("active");
     $("#goverlay p").text(
       "Grafik pada " +
-        convertToDateLong(plotData.plotDate) +
-        " tidak tersedia. Hal ini disebabkan karena kontroller anda tidak online pada tanggal tersebut, pastikan kontroller anda tetap tersambung ke internet agar kontroller dapat mengirim data grafik ke database"
+      convertToDateLong(plotData.plotDate) +
+      " tidak tersedia. Hal ini disebabkan karena kontroller anda tidak online pada tanggal tersebut, pastikan kontroller anda tetap tersambung ke internet agar kontroller dapat mengirim data grafik ke database"
     );
   }
 }
@@ -2904,11 +2938,11 @@ function loadDeviceInformation(master) {
         for (x in parseJson.otherName) {
           $("#deviceheader .dropdown-menu").append(
             `<a href="#" data-device-type="${parseJson.otherName[x]["deviceType"]}"class="dropdown-item ` +
-              "subMasterName" +
-              String(x) +
-              '">' +
-              parseJson.otherName[x]["masterName"] +
-              "</a>"
+            "subMasterName" +
+            String(x) +
+            '">' +
+            parseJson.otherName[x]["masterName"] +
+            "</a>"
           );
 
           $(".subMasterName" + String(x))
@@ -3091,7 +3125,7 @@ function loadDeviceInformation(master) {
       redrawChart(parseJson.plot);
       if (
         new Date().getTime() / 1000 -
-          new Date(parseJson.nexusBond.lastUpdate).getTime() / 1000 >=
+        new Date(parseJson.nexusBond.lastUpdate).getTime() / 1000 >=
         300
       ) {
         parseJson.nexusBond.lastUpdate = parseJson.nexusBond.lastUpdate.split(
@@ -3101,11 +3135,10 @@ function loadDeviceInformation(master) {
           bootbox.alert({
             size: "large",
             title: "Pemberitahuan",
-            message: `Kontroller anda dengan nama <b>${
-              parseJson.deviceInfo.masterName
-            }</b> sudah tidak mengirim respon ke server selama lebih dari 5 menit, <b>pastikan kontroller anda menyambung ke internet</b> agar anda dapat mengkontrol atau mengupdate kontroller.<br>Kontroller anda terakhir online pada<b> ${convertToDateLong(
-              parseJson.nexusBond.lastUpdate[0]
-            )} ${parseJson.nexusBond.lastUpdate[1]}</b>`,
+            message: `Kontroller anda dengan nama <b>${parseJson.deviceInfo.masterName
+              }</b> sudah tidak mengirim respon ke server selama lebih dari 5 menit, <b>pastikan kontroller anda menyambung ke internet</b> agar anda dapat mengkontrol atau mengupdate kontroller.<br>Kontroller anda terakhir online pada<b> ${convertToDateLong(
+                parseJson.nexusBond.lastUpdate[0]
+              )} ${parseJson.nexusBond.lastUpdate[1]}</b>`,
             closeButton: false,
             buttons: {
               ok: {
@@ -3337,7 +3370,7 @@ function nexusSettingLoad() {
               bondKey: getBondKey(),
               token: getMeta("token"),
             },
-            function (response) {},
+            function (response) { },
             5000,
             function (status) {
               bootbox.alert({
@@ -3536,17 +3569,16 @@ function nexusFirstLoad(bondKey = null, devName = null) {
           elem.prop("checked", !check);
           bootbox.alert({
             size: "large",
-            title: `Gagal mengubah kondisi saklar ${
-              (arg.id == arg.id) == "aux1Switch"
-                ? $("#auxname1").text()
-                : arg.id == "aux2Switch"
+            title: `Gagal mengubah kondisi saklar ${(arg.id == arg.id) == "aux1Switch"
+              ? $("#auxname1").text()
+              : arg.id == "aux2Switch"
                 ? $("#auxname2").text()
                 : arg.id == "aux3Switch"
-                ? $("#auxname3").text()
-                : arg.id == "aux4Switch"
-                ? $("#auxname4").text()
-                : ""
-            }`,
+                  ? $("#auxname3").text()
+                  : arg.id == "aux4Switch"
+                    ? $("#auxname4").text()
+                    : ""
+              }`,
             message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
             closeButton: false,
             buttons: {
@@ -3641,11 +3673,11 @@ function loadNitenanInfo(ajaxBuffer) {
         for (x in parseJson.otherName) {
           $("#deviceheader .dropdown-menu").append(
             `<a href="#" data-device-type="${parseJson.otherName[x]["deviceType"]}"class="dropdown-item ` +
-              "subMasterName" +
-              String(x) +
-              '">' +
-              parseJson.otherName[x]["masterName"] +
-              "</a>"
+            "subMasterName" +
+            String(x) +
+            '">' +
+            parseJson.otherName[x]["masterName"] +
+            "</a>"
           );
 
           $(".subMasterName" + String(x))
@@ -3769,10 +3801,7 @@ function loadNitenanInfo(ajaxBuffer) {
             },
             function callback(xhrResponse) {
               let response = JSON.parse(xhrResponse);
-              if (
-                $("#js-nitenan-image").attr("data-timestamp") !=
-                response["lastPhotoStamp"]
-              ) {
+              if ($("#js-nitenan-image").attr("data-timestamp") != response["lastPhotoStamp"]) {
                 $("#js-nitenan-image").attr(
                   "data-timestamp",
                   response["lastPhotoStamp"]
@@ -3792,12 +3821,12 @@ function loadNitenanInfo(ajaxBuffer) {
             }
           );
         }
-        nitenanReloadTimer = setTimeout(reload, 1000);
+        nitenanReloadTimer = setTimeout(reload, 500);
       }, 500);
 
       if (
         new Date().getTime() / 1000 -
-          new Date(parseJson.nitenanBond.lastUpdate).getTime() / 1000 >=
+        new Date(parseJson.nitenanBond.lastUpdate).getTime() / 1000 >=
         300
       ) {
         parseJson.nitenanBond.lastUpdate = parseJson.nitenanBond.lastUpdate.split(
@@ -3807,11 +3836,10 @@ function loadNitenanInfo(ajaxBuffer) {
           bootbox.alert({
             size: "large",
             title: "Pemberitahuan",
-            message: `Kontroller anda dengan nama <b>${
-              parseJson.deviceInfo.masterName
-            }</b> sudah tidak mengirim respon ke server selama lebih dari 5 menit, <b>pastikan kontroller anda menyambung ke internet</b> agar anda dapat mengkontrol atau mengupdate kontroller.<br>Kontroller anda terakhir online pada<b> ${convertToDateLong(
-              parseJson.nitenanBond.lastUpdate[0]
-            )} ${parseJson.nitenanBond.lastUpdate[1]}</b>`,
+            message: `Kontroller anda dengan nama <b>${parseJson.deviceInfo.masterName
+              }</b> sudah tidak mengirim respon ke server selama lebih dari 5 menit, <b>pastikan kontroller anda menyambung ke internet</b> agar anda dapat mengkontrol atau mengupdate kontroller.<br>Kontroller anda terakhir online pada<b> ${convertToDateLong(
+                parseJson.nitenanBond.lastUpdate[0]
+              )} ${parseJson.nitenanBond.lastUpdate[1]}</b>`,
             closeButton: false,
             buttons: {
               ok: {

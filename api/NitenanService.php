@@ -38,6 +38,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                         if (($requestType === "stream")) {
                             streamCommand($json, $dbController);
                         }
+                        if ($requestType === "liveCameraRequest") {
+                            $bondKey = $json["bondKey"];
+                            $dbController->execute("UPDATE nitenanbond SET snapCommand='1' WHERE bondKey = :bondKey;", ["bondKey" => $bondKey]);
+                            print_r($dbController->runQuery("SELECT lastPhotoStamp FROM nitenanbond WHERE bondKey = :bondKey;", ["bondKey" => $bondKey])["lastPhotoStamp"]);
+                        }
                     }
                 }
             }
