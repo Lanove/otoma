@@ -68,8 +68,8 @@ if (cityPicker) {
           requestType: "getProducts",
           token: getMeta("token"),
           provinsi: $("#js-provinsi-selector")
-          .find(".city-picker__selector__selected")
-          .text(),
+            .find(".city-picker__selector__selected")
+            .text(),
           kota: this.innerHTML,
         },
         function (response) {
@@ -135,55 +135,6 @@ if (cityPicker) {
                       <h3 class="not-found__frown">:(</h3>
                       <span class="not-found__oops">Oops!</span>
                       <span class="not-found__description">Sepertinya kami tidak dapat menemukan produk yang anda cari!</span>
-                  </div>
-              </div>`);
-            // User specific owned products
-
-            if (response.myProducts) {
-              response.myProducts.forEach((element, index) => {
-                $("#penjual").append(`
-                <div class="row mt-3 product-box" id="${element.bondKey}">
-                    <div style="padding:0px;">
-                        <img class="product-box__image" src="${element.gambar1.replace(
-                          "../",
-                          ""
-                        )}" alt="">
-                    </div>
-                    <div style="padding-left:15px;">
-                        <div class="row product-box__title-label">
-                            <span>${element.namaBarang}</span>
-                        </div>
-                        <div class="row product-box__from-label">
-                            <span>${
-                              "Dari " + element.provinsi + ", " + element.kota
-                            }</span>
-                        </div>
-                        <div class="row product-box__oleh-label">
-                            <span>Oleh ${element.nama}</span>
-                        </div>
-                        <div class="row">
-                            <span class="fa fa-star product-box__star"></span>
-                            <span class="product-box__rating">${parseFloat(
-                              element.rating
-                            ).toFixed(1)}</span>
-                            <span class="product-box__out-of">/5</span>
-                            <span class="product-box__review-label">${
-                              element.review
-                            } Ulasan</span>
-                            <div class="product-box__price-box btn btn-info">${formatRupiah(
-                              element.hargaBarang
-                            )}</div>
-                        </div>
-                    </div>
-                </div>`);
-              });
-            } else
-              $("#penjual").append(`
-              <div class="row mt-3 product-not-found">
-                  <div class="col-12 text-center">
-                      <h3 class="not-found__frown">:(</h3>
-                      <span class="not-found__oops">Oops!</span>
-                      <span class="not-found__description">Sepertinya anda tidak mempunyai produk yang anda jual!, tambahkan produk sekarang!</span>
                   </div>
               </div>`);
           } else {
