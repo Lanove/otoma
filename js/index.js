@@ -5,6 +5,21 @@ let userInfo;
 var deviceBelonging = $("#bigdevicebox");
 let nexusReloadTimer, nitenanReloadTimer, nitenanPhotoTimer;
 let nitenan;
+
+let formatRupiah = function (angka) {
+  var number_string = angka.replace(/[^,\d]/g, "").toString(),
+    split = number_string.split(","),
+    sisa = split[0].length % 3,
+    rupiah = split[0].substr(0, sisa),
+    ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+  // tambahkan titik jika yang di input sudah menjadi angka ribuan
+  if (ribuan) {
+    separator = sisa ? "." : "";
+    rupiah += separator + ribuan.join(".");
+  }
+  rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
+  return "Rp" + rupiah;
+};
 if (cityPicker) {
   document.addEventListener("click", closeAllSelect);
   fetch("js/json/pulau-jawa.json")
@@ -73,20 +88,6 @@ if (cityPicker) {
           kota: this.innerHTML,
         },
         function (response) {
-          let formatRupiah = function (angka) {
-            var number_string = angka.replace(/[^,\d]/g, "").toString(),
-              split = number_string.split(","),
-              sisa = split[0].length % 3,
-              rupiah = split[0].substr(0, sisa),
-              ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-            // tambahkan titik jika yang di input sudah menjadi angka ribuan
-            if (ribuan) {
-              separator = sisa ? "." : "";
-              rupiah += separator + ribuan.join(".");
-            }
-            rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
-            return "Rp" + rupiah;
-          };
           response = JSON.parse(response);
           if (response.status) {
             //Marketplace public products
@@ -326,6 +327,8 @@ function submitAddProduct() {
     nama: userInfo.nama,
     kota: userInfo.kota,
     provinsi: userInfo.provinsi,
+    phoneNumber: userInfo.phoneNumber,
+    photoPath: userInfo.photoPath
   };
 
   requestAJAX(
@@ -846,21 +849,6 @@ function pageChanger() {
               kota: "",
             },
             function (response) {
-              let formatRupiah = function (angka) {
-                var number_string = angka.replace(/[^,\d]/g, "").toString(),
-                  split = number_string.split(","),
-                  sisa = split[0].length % 3,
-                  rupiah = split[0].substr(0, sisa),
-                  ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-                // tambahkan titik jika yang di input sudah menjadi angka ribuan
-                if (ribuan) {
-                  separator = sisa ? "." : "";
-                  rupiah += separator + ribuan.join(".");
-                }
-                rupiah =
-                  split[1] != undefined ? rupiah + "," + split[1] : rupiah;
-                return "Rp" + rupiah;
-              };
               response = JSON.parse(response);
               if (response.status) {
                 //Marketplace public products
@@ -950,20 +938,6 @@ function pageChanger() {
             kota: "",
           },
           function (response) {
-            let formatRupiah = function (angka) {
-              var number_string = angka.replace(/[^,\d]/g, "").toString(),
-                split = number_string.split(","),
-                sisa = split[0].length % 3,
-                rupiah = split[0].substr(0, sisa),
-                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-              // tambahkan titik jika yang di input sudah menjadi angka ribuan
-              if (ribuan) {
-                separator = sisa ? "." : "";
-                rupiah += separator + ribuan.join(".");
-              }
-              rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
-              return "Rp" + rupiah;
-            };
             response = JSON.parse(response);
             if (response.status) {
               //Marketplace public products
@@ -1341,8 +1315,67 @@ $(document).ready(function () {
     $(".absolute-overlay").addClass("loaded");
   }
   $(document).on("click", ".product-box", function () {
+    let id = this.id;
     $(".absolute-overlay").removeClass("loaded");
     $("#content").html("");
+    $("#content").load(
+      "pagecon/product-page.php",
+      function (responseTxt, statusTxt, xhr) {
+        if (statusTxt == "success") {
+          requestAJAX(
+            "GlobalService",
+            {
+              requestType: "getSpecificProduct",
+              token: getMeta("token"),
+              id: id,
+            },
+            function (response) {
+              response = JSON.parse(response);
+              if (response.status) {
+                $(".absolute-overlay").addClass("loaded");
+                $("#js-gambar-1").attr("src",response.product.gambar1.replace("../",""));
+                $("#js-gambar-2").attr("src",response.product.gambar2.replace("../",""));
+                $("#js-gambar-3").attr("src",response.product.gambar3.replace("../",""));
+                $("#js-price").text(formatRupiah(response.product.hargaBarang));
+                $("#js-title").text(response.product.namaBarang);
+                $("#js-rating").text(parseFloat(response.product.rating).toFixed(1));
+                $("#js-review").text(response.product.review + " Ulasan");
+                $("#js-photo").attr("src",response.product.photoPath.replace("../",""));
+                $("#js-nama").text(response.product.nama);
+                $("#js-from").text(response.product.provinsi +", "+response.product.kota);
+                $("#js-contact").text(response.product.phoneNumber);
+                $("#js-description").html(response.product.deskripsiBarang.replace(/\n/gi, "<br>"));
+              } else
+                bootbox.alert({
+                  size: "large",
+                  title: "Gagal memuat halaman produk",
+                  message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+                  closeButton: false,
+                  buttons: {
+                    ok: {
+                      label: "Tutup",
+                    },
+                  },
+                });
+            },
+            8000,
+            function (status) {
+              bootbox.alert({
+                size: "large",
+                title: "Gagal memuat halaman produk",
+                message: `Sepertinya server terlalu lama merespons, ini dapat disebabkan oleh koneksi yang buruk atau error pada server kami. Mohon coba lagi sesaat kemudian<br>Status Error : ${status}`,
+                closeButton: false,
+                buttons: {
+                  ok: {
+                    label: "Tutup",
+                  },
+                },
+              });
+            }
+          );
+        }
+      }
+    );
   });
   $(document).on("change", "#js-file-upload", function (event) {
     let files = event.target.files; //FileList object

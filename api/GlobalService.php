@@ -34,12 +34,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if Request Method used is P
                 submitAddProduct($json, $dbController);
             } else if ($requestType == "getProducts") {
                 getProducts($json, $dbController);
+            } else if ($requestType == "getSpecificProduct") {
+                getSpecificProduct($json, $dbController);
             }
         }
     }
     $dbController->close();
     $dbController = null;
 } else header('HTTP/1.1 403 Forbidden');
+
+function getSpecificProduct($arg, $dbC)
+{
+    $responseBuffer = array();
+    $responseBuffer["status"] = false;
+    if (isset($arg["id"])) {
+        $bondKey = $arg["id"];
+        $responseBuffer["product"] = $dbC->runQuery("SELECT * FROM lapak WHERE bondKey=?;", [$bondKey]);
+        $responseBuffer["status"] = true;
+    }
+    echo json_encode($responseBuffer);
+}
 
 function getProducts($arg, $dbC)
 {
@@ -73,11 +87,15 @@ function submitAddProduct($arg, $dbC)
         isset($arg["productData"]["gambar3"]) &&
         isset($arg["productData"]["nama"]) &&
         isset($arg["productData"]["provinsi"]) &&
-        isset($arg["productData"]["kota"])
+        isset($arg["productData"]["kota"]) &&
+        isset($arg["productData"]["phoneNumber"])&&
+        isset($arg["productData"]["photoPath"])
     ) {
         $nama = $arg["productData"]["nama"];
         $kota = $arg["productData"]["kota"];
         $provinsi = $arg["productData"]["provinsi"];
+        $phoneNumber = $arg["productData"]["phoneNumber"];
+        $photoPath = $arg["productData"]["photoPath"];
         $namaProduk = filter_var($arg["productData"]["namaProduk"], FILTER_SANITIZE_STRING);
         $hargaProduk = intVal(filter_var($arg["productData"]["hargaProduk"], FILTER_SANITIZE_NUMBER_INT));
         $deskripsiProduk = filter_var($arg["productData"]["deskripsiProduk"], FILTER_SANITIZE_STRING);
@@ -175,7 +193,7 @@ function submitAddProduct($arg, $dbC)
                 }
             }
             if ($responseBuffer["status"] === true && $responseBuffer["message"] === "") {
-                $dbC->execute("INSERT INTO lapak(bondkey,namaBarang,hargaBarang,deskripsiBarang,gambar1,gambar2,gambar3,nama,provinsi,kota,username) VALUES (?,?,?,?,?,?,?,?,?,?,?);", [$bondKey, $namaProduk, $hargaProduk, $deskripsiProduk, $imagePath[0], $imagePath[1], $imagePath[2], $nama, $provinsi, $kota, $arg["username"]]);
+                $dbC->execute("INSERT INTO lapak(bondkey,namaBarang,hargaBarang,deskripsiBarang,gambar1,gambar2,gambar3,nama,provinsi,kota,username,phoneNumber,photoPath) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);", [$bondKey, $namaProduk, $hargaProduk, $deskripsiProduk, $imagePath[0], $imagePath[1], $imagePath[2], $nama, $provinsi, $kota, $arg["username"], $phoneNumber,$photoPath]);
             }
         } else {
             $responseBuffer["message"] .= "Terjadi kesalahan, kontroller dengan nama {$kamera} tidak ditemukan\n";

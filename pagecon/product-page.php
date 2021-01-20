@@ -61,7 +61,9 @@
             color: #777;
             position: absolute;
             bottom: 18px;
-            right: 20px;
+            right: 13px;
+            width: 70px;
+            text-align: center;
         }
 
         .product__review-box {
@@ -151,13 +153,13 @@
                 </ol>
                 <div class="carousel-inner">
                     <div class="carousel-item active">
-                        <img class="product__image" src="https://kanaanglobal.net/wp-content/uploads/2019/04/cara-ternak-ayam-potong.jpg" alt="">
+                        <img class="product__image" src="img/image-not-found.jpg" alt="" id="js-gambar-1">
                     </div>
                     <div class="carousel-item">
-                        <img class="product__image" src="https://www.nusabali.com/article_images/71513/peternakan-ayam-di-bali-terkapar-2020-04-06-141737_0.jpg" alt="">
+                        <img class="product__image" src="img/image-not-found.jpg" alt="" id="js-gambar-2">
                     </div>
                     <div class="carousel-item">
-                        <img class="product__image" src="https://www.batamnews.co.id/foto_berita/78chicken-2692019_960_720.jpg" alt="">
+                        <img class="product__image" src="img/image-not-found.jpg" alt="" id="js-gambar-3">
                     </div>
                 </div>
                 <a class="carousel-control-prev" href="#productCarousel" role="button" data-slide="prev">
@@ -169,36 +171,23 @@
                     <span class="sr-only">Next</span>
                 </a>
             </div>
-            <span class="product__price">Rp1.000</span>
-            <span class="product__title">Ayam Sehat</span>
+            <span class="product__price" id="js-price"></span>
+            <span class="product__title" id="js-title"></span>
             <span class="fa fa-star product__star"></span>
-            <span class="product__rating">4.6</span>
+            <span class="product__rating" id="js-rating"></span>
             <span class="product__out-of">/5</span>
-            <span class="product__review-label">27 Ulasan</span>
+            <span class="product__review-label" id="js-review"></span>
         </div>
     </div>
     <div class="penjual-box mt-3">
         <span class="penjual-box__label">Penjual</span>
-        <img class="penjual-box__photo" src="https://i.redd.it/4nj0lojm5no51.jpg" alt="">
-        <span class="penjual-box__username">Lanove</span>
-        <span class="penjual-box__dari">Kab. Kediri, Kec. Gurah</span>
-        <span class="penjual-box__contact">085843503354</span>
+        <img class="penjual-box__photo" src="img/image-not-found.jpg" alt="" id="js-photo">
+        <span class="penjual-box__username" id="js-nama"></span>
+        <span class="penjual-box__dari" id="js-from"></span>
+        <span class="penjual-box__contact" id="js-contact"></span>
     </div>
     <div class="description-box mt-3">
         <span class="description-box__label">Deskripsi Produk</span>
-        <span class="description-box__content">Lorem ipsum,<br>
-            dolor sit amet consectetur adipisicing elit.
-            Odit fugiat at perferendis saepe,<br>
-            id voluptatum ut nihil mollitia autem consectetur,
-            fugit, esse aliquid porro totam iste atque dolorem
-            repudiandae ipsa architecto a adipisci illum.
-            Voluptatem, asperiores hic voluptatibus tempora voluptates assumenda
-            laudantium laboriosam reiciendis sapiente veritatis,
-            sequi nesciunt cumque excepturi fuga, dicta aliquam.
-            Aliquam pariatur, sequi aspernatur saepe animi,
-            nihil in ratione laudantium molestiae ullam tempora maiores nisi,
-            doloremque quos quisquam totam perferendis est eum itaque consequatur ad.
-            Magnam maxime velit quas cumque consequuntur provident alias eaque,
-            ullam porro, quos facere mollitia amet ex? Quo tenetur sunt earum impedit qui.</span>
+        <span class="description-box__content" id="js-description"></span>
     </div>
 </div>
