@@ -15,6 +15,7 @@ if (isset($_SERVER['HTTP_DEVICE_TOKEN']) && $_SERVER["REQUEST_METHOD"] == "POST"
     */
     // print_r($_SERVER);
     if (isset($json["type"])) {
+        header("Connection: keep-alive");
         $macAddr = $_SERVER['HTTP_ESP8266_MAC'];
         $buildVersion = $_SERVER['HTTP_ESP8266_BUILD_VERSION'];
         $deviceToken = $_SERVER['HTTP_DEVICE_TOKEN'];
