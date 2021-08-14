@@ -167,7 +167,7 @@
             font-weight: bold;
             position: absolute;
             right: 10px;
-            width: 150px;
+            width: 120px;
             border-radius: 15px;
             line-height: 30px;
             bottom: 5px;
@@ -349,6 +349,110 @@
                     </div>
                 </div>
             </div>
+            <div class="row mt-3 product-box" id="f33a56cbca">
+                <div style="padding:0px;">
+                    <img class="product-box__image" src="img/product-photo/download.jpeg" alt="">
+                </div>
+                <div style="padding-left:15px;">
+                    <div class="row product-box__title-label">
+                        <span>Ayam bobot 2 kg</span>
+                    </div>
+                    <div class="row product-box__from-label">
+                        <span>Dari Jawa Timur, Kab. Kediri</span>
+                    </div>
+                    <div class="row product-box__oleh-label">
+                        <span>Oleh pak faigo</span>
+                    </div>
+                    <div class="row">
+                        <svg class="svg-inline--fa fa-star fa-w-18 product-box__star" aria-hidden="true" data-prefix="fa" data-icon="star" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg="">
+                            <path fill="currentColor" d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z"></path>
+                        </svg><!-- <span class="fa fa-star product-box__star"></span> -->
+                        <span class="product-box__rating">4.3</span>
+                        <span class="product-box__out-of">/5</span>
+                        <span class="product-box__review-label">67 Ulasan</span>
+                        <div class="product-box__price-box btn btn-info">Rp48.000</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-3 product-box" id="f33a56cbca">
+                <div style="padding:0px;">
+                    <img class="product-box__image" src="img/product-photo/download 1.jpeg" alt="">
+                </div>
+                <div style="padding-left:15px;">
+                    <div class="row product-box__title-label">
+                        <span>Nomor satu</span>
+                    </div>
+                    <div class="row product-box__from-label">
+                        <span>Dari Jawa Timur, Kab. Kediri</span>
+                    </div>
+                    <div class="row product-box__oleh-label">
+                        <span>Oleh Fifi</span>
+                    </div>
+                    <div class="row">
+                        <svg class="svg-inline--fa fa-star fa-w-18 product-box__star" aria-hidden="true" data-prefix="fa" data-icon="star" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg="">
+                            <path fill="currentColor" d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z"></path>
+                        </svg><!-- <span class="fa fa-star product-box__star"></span> -->
+                        <span class="product-box__rating">3.7</span>
+                        <span class="product-box__out-of">/5</span>
+                        <span class="product-box__review-label">82 Ulasan</span>
+                        <div class="product-box__price-box btn btn-info">Rp30.000</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-3 product-box" id="f33a56cbca">
+                <div style="padding:0px;">
+                    <img class="product-box__image" src="img/product-photo/download 2.jpeg" alt="">
+                </div>
+                <div style="padding-left:15px;">
+                    <div class="row product-box__title-label">
+                        <span>Ternak ayam subor</span>
+                    </div>
+                    <div class="row product-box__from-label">
+                        <span>Dari Jawa Tengah, Kab. Semarang</span>
+                    </div>
+                    <div class="row product-box__oleh-label">
+                        <span>Oleh pak Subur</span>
+                    </div>
+                    <div class="row">
+                        <svg class="svg-inline--fa fa-star fa-w-18 product-box__star" aria-hidden="true" data-prefix="fa" data-icon="star" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg="">
+                            <path fill="currentColor" d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z"></path>
+                        </svg><!-- <span class="fa fa-star product-box__star"></span> -->
+                        <span class="product-box__rating">5.0</span>
+                        <span class="product-box__out-of">/5</span>
+                        <span class="product-box__review-label">116 Ulasan</span>
+                        <div class="product-box__price-box btn btn-info">Rp45.000</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-3 product-box" id="f33a56cbca">
+                <div style="padding:0px;">
+                    <img class="product-box__image" src="img/product-photo/download 4.jpeg" alt="">
+                </div>
+                <div style="padding-left:15px;">
+                    <div class="row product-box__title-label">
+                        <span>Ternak makmur</span>
+                    </div>
+                    <div class="row product-box__from-label">
+                        <span>Dari Jawa Timur, Kota Kediri</span>
+                    </div>
+                    <div class="row product-box__oleh-label">
+                        <span>Oleh Bu Fadil</span>
+                    </div>
+                    <div class="row">
+                        <svg class="svg-inline--fa fa-star fa-w-18 product-box__star" aria-hidden="true" data-prefix="fa" data-icon="star" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg="">
+                            <path fill="currentColor" d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z"></path>
+                        </svg><!-- <span class="fa fa-star product-box__star"></span> -->
+                        <span class="product-box__rating">4.2</span>
+                        <span class="product-box__out-of">/5</span>
+                        <span class="product-box__review-label">54 Ulasan</span>
+                        <div class="product-box__price-box btn btn-info">Rp24.000</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <div class="tab-pane fade" id="penjual" role="tabpanel" aria-labelledby="contact-tab">

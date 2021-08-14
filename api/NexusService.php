@@ -346,6 +346,8 @@ function updateProgram($arg, $dbC) // Be careful, within this function there are
                     $aturKe = (float)$arg["passedData"]["aturKe"];
                     $toleransi = (float)$arg["passedData"]["toleransi"];
                     if(!is_nan($aturKe) && !is_nan($toleransi) && $toleransi >= 0 && $toleransi <= 100.9 && $aturKe >= 0 && $aturKe <= 100.9){
+                        if($toleransi == 0.0) $toleransi = 0.1;
+                        if($aturKe == 0.0) $aturKe = 0.1;
                         $dbC->execute("UPDATE nexusautomation SET exist='1', progData1=:trigger, progData2=:action, progData3=:aturKe, progData4=:toleransi, progData5='', progData6='', progData7='', progData8='' WHERE bondKey = :bondKey AND progNumber = :progNum;", ["trigger" => $trigger, "action" => $action, "toleransi" => $toleransi, "aturKe" => $aturKe, "bondKey" => $bondKey, "progNum" => $progNum]);
                         $doubleCheck = $dbC->runQuery("SELECT * FROM nexusautomation WHERE bondKey = :bondKey AND progNumber = :progNumber;", ["bondKey" => $bondKey, "progNumber" => $progNum]);
                         if (
